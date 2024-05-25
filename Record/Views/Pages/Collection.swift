@@ -12,6 +12,7 @@ struct Collection: View {
     
     @Query var albums: [Album]
     
+    
     var body: some View {
         VStack(alignment: .center) {
             Spacer()
@@ -57,7 +58,8 @@ struct Collection: View {
             }
             .padding(.horizontal, 16.0)
             Spacer()
-            AlbumGridList(albums: [])
+                .frame(height: 16)
+            AlbumGridList(albums: [Image("tpab")])
         }
     }
 }

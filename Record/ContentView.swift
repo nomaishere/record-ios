@@ -9,9 +9,20 @@ import SwiftUI
 import SwiftData
 
 struct ContentView: View {
+    
+    @State var selectedTab: Tab = .Collection
 
     var body: some View {
-        Collection()
+        switch selectedTab {
+        case .Collection:
+            Collection()
+        case .Playlist:
+            Playlist()
+        case .More:
+            More()
+        }
+        Spacer()
+        NavigationBar(selectedTab: $selectedTab)
     }
   
 }

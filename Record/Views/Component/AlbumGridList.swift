@@ -12,14 +12,12 @@ struct AlbumGridList: View {
     var albums: [Image]
     
     var body: some View {
-        ScrollView {
-            LazyVGrid(columns: columns, spacing: 16) {
-                ForEach(albums.indices, id:\.self) {value in
-                    ClickableAlbumCover(cover: albums[value])
-                }
+        LazyVGrid(columns: columns, spacing: 16) {
+            ForEach(albums.indices, id:\.self) {value in
+                ClickableAlbumCover(cover: albums[value])
             }
-            .padding(.horizontal, 16.0)
         }
+        .padding(.horizontal, 16.0)
     }
 }
 
