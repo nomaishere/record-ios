@@ -8,11 +8,17 @@
 import SwiftUI
 
 struct ClickableAlbumCover: View {
+    var cover: Image
+    
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        cover
+            .resizable()
+            .scaledToFit()
+            .clipShape(RoundedRectangle(cornerRadius: 4))
+            .scaledToFit()
     }
 }
 
 #Preview {
-    ClickableAlbumCover()
+    ClickableAlbumCover(cover: Image("tpab"))
 }

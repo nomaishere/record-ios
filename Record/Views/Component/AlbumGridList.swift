@@ -8,11 +8,21 @@
 import SwiftUI
 
 struct AlbumGridList: View {
+    let columns = [GridItem(.flexible(), spacing: 16), GridItem(.flexible(), spacing: 16)]
+    var albums: [Image]
+    
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        ScrollView {
+            LazyVGrid(columns: columns, spacing: 16) {
+                ForEach(albums.indices, id:\.self) {value in
+                    ClickableAlbumCover(cover: albums[value])
+                }
+            }
+            .padding(.horizontal, 16.0)
+        }
     }
 }
 
 #Preview {
-    AlbumGridList()
+    AlbumGridList(albums: [Image("mmtbs"), Image("mb"), Image("tpab"),Image("bomm") ])
 }

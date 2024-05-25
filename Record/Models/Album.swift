@@ -10,12 +10,14 @@ import SwiftData
 
 @Model
 final class Album {
-    var name: String
+    var title: String
     @Relationship var artist: [Artist]
     var releaseDate: Date?
+    @Attribute(.externalStorage) var coverImage: Data
     
-    init(name: String, artist: [Artist]) {
-        self.name = name
+    init(title: String, artist: [Artist], coverImage: Data ) {
+        self.title = title
         self.artist = artist
+        self.coverImage = coverImage
     }
 }
