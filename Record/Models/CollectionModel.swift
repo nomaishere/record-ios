@@ -10,9 +10,9 @@ import SwiftData
 
 @Model
 final class CollectionModel {
-    @Relationship var albums: Album
+    @Relationship var albums: [Album]
     
-    init(albums: Album) {
+    init(albums: [Album]) {
         self.albums = albums
     }
 }
