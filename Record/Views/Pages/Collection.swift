@@ -11,6 +11,7 @@ import SwiftData
 struct Collection: View {
     
     @Query var albums: [Album]
+    @EnvironmentObject var router: Router
     
     
     var body: some View {
@@ -22,7 +23,7 @@ struct Collection: View {
                     .font(Font.custom("ProFont For Powerline", size: 32))
                     .foregroundStyle(Color("DefaultBlack"))
                 Spacer()
-                Button("Add", action: {print("Hello, World!")})
+                Button("Add", action: {router.navigate(to: .addalbum)})
                     .padding(.vertical, 4.0)
                     .padding(.horizontal, 24)
                     .background(Color("DefaultBlack"))
@@ -59,7 +60,7 @@ struct Collection: View {
             .padding(.horizontal, 16.0)
             Spacer()
                 .frame(height: 16)
-            AlbumGridList(albums: [Image("tpab")])
+            AlbumGridList(albums: [])
         }
     }
 }

@@ -10,6 +10,8 @@ import SwiftData
 
 @main
 struct RecordApp: App {
+    @ObservedObject var router = Router()
+    
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
             Album.self, Artist.self
@@ -25,7 +27,18 @@ struct RecordApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            NavigationStack(path: $router.navPath) {
+                    ContentView()
+                    .navigationDestination(for: Router.Destination.self) { destination in
+                        switch destination {
+                        case .home:
+                            ContentView()
+                        case .addalbum:
+                            AddAlbum()
+                        }
+                    }
+            }
+            .environmentObject(router)
         }
         .modelContainer(sharedModelContainer)
     }
