@@ -23,15 +23,7 @@ struct NavigationItem: View {
     
     var body: some View {
         VStack(spacing: 2) {
-            ZStack {
-                icon
-                    .renderingMode(.template)
-                    .resizable()
-                    .scaledToFill()
-                    .foregroundColor(tab == selectedTab ? Color("G6") : Color("G3"))
-                .frame(width: iconWidth, height: 0)
-            }
-            .frame(width: 32, height: 32)
+            RectIconWrapper(icon: icon, color: tab == selectedTab ? Color("G6") : Color("G3"), iconWidth: iconWidth, wrapperWidth: 32, wrapperHeight: 32)
             title
                 .font(Font.custom("Pretendard-Semibold", size: 14))
                 .foregroundStyle(tab == selectedTab ? Color("G6") : Color("G3"))
