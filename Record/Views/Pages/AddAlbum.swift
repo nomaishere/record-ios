@@ -37,6 +37,8 @@ struct EdgeBorder: Shape {
 struct AddAlbum: View {
     
     @EnvironmentObject var router: Router
+    
+    var progressBarWidth = UIScreen.main.bounds.size.width - 48
 
     var body: some View {
         UnevenRoundedRectangle(cornerRadii: .init(
@@ -45,7 +47,7 @@ struct AddAlbum: View {
         .fill(Color("G1"))
         .strokeBorder(Color("G2") , lineWidth: 2, antialiased: true)
         .border(width: 2, edges: [.top], color: Color("G1"))
-        .frame(height: 300, alignment: .top)
+        .frame(height: 400, alignment: .top)
         .overlay(
             VStack {
                 ZStack {
@@ -69,17 +71,25 @@ struct AddAlbum: View {
                         .foregroundStyle(Color("G7"))
                 }
                 .padding(.bottom, 24)
+                
                 HStack {
                     Text("Import")
+                    Spacer()
                     Text("Tracklist")
+                    Spacer()
                     Text("Metadata")
+                    Spacer()
                     Text("Check")
                 }
                 .font(Font.custom("Poppins-Medium", size: 16))
-                .foregroundStyle(Color("G6"))
-                .frame(maxWidth: .infinity)
+                .foregroundStyle(Color("G3"))
+                .padding(.horizontal, 24)
+                Divider()
+                ProgressWithText()
                 
             }
+                .padding(.top, 60)
+        , alignment: .top
         )
         .ignoresSafeArea()
 
@@ -90,6 +100,9 @@ struct AddAlbum: View {
     }
 }
 
+
+
 #Preview {
     AddAlbum()
 }
+
