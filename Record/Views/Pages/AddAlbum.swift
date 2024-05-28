@@ -11,52 +11,73 @@ struct AddAlbum: View {
     
     @EnvironmentObject var router: Router
     
-    var progressBarWidth = UIScreen.main.bounds.size.width - 48
-
     var body: some View {
-        UnevenRoundedRectangle(cornerRadii: .init(
-            topLeading: 0,
-            bottomLeading: 40, bottomTrailing: 40, topTrailing: 0), style: .continuous)
-        .fill(Color("G1"))
-        .strokeBorder(Color("G2") , lineWidth: 2, antialiased: true)
-        .border(width: 2, edges: [.top], color: Color("G1"))
-        .frame(height: 188, alignment: .top)
-        .overlay(
-            VStack(spacing: 0) {
-                ZStack {
-                    HStack {
-                        Button() {
-                            router.navigateBack()
-                        } label: {
-                            
-                            Image("LeftChevron")
-                                .frame(width: 48, height: 48)
-                                .foregroundColor(Color("G6"))
-                                .background(.white)
-                                .clipShape(Circle())
-                                .shadow(color: Color("G2"), radius: 8, y: 2)
+        VStack(spacing: 0) {
+            Color.clear
+                .frame(height: 0)
+                .background(Color("G1").ignoresSafeArea())
+            UnevenRoundedRectangle(cornerRadii: .init(
+                topLeading: 0,
+                bottomLeading: 40, bottomTrailing: 40, topTrailing: 0), style: .continuous)
+            .fill(Color("G1"))
+            .strokeBorder(Color("G2") , lineWidth: 2, antialiased: true)
+            .border(width: 2, edges: [.top], color: Color("G1"))
+            .frame(height: 128, alignment: .top)
+            .overlay(
+                VStack(spacing: 0) {
+                    ZStack {
+                        HStack {
+                            Button() {
+                                router.navigateBack()
+                            } label: {
+                                
+                                Image("LeftChevron")
+                                    .frame(width: 48, height: 48)
+                                    .foregroundColor(Color("G6"))
+                                    .background(.white)
+                                    .clipShape(Circle())
+                                    .shadow(color: Color("G2"), radius: 8, y: 2)
+                            }
+                            Spacer()
                         }
-                        Spacer()
+                        .padding(.horizontal, 16)
+                        Text("Add Album")
+                            .font(Font.custom("Poppins-Medium", size: 20))
+                            .foregroundStyle(Color("G7"))
                     }
-                    .padding(.horizontal, 16)
-                    Text("Add Album")
-                        .font(Font.custom("Poppins-Medium", size: 20))
-                        .foregroundStyle(Color("G7"))
-                }
-                .padding(.bottom, 24)
-                ProgressWithText()
                     .padding(.bottom, 24)
-                
+                    ProgressWithText()
+                        .padding(.bottom, 24)
+                    
+                }
+                , alignment: .top
+            )
+            .navigationBarBackButtonHidden()
+        }
+        
+        
+        
+        ScrollView() {
+            VStack {
+                AddAlbum_Import()
             }
-                .padding(.top, 60)
-        , alignment: .top
-        )
-        .ignoresSafeArea()
+            .frame(maxWidth: .infinity)
+        }
+        .padding(.vertical, -8)
+
 
         
-        Spacer()
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
-            .navigationBarBackButtonHidden()
+        VStack(spacing: 0) {
+            Color("G2")
+                .frame(maxHeight: 2)
+                .padding(.all, 0)
+            HStack(spacing: 15.5) {
+                Text("hi")
+            }
+            .padding(.top, 6)
+        }
+        .frame(maxWidth: .infinity, minHeight: 59, maxHeight: 59, alignment: .top)
+        .background(Color("G1"))
     }
 }
 
