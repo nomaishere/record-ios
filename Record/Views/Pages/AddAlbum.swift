@@ -11,6 +11,9 @@ struct AddAlbum: View {
     
     @EnvironmentObject var router: Router
     
+    @ObservedObject var importManager = ImportManager()
+
+    
     @State var isNextEnabled: Bool = false
     
     var body: some View {
@@ -62,6 +65,7 @@ struct AddAlbum: View {
         ScrollView() {
             VStack {
                 AddAlbum_Import()
+                    .environmentObject(importManager)
             }
             .frame(maxWidth: .infinity)
         }

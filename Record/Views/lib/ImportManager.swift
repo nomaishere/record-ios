@@ -6,3 +6,19 @@
 //
 
 import Foundation
+import SwiftUI
+
+
+final class ImportManager: ObservableObject {
+    
+    public enum importSteps: Codable, Hashable {
+        case IMPORT
+        case TRACKLIST
+        case METADATA
+        case CHECK
+    }
+    
+    @Published var nowStep: importSteps = .IMPORT
+
+    var importedFilesURL: [URL] = []
+}

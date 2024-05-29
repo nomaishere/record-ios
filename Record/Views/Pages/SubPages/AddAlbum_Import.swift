@@ -12,12 +12,39 @@ struct AddAlbum_Import: View {
     @State private var showFileImporter = false
     @State private var isAnyFileSelected = false
     
+    @EnvironmentObject var importManager: ImportManager
+    
     var body: some View {
         Spacer()
             .frame(height: 32)
         VStack(spacing: 12) {
             if isAnyFileSelected {
-                Text("hi")
+                HStack(spacing: 0) {
+                    Text("16 Tracks from ")
+                        .font(Font.custom("Poppins-SemiBold", size: 20))
+                        .foregroundStyle(Color("DefaultBlack"))
+                    Text(" Files")
+                        .font(Font.custom("Poppins-SemiBold", size: 20))
+                        .foregroundStyle(Color(hex: 0x1BA5F8))
+                    Spacer()
+                }
+                .padding(.horizontal, 24)
+                ZStack {
+                    RoundedRectangle(cornerRadius: 4)
+                        .fill(Color("G1"))
+                    
+                    VStack(alignment: .leading, spacing: 12) {
+                        ForEach(importManager.importedFilesURL, id: \.self) { file in
+                            Text(file.lastPathComponent)
+                                .font(Font.custom("Pretendard-SemiBold", size: 18))
+                                .foregroundStyle(Color("G6"))
+                        }
+                    }
+                    .padding(.vertical, 16)
+                    .padding(.horizontal, 16)
+                }
+                .padding(.horizontal, 16)
+                
             } else {
                 HStack {
                     Text("Choose Method")
@@ -52,7 +79,12 @@ struct AddAlbum_Import: View {
                     .fileImporter(isPresented: $showFileImporter, allowedContentTypes: [.mp3, .wav, .aiff, ], allowsMultipleSelection: true) {result in
                         switch result {
                         case .success(let files):
-                            isAnyFileSelected = true
+                            files.forEach { file in
+                                importManager.importedFilesURL.append(file)
+                            }
+                            if (!importManager.importedFilesURL.isEmpty) {
+                                isAnyFileSelected = true
+                            }
                         case .failure(let error):
                             print(error)
                         }
