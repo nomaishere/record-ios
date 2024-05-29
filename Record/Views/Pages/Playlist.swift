@@ -9,7 +9,21 @@ import SwiftUI
 
 struct Playlist: View {
     var body: some View {
-        Text("Playlist")
+        Spacer()
+            .frame(height: 24)
+        HStack(alignment: .center) {
+            Text("PLAYLIST")
+                .font(Font.custom("ProFont For Powerline", size: 32))
+                .foregroundStyle(Color("DefaultBlack"))
+            Spacer()
+            Button("Create", action: {print("create")})
+                .padding(.vertical, 4.0)
+                .padding(.horizontal, 24)
+                .background(Color("DefaultBlack"))
+                .font(Font.custom("Poppins-Medium", size: 20)).foregroundStyle(.white)
+                .clipShape(Capsule())
+        }
+        .padding(.horizontal, 24.0)
     }
 }
 

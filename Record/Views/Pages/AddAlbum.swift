@@ -11,6 +11,8 @@ struct AddAlbum: View {
     
     @EnvironmentObject var router: Router
     
+    @State var isNextEnabled: Bool = false
+    
     var body: some View {
         VStack(spacing: 0) {
             Color.clear
@@ -69,12 +71,26 @@ struct AddAlbum: View {
         
         VStack(spacing: 0) {
             Color("G2")
-                .frame(maxHeight: 2)
+                .frame(height: 2)
                 .padding(.all, 0)
             HStack(spacing: 15.5) {
-                Text("hi")
+                Spacer()
+                Button("Next Step", action: {
+                    if isNextEnabled {
+                        print("hi")
+                    } else {
+                        print("bye")
+                    }
+                })
+                    .padding(.vertical, 8.0)
+                    .padding(.horizontal, 32.0)
+                    .background(isNextEnabled ? Color("DefaultBlack") : Color("G3"))
+                    .font(Font.custom("Poppins-Medium", size: 20))
+                    .foregroundStyle(.white)
+                    .clipShape(Capsule())
             }
-            .padding(.top, 6)
+            .padding(.top, 14)
+            .padding(.horizontal, 16)
         }
         .frame(maxWidth: .infinity, minHeight: 59, maxHeight: 59, alignment: .top)
         .background(Color("G1"))
