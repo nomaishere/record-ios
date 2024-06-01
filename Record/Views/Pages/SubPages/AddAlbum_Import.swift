@@ -29,21 +29,7 @@ struct AddAlbum_Import: View {
                     Spacer()
                 }
                 .padding(.horizontal, 24)
-                ZStack {
-                    RoundedRectangle(cornerRadius: 4)
-                        .fill(Color("G1"))
-                    
-                    VStack(alignment: .leading, spacing: 12) {
-                        ForEach(importManager.importedFilesURL, id: \.self) { file in
-                            Text(file.lastPathComponent)
-                                .font(Font.custom("Pretendard-SemiBold", size: 18))
-                                .foregroundStyle(Color("G6"))
-                        }
-                    }
-                    .padding(.vertical, 16)
-                    .padding(.horizontal, 16)
-                }
-                .padding(.horizontal, 16)
+                FileListView(fileURLs: importManager.importedFilesURL)
                 
             } else {
                 HStack {
@@ -98,6 +84,40 @@ struct AddAlbum_Import: View {
     }
 }
 
+struct FileListView: View {
+    var fileURLs: [URL]
+    
+    var body: some View {
+        ZStack {
+            VStack(alignment: .leading, spacing: 12) {
+                ForEach(fileURLs, id: \.self) { file in
+                    HStack {
+                        Text(file.lastPathComponent)
+                            .font(Font.custom("Pretendard-SemiBold", size: 18))
+                        .foregroundStyle(Color("G6"))
+                        Spacer()
+                    }
+                }
+            }
+            .padding(.vertical, 16)
+            .padding(.horizontal, 16)
+            .background(
+                RoundedRectangle(cornerRadius: 4)
+                    .fill(Color("G1"))
+                    .frame(minHeight: 1)
+            )
+        }
+        .padding(.horizontal, 16)
+    }
+}
+
 #Preview {
     AddAlbum_Import()
+}
+
+
+#Preview("FileList") {
+    let first = URL(string: "hi")!
+    var test: [URL] = [first]
+    return FileListView(fileURLs: [URL(string: "test")!, URL(string: "affaaldkwjkldjlkajwldkjalkwjdlkajkwldjlkajkwjdlkwdad")!])
 }
