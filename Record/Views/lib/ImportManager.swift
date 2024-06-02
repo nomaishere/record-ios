@@ -20,5 +20,5 @@ final class ImportManager: ObservableObject {
     
     @Published var nowStep: importSteps = .IMPORT
 
-    var importedFilesURL: [URL] = []
+    var selectedFilesURL: [URL] = []
 }

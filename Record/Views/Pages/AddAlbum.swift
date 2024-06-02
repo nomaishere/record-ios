@@ -64,8 +64,20 @@ struct AddAlbum: View {
         
         ScrollView() {
             VStack {
-                AddAlbum_Import()
-                    .environmentObject(importManager)
+                Group {
+                    switch importManager.nowStep {
+                    case .IMPORT:
+                        AddAlbum_Import(isNextEnabled: $isNextEnabled)
+                    case .TRACKLIST:
+                        AddAlbum_Tracklist()
+                    case .METADATA:
+                        AddAlbum_Metadata()
+                    case .CHECK:
+                        AddAlbum_Check()
+                    }
+                    
+                }.environmentObject(importManager)
+                
             }
             .frame(maxWidth: .infinity)
         }
@@ -81,7 +93,10 @@ struct AddAlbum: View {
                 Spacer()
                 Button("Next Step", action: {
                     if isNextEnabled {
-                        print("hi")
+                        if(importManager.nowStep == .IMPORT) {
+                            importManager.nowStep = .TRACKLIST
+                        }
+                            
                     } else {
                         print("bye")
                     }

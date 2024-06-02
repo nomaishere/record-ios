@@ -14,6 +14,8 @@ struct AddAlbum_Import: View {
     
     @EnvironmentObject var importManager: ImportManager
     
+    @Binding var isNextEnabled: Bool
+    
     var body: some View {
         Spacer()
             .frame(height: 32)
@@ -29,7 +31,7 @@ struct AddAlbum_Import: View {
                     Spacer()
                 }
                 .padding(.horizontal, 24)
-                FileListView(fileURLs: importManager.importedFilesURL)
+                FileListView(fileURLs: importManager.selectedFilesURL)
                 
             } else {
                 HStack {
@@ -66,10 +68,11 @@ struct AddAlbum_Import: View {
                         switch result {
                         case .success(let files):
                             files.forEach { file in
-                                importManager.importedFilesURL.append(file)
+                                importManager.selectedFilesURL.append(file)
                             }
-                            if (!importManager.importedFilesURL.isEmpty) {
+                            if (!importManager.selectedFilesURL.isEmpty) {
                                 isAnyFileSelected = true
+                                isNextEnabled = true
                             }
                         case .failure(let error):
                             print(error)
@@ -112,7 +115,7 @@ struct FileListView: View {
 }
 
 #Preview {
-    AddAlbum_Import()
+    AddAlbum_Import(isNextEnabled: .constant(false))
 }
 
 
