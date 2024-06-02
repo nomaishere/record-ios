@@ -22,7 +22,7 @@ struct AddAlbum_Import: View {
         VStack(spacing: 12) {
             if isAnyFileSelected {
                 HStack(spacing: 0) {
-                    Text("16 Tracks from ")
+                    Text("\(importManager.selectedFilesURL.count) Tracks from ")
                         .font(Font.custom("Poppins-SemiBold", size: 20))
                         .foregroundStyle(Color("DefaultBlack"))
                     Text(" Files")

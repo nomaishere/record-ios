@@ -61,7 +61,23 @@ struct AddAlbum: View {
         }
         
         
+        Group {
+            switch importManager.nowStep {
+            case .IMPORT:
+                ScrollView() {
+                    AddAlbum_Import(isNextEnabled: $isNextEnabled)
+                }.padding(.vertical, -8)
+            case .TRACKLIST:
+                AddAlbum_Tracklist()
+            case .METADATA:
+                AddAlbum_Metadata()
+            case .CHECK:
+                AddAlbum_Check()
+            }
+            
+        }.environmentObject(importManager)
         
+        /*
         ScrollView() {
             VStack {
                 Group {
@@ -82,6 +98,7 @@ struct AddAlbum: View {
             .frame(maxWidth: .infinity)
         }
         .padding(.vertical, -8)
+         */
 
 
         

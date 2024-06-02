@@ -18,7 +18,8 @@ final class ImportManager: ObservableObject {
         case CHECK
     }
     
-    @Published var nowStep: importSteps = .IMPORT
+    // FOR TEST
+    @Published var nowStep: importSteps = .TRACKLIST
 
     var selectedFilesURL: [URL] = []
 }
