@@ -7,9 +7,9 @@
 
 import SwiftUI
 
-public typealias Reorderable = Identifiable & Equatable
+public typealias Reorderable = Identifiable & Equatable & Hashable
 
-struct GridData: Identifiable, Equatable {
+struct GridData: Identifiable, Equatable, Hashable {
     let id: Int
 }
 
@@ -103,6 +103,7 @@ struct ReorderableDragRelocateDelegate<Item: Reorderable>: DropDelegate {
     var moveAction: (IndexSet, Int) -> Void
     
     func dropEntered(info: DropInfo) {
+        print("entered!")
         guard item != active, let current = active else { return }
         guard let from  = items.firstIndex(of: current) else { return }
         guard let to = items.firstIndex(of: item) else { return }
@@ -153,6 +154,16 @@ public extension View {
 
 // V2
 
+class CustomDragEntryObserver<Item: Reorderable>: Observable {
+    
+    private var targetFrames: [Item: CGRect] = [:]
+    
+    func update(frame: CGRect, for index: Item) {
+        targetFrames[index] = frame
+    }
+}
+
+
 struct AdvancedReorderableForEach<Item: Reorderable, Content: View, Preview: View>: View {
     public init(
         _ items: [Item],
@@ -191,16 +202,36 @@ struct AdvancedReorderableForEach<Item: Reorderable, Content: View, Preview: Vie
     private let content: (Item) -> Content
     private let preview: ((Item) -> Preview)?
     private let moveAction: (IndexSet, Int) -> Void
-    
+
     @Binding private var isScrollDisabled: Bool
+    
+    let customCoordinateSpace = "CoordinateSpace"
+    @State private var targetFrames: [Item: CGRect] = [:]
+    
+    /// set true to lock doonce
+    @State private var doOnceLock: Bool = false
+    @State private var isDraggingNow: Bool = false
+    
+    @State private var tempLocation: Double = 0
     
     var drag: some Gesture {
         DragGesture()
             .onChanged{ gesture in
-                print("\(gesture.location.y)")
+                //print("\(gesture.location.y)")
                 isScrollDisabled = true
+                
+                if(!doOnceLock) {
+                    if(gesture.location.y >= gesture.startLocation.y + 50) {
+                        doOnceLock = true
+                        print("move 1->2")
+                        withAnimation {
+                            moveAction(IndexSet(integer: 4), 0)
+                        }
+                    }
+                }
             }
             .onEnded { gesture in
+                doOnceLock = false
                 print("ended!")
                 isScrollDisabled = false
             }
@@ -208,59 +239,56 @@ struct AdvancedReorderableForEach<Item: Reorderable, Content: View, Preview: Vie
     
     var body: some View {
         ForEach(items) { item in
-            if let preview {
-                HStack {
-                    contentView(for: item)
-                        .contentShape(.dragPreview, Rectangle())
-                        .onDrag {
-                            dragData(for: item)
-                        } preview: {
-                            preview(item)
-                        }
-                    Spacer()
-                    Image("More")
-                        .frame(width: 16, height: 0)
-                        .padding(.trailing, 16)
-                        .gesture(drag)
-                }
-            } else {
-                HStack {
-                    contentView(for: item)
-                        .contentShape(.dragPreview, Rectangle())
-                        .onDrag {
-                            dragData(for: item)
-                        }
-                    Spacer()
-                    Image("More")
-                        .frame(width: 16, height: 0)
-                        .padding(.trailing, 16)
-                        .gesture(drag)
-                }
-                
-            }
+            contentView(for: item)
         }
     }
     
-    private func contentView(for item: Item) -> some View {
-        content(item)
-            .opacity(active == item && hasChangedLocation ? 0.5 : 1)
-            .onDrop(
-                of: [.text],
-                delegate: ReorderableDragRelocateDelegate(
-                    item: item,
-                    items: items,
-                    active: $active,
-                    hasChangedLocation: $hasChangedLocation
-                ) { from, to in
-                    withAnimation {
-                        moveAction(from, to)
-                    }
-                }
-            )
-    }
+    var axisGap:CGFloat = 44 + 18 // Height of item + Height of padding
     
-    private func dragData(for item: Item) -> NSItemProvider {
-        active = item
-        return NSItemProvider(object: "\(item.id)" as NSString)
+    private func contentView(for item: Item) -> some View {
+        HStack {
+            content(item)
+            Spacer()
+            Image("More")
+                .frame(width: 16, height: 0)
+                .padding(.trailing, 23)
+                .gesture(
+                    DragGesture()
+                        .onChanged{ gesture in
+                            print(gesture.location.y)
+                            if (isDraggingNow == false) {
+                                isDraggingNow = true
+                                tempLocation = gesture.startLocation.y
+                                isScrollDisabled = true
+                            }
+                            guard let selectedItemIndex  = items.firstIndex(of: item) else { return }
+                            if(!doOnceLock) {
+                                if(gesture.location.y >= 0 + axisGap) {
+                                    doOnceLock = true
+                                    tempLocation = gesture.location.y
+                                    withAnimation(.easeInOut(duration: 0.01)) {
+                                        moveAction(IndexSet(integer: selectedItemIndex), selectedItemIndex+2)
+                                    } completion: {
+                                        doOnceLock = false
+                                    }
+                                } else if (gesture.location.y <= 0 - axisGap) {
+                                    doOnceLock = true
+                                    tempLocation = gesture.location.y
+                                    withAnimation(.easeInOut(duration: 0.01)) {
+                                        moveAction(IndexSet(integer: selectedItemIndex), selectedItemIndex-1)
+                                    } completion: {
+                                        doOnceLock = false
+                                    }
+                                }
+                            }
+                        }
+                        .onEnded { gesture in
+                            isDraggingNow = false
+                            doOnceLock = false
+                            print("ended!")
+                            isScrollDisabled = false
+                        }
+                )
+        }
     }
 }
