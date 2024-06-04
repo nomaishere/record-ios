@@ -13,6 +13,9 @@ struct GridData: Identifiable, Equatable {
     let id: Int
 }
 
+
+/// Reordeable List using onDrag function
+/// Originated by Daniel Saidi. check: https://danielsaidi.com/blog/2023/08/30/enabling-drag-reordering-in-swiftui-lazy-grids-and-stacks
 struct ReorderableForEach<Item: Reorderable, Content: View, Preview: View>: View {
     public init(
         _ items: [Item],
@@ -142,5 +145,122 @@ public extension View {
         active: Binding<Item?>
     ) -> some View {
         onDrop(of: [.text], delegate: ReorderableDropOutsideDelegate(active: active))
+    }
+}
+
+
+
+
+// V2
+
+struct AdvancedReorderableForEach<Item: Reorderable, Content: View, Preview: View>: View {
+    public init(
+        _ items: [Item],
+        active: Binding<Item?>,
+        isScrollDisabled: Binding<Bool>,
+        @ViewBuilder content: @escaping (Item) -> Content,
+        @ViewBuilder preview: @escaping (Item) -> Preview,
+        moveAction: @escaping (IndexSet, Int) -> Void
+    ) {
+        self.items = items
+        self._active = active
+        self._isScrollDisabled = isScrollDisabled
+        self.content = content
+        self.preview = preview
+        self.moveAction = moveAction
+    }
+    
+    public init(
+        _ items: [Item],
+        active: Binding<Item?>,
+        isScrollDisabled: Binding<Bool>,
+        @ViewBuilder content: @escaping (Item) -> Content,
+        moveAction: @escaping (IndexSet, Int) -> Void
+    ) where Preview == EmptyView {
+        self.items = items
+        self._active = active
+        self._isScrollDisabled = isScrollDisabled
+        self.content = content
+        self.preview = nil
+        self.moveAction = moveAction
+    }
+    
+    @Binding private var active: Item?
+    @State private var hasChangedLocation = false
+    private let items: [Item]
+    private let content: (Item) -> Content
+    private let preview: ((Item) -> Preview)?
+    private let moveAction: (IndexSet, Int) -> Void
+    
+    @Binding private var isScrollDisabled: Bool
+    
+    var drag: some Gesture {
+        DragGesture()
+            .onChanged{ gesture in
+                print("\(gesture.location.y)")
+                isScrollDisabled = true
+            }
+            .onEnded { gesture in
+                print("ended!")
+                isScrollDisabled = false
+            }
+    }
+    
+    var body: some View {
+        ForEach(items) { item in
+            if let preview {
+                HStack {
+                    contentView(for: item)
+                        .contentShape(.dragPreview, Rectangle())
+                        .onDrag {
+                            dragData(for: item)
+                        } preview: {
+                            preview(item)
+                        }
+                    Spacer()
+                    Image("More")
+                        .frame(width: 16, height: 0)
+                        .padding(.trailing, 16)
+                        .gesture(drag)
+                }
+            } else {
+                HStack {
+                    contentView(for: item)
+                        .contentShape(.dragPreview, Rectangle())
+                        .onDrag {
+                            dragData(for: item)
+                        }
+                    Spacer()
+                    Image("More")
+                        .frame(width: 16, height: 0)
+                        .padding(.trailing, 16)
+                        .gesture(drag)
+                }
+                
+            }
+        }
+    }
+    
+    private func contentView(for item: Item) -> some View {
+        content(item)
+            .opacity(active == item && hasChangedLocation ? 0.5 : 1)
+            .onDrop(
+                of: [.text],
+                delegate: ReorderableDragRelocateDelegate(
+                    item: item,
+                    items: items,
+                    active: $active,
+                    hasChangedLocation: $hasChangedLocation
+                ) { from, to in
+                    withAnimation {
+                        moveAction(from, to)
+                    }
+                }
+            )
+    }
+    
+    private func dragData(for item: Item) -> NSItemProvider {
+        active = item
+        return NSItemProvider(object: "\(item.id)" as NSString)
     }
 }
