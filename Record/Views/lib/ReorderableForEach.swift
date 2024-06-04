@@ -9,6 +9,7 @@ import SwiftUI
 
 public typealias Reorderable = Identifiable & Equatable & Hashable
 
+
 struct GridData: Identifiable, Equatable, Hashable {
     let id: Int
 }
@@ -103,7 +104,7 @@ struct ReorderableDragRelocateDelegate<Item: Reorderable>: DropDelegate {
     var moveAction: (IndexSet, Int) -> Void
     
     func dropEntered(info: DropInfo) {
-        print("entered!")
+        //print("entered!")
         guard item != active, let current = active else { return }
         guard let from  = items.firstIndex(of: current) else { return }
         guard let to = items.firstIndex(of: item) else { return }
@@ -255,7 +256,7 @@ struct AdvancedReorderableForEach<Item: Reorderable, Content: View, Preview: Vie
                 .gesture(
                     DragGesture()
                         .onChanged{ gesture in
-                            print(gesture.location.y)
+                            active = item
                             if (isDraggingNow == false) {
                                 isDraggingNow = true
                                 tempLocation = gesture.startLocation.y
@@ -287,8 +288,10 @@ struct AdvancedReorderableForEach<Item: Reorderable, Content: View, Preview: Vie
                             doOnceLock = false
                             print("ended!")
                             isScrollDisabled = false
+                            active = nil
                         }
                 )
         }
+        .opacity(active == item ? 0.2 : 1)
     }
 }

@@ -19,7 +19,19 @@ final class ImportManager: ObservableObject {
     }
     
     // FOR TEST
-    @Published var nowStep: importSteps = .TRACKLIST
+    @Published var nowStep: importSteps = .IMPORT
 
     var selectedFilesURL: [URL] = []
+
+    func makeTracktempDatas() -> [TrackTempData] {
+        var trackTempDatas: [TrackTempData] = []
+
+        
+        for (index, url) in self.selectedFilesURL.enumerated() {
+            trackTempDatas.append(TrackTempData(title: url.lastPathComponent, trackNumber: index+1, fileURL: url))
+        }
+        
+        return trackTempDatas
+        
+    }
 }

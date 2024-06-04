@@ -68,7 +68,7 @@ struct AddAlbum: View {
                     AddAlbum_Import(isNextEnabled: $isNextEnabled)
                 }.padding(.vertical, -8)
             case .TRACKLIST:
-                AddAlbum_Tracklist()
+                AddAlbum_Tracklist(trackTempDatas: importManager.makeTracktempDatas())
             case .METADATA:
                 AddAlbum_Metadata()
             case .CHECK:
