@@ -78,7 +78,7 @@ struct ProgressWithText: View {
                     .foregroundStyle(Color("G2"))
                 HStack {
                     RoundedRectangle(cornerRadius: 25.0)
-                        .frame(width: makeProgressBarPosition() , height: 4)
+                        .frame(minWidth: 0, maxWidth: abs(makeProgressBarPosition()) , maxHeight: 4)
                         .foregroundStyle(Color("G6"))
                     Spacer()
                 }

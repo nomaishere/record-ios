@@ -78,36 +78,25 @@ struct AddAlbum: View {
             
         }.environmentObject(importManager)
         
-        /*
-        ScrollView() {
-            VStack {
-                Group {
-                    switch importManager.nowStep {
-                    case .IMPORT:
-                        AddAlbum_Import(isNextEnabled: $isNextEnabled)
-                    case .TRACKLIST:
-                        AddAlbum_Tracklist()
-                    case .METADATA:
-                        AddAlbum_Metadata()
-                    case .CHECK:
-                        AddAlbum_Check()
-                    }
-                    
-                }.environmentObject(importManager)
-                
-            }
-            .frame(maxWidth: .infinity)
-        }
-        .padding(.vertical, -8)
-         */
-
-
         
         VStack(spacing: 0) {
             Color("G2")
                 .frame(height: 2)
                 .padding(.all, 0)
             HStack(spacing: 15.5) {
+                Button(action: /*@START_MENU_TOKEN@*/{}/*@END_MENU_TOKEN@*/, label: {
+                    HStack {
+                        Image("LeftChevron")
+                            .renderingMode(.template)
+                            .frame(height: 16)
+                        Spacer()
+                            .frame(width: 6)
+                        Text("Before")
+                            .font(Font.custom("Poppins-Medium", size: 20))
+                    }
+                    .foregroundStyle(Color("G5"))
+                })
+                .padding(.leading, 8)
                 Spacer()
                 Button("Next Step", action: {
                     withAnimation {
