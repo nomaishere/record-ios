@@ -19,7 +19,7 @@ final class ImportManager: ObservableObject {
     }
     
     // FOR TEST
-    @Published var nowStep: importSteps = .METADATA
+    @Published var nowStep: importSteps = .IMPORT
     
 
     var selectedFilesURL: [URL] = []

@@ -110,13 +110,15 @@ struct AddAlbum: View {
             HStack(spacing: 15.5) {
                 Spacer()
                 Button("Next Step", action: {
-                    if isNextEnabled {
-                        if(importManager.nowStep == .IMPORT) {
-                            importManager.nowStep = .TRACKLIST
-                        }
+                    withAnimation {
+                        if isNextEnabled {
+                            if(importManager.nowStep == .IMPORT) {
+                                importManager.nowStep = .TRACKLIST
+                            }
                             
-                    } else {
-                        print("bye")
+                        } else {
+                            print("bye")
+                        }
                     }
                 })
                     .padding(.vertical, 8.0)
