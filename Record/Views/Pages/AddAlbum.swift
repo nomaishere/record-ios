@@ -51,8 +51,9 @@ struct AddAlbum: View {
                             .foregroundStyle(Color("G7"))
                     }
                     .padding(.bottom, 24)
-                    ProgressWithText()
+                    ProgressWithText(steps: [Step(id: 1, name: "Import"), Step(id: 2, name: "Tracklist"), Step(id: 3, name: "Metadata"), Step(id: 4, name: "Check")])
                         .padding(.bottom, 24)
+                        .environmentObject(importManager)
                     
                 }
                 , alignment: .top

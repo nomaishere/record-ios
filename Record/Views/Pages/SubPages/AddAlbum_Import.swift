@@ -121,6 +121,5 @@ struct FileListView: View {
 
 #Preview("FileList") {
     let first = URL(string: "hi")!
-    var test: [URL] = [first]
     return FileListView(fileURLs: [URL(string: "test")!, URL(string: "affaaldkwjkldjlkajwldkjalkwjdlkajkwldjlkajkwjdlkwdad")!])
 }

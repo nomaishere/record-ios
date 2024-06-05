@@ -141,7 +141,7 @@ struct AddAlbum_Tracklist: View {
                     moveAction: { from, to in
                         trackTempDatas.move(fromOffsets: from, toOffset: to)
                         // Stupid Method. Need to change
-                        for (index, track) in trackTempDatas.enumerated() {
+                        for (index, _) in trackTempDatas.enumerated() {
                             trackTempDatas[index].trackNumber = index+1
                         }
                         

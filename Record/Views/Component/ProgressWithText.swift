@@ -10,27 +10,75 @@
 
 import SwiftUI
 
+struct Step: Codable, Hashable, Identifiable{
+    var id: Int
+    var name: String
+}
+
 
 
 struct ProgressWithText: View {
-    var progressBarWidth = UIScreen.main.bounds.size.width - 48
+    let progressBarWidth = UIScreen.main.bounds.size.width - 48
     
-    @State var secondItemX: CGFloat = 0
-    @State var thirdItemX: CGFloat = 0
-    @State var fourthItemX: CGFloat = 0
+    let horizontalPadding: CGFloat = 24
     
-    @State var ProgressBarPosition: CGFloat = 0
-    var steps: Int = 0
+    let steps: [Step]
+
+    @State var itemRects: [CGRect]
+    
+    
+    @EnvironmentObject var importManager: ImportManager
+    
+    /// NOTE: Need to update(remove hard-corded code)
+    func makeProgressBarPosition() -> CGFloat {
+        switch importManager.nowStep {
+        case .IMPORT:
+            return itemRects[0].minX + itemRects[0].width/2 - horizontalPadding
+        case .TRACKLIST:
+            return itemRects[1].minX + itemRects[1].width/2 - horizontalPadding
+        case .METADATA:
+            return itemRects[2].minX + itemRects[2].width/2 - horizontalPadding
+        case .CHECK:
+            return itemRects[3].minX + itemRects[3].width/2 - horizontalPadding
+        }
+    }
+    
+    /// NOTE: Need to update(remove hard-corded code)
+    func isTextShouldHighlighted(_ selectedStep: Step) -> Bool {
+        var tempNowStep: Step
+        switch importManager.nowStep {
+        case .IMPORT:
+            tempNowStep = Step(id: 1, name: "Import")
+        case .TRACKLIST:
+            tempNowStep = Step(id: 2, name: "Tracklist")
+        case .METADATA:
+            tempNowStep = Step(id: 3, name: "Metadata")
+        case .CHECK:
+            tempNowStep = Step(id: 4, name: "Check")
+        }
+        
+        if(selectedStep.id <= tempNowStep.id) {
+            return true
+        } else {
+            return false
+        }
+    }
+    
+    init(steps: [Step]) {
+        self.steps = steps
+        _itemRects = State(initialValue: [CGRect](repeating: CGRect(), count: steps.count))
+    }
     
     var body: some View {
         VStack(spacing: 4) {
+            // Bar
             ZStack {
                 RoundedRectangle(cornerRadius: 25.0)
                     .frame(width: progressBarWidth, height: 4)
                     .foregroundStyle(Color("G2"))
                 HStack {
                     RoundedRectangle(cornerRadius: 25.0)
-                        .frame(width: ProgressBarPosition , height: 4)
+                        .frame(width: makeProgressBarPosition() , height: 4)
                         .foregroundStyle(Color("G6"))
                     Spacer()
                 }
@@ -38,88 +86,44 @@ struct ProgressWithText: View {
             }
             .frame(width: progressBarWidth, height: 4, alignment: .leading)
             .padding(.all, 0)
-            HStack {
-                Text("Import")
-                Spacer()
-                Text("Tracklist")
-                    .background(
-                        GeometryReader {geo in
-                            Color.clear
-                                .preference(key: SecondGeoPreferenceKey.self, value:geo.frame(in: .global).minX )
-                        }
-                            .onPreferenceChange(SecondGeoPreferenceKey.self) { preferences in
-                                self.secondItemX = preferences
-                            }
-                    )
-                Spacer()
-                Text("Metadata")
-                    .background(
-                        GeometryReader {geo in
-                            Color.clear
-                                .preference(key: ThirdGeoPreferenceKey.self, value:geo.frame(in: .global).minX )
-                        }
-                            .onPreferenceChange(ThirdGeoPreferenceKey.self) { preferences in
-                                self.thirdItemX = preferences
-                            }
-                    )
-                Spacer()
-                Text("Check")
-                    .background(
-                        GeometryReader {geo in
-                            Color.clear
-                                .preference(key: FourthGeoPreferenceKey.self, value:geo.frame(in: .global).minX )
-                        }
-                            .onPreferenceChange(FourthGeoPreferenceKey.self) { preferences in
-                                self.fourthItemX = preferences
-                            }
-                    )
-            }
-            .font(Font.custom("Poppins-Medium", size: 16))
-            .foregroundStyle(Color("G3"))
-            .padding(.horizontal, 24)
             
-            /*
-             Button("Previous") {
-             withAnimation {
-             ProgressBarPosition = secondItemX - 24
-             }
-             }
-             Button("Next") {
-             withAnimation {
-             ProgressBarPosition = thirdItemX - 24
-             }
-             }
-             */
+            // Text
+            HStack {
+                ForEach(Array(steps.enumerated()), id: \.offset) { index, step in
+                    Text(step.name)
+                        .font(Font.custom("Poppins-Medium", size: 16))
+                        .foregroundStyle(isTextShouldHighlighted(step) ? Color("G6") : Color("G3"))
+                        .background(
+                            GeometryReader { geo in
+                                Color.clear
+                                    .preference(key: ItemGeoPreferenceKey.self, value: geo.frame(in: .global))
+                            }
+                                .onPreferenceChange(ItemGeoPreferenceKey.self) { preferences in
+                                    self.itemRects[index] = preferences
+                                }
+                        )
+                    if(index != steps.count-1) {
+                        Spacer()
+                    }
+                }
+            }
+            .padding(.horizontal, horizontalPadding)
+            
+           
         }
     }
 }
 
 #Preview {
-    ProgressWithText()
+    ProgressWithText(steps: [Step(id: 1, name: "Import"), Step(id: 2, name: "Tracklist"), Step(id: 3, name: "Metadata"), Step(id: 4, name: "Check")])
+        .environmentObject(ImportManager())
 }
 
 
-struct SecondGeoPreferenceKey: PreferenceKey {
-        typealias Value = CGFloat
-        static var defaultValue: Value = 0
 
-        static func reduce(value: inout Value, nextValue: () -> Value) {
-            value = nextValue()
-        }
-}
-
-struct ThirdGeoPreferenceKey: PreferenceKey {
-        typealias Value = CGFloat
-        static var defaultValue: Value = 0
-
-        static func reduce(value: inout Value, nextValue: () -> Value) {
-            value = nextValue()
-        }
-}
-
-struct FourthGeoPreferenceKey: PreferenceKey {
-        typealias Value = CGFloat
-        static var defaultValue: Value = 0
+struct ItemGeoPreferenceKey: PreferenceKey {
+        typealias Value = CGRect
+        static var defaultValue: Value = CGRect()
 
         static func reduce(value: inout Value, nextValue: () -> Value) {
             value = nextValue()
