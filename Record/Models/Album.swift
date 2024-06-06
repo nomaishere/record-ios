@@ -9,7 +9,8 @@ import Foundation
 import SwiftData
 
 @Model
-final class Album {
+final class Album: Identifiable {
+    var id: UUID = UUID()
     var title: String
     @Relationship var artist: [Artist]
     @Relationship var tracks: [Track]

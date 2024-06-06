@@ -8,14 +8,13 @@
 import SwiftUI
 
 struct AddAlbum_Import: View {
-    
     @State private var showFileImporter = false
     @State private var isAnyFileSelected = false
-    
+
     @EnvironmentObject var importManager: ImportManager
-    
+
     @Binding var isNextEnabled: Bool
-    
+
     var body: some View {
         Spacer()
             .frame(height: 32)
@@ -32,7 +31,7 @@ struct AddAlbum_Import: View {
                 }
                 .padding(.horizontal, 24)
                 FileListView(fileURLs: importManager.selectedFilesURL)
-                
+
                 Spacer()
             } else {
                 HStack {
@@ -65,13 +64,13 @@ struct AddAlbum_Import: View {
                         .background(Color("G1"))
                         .clipShape(RoundedRectangle(cornerRadius: 8))
                     }
-                    .fileImporter(isPresented: $showFileImporter, allowedContentTypes: [.mp3, .wav, .aiff, ], allowsMultipleSelection: true) {result in
+                    .fileImporter(isPresented: $showFileImporter, allowedContentTypes: [.mp3, .wav, .aiff], allowsMultipleSelection: true) { result in
                         switch result {
                         case .success(let files):
-                            files.forEach { file in
+                            for file in files {
                                 importManager.selectedFilesURL.append(file)
                             }
-                            if (!importManager.selectedFilesURL.isEmpty) {
+                            if !importManager.selectedFilesURL.isEmpty {
                                 isAnyFileSelected = true
                                 isNextEnabled = true
                             }
@@ -82,18 +81,16 @@ struct AddAlbum_Import: View {
                     Spacer()
                 }
                 .padding(.horizontal, 16)
-                
-                Spacer()
 
+                Spacer()
             }
         }
-        
     }
 }
 
 struct FileListView: View {
     var fileURLs: [URL]
-    
+
     var body: some View {
         ZStack {
             VStack(alignment: .leading, spacing: 12) {
@@ -101,7 +98,7 @@ struct FileListView: View {
                     HStack {
                         Text(file.lastPathComponent)
                             .font(Font.custom("Pretendard-SemiBold", size: 18))
-                        .foregroundStyle(Color("G6"))
+                            .foregroundStyle(Color("G6"))
                         Spacer()
                     }
                 }
@@ -121,7 +118,6 @@ struct FileListView: View {
 #Preview {
     AddAlbum_Import(isNextEnabled: .constant(false))
 }
-
 
 #Preview("FileList") {
     let first = URL(string: "hi")!

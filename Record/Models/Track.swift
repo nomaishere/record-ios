@@ -9,7 +9,8 @@ import Foundation
 import SwiftData
 
 @Model
-final class Track {
+final class Track: Identifiable {
+    var id: UUID = UUID()
     var title: String
     @Attribute(.externalStorage) var audioData: Data
     
