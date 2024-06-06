@@ -15,15 +15,12 @@ struct AddAlbum_Metadata: View {
     @State var title: String = ""
     @State var artistName: String = ""
 
-    @FocusState private var isFocused: Bool
+    @State var artists: [Artist] = []
 
     var body: some View {
         ScrollView {
             Spacer()
                 .frame(height: 32)
-            Rectangle()
-                .fill(.red)
-                .frame(height: 300)
             VStack(spacing: 12) {
                 HStack {
                     Text("Title")
@@ -34,7 +31,6 @@ struct AddAlbum_Metadata: View {
                 }
                 TextField("Enter name of album", text: $title)
                     .autocorrectionDisabled()
-                    .focused($isFocused)
                     .submitLabel(.done)
                     .font(Font.custom("Pretendard-SemiBold", size: 18))
                     .foregroundStyle(Color("DefaultBlack"))
@@ -57,26 +53,48 @@ struct AddAlbum_Metadata: View {
                         .padding(.leading, 24)
                     Spacer()
                 }
-                HStack {
-                    Circle()
-                        .fill(Color(hex: 0xF2F2F2))
-                        .frame(width: 48, height: 48)
-                        .overlay {
-                            Text("?")
-                                .font(Font.custom("Pretendard-SemiBold", size: 20))
-                                .foregroundStyle(Color(hex: 0xD7D7D7))
-                        }
-                        .padding(.all, 6)
-                    TextField("name", text: $artistName)
-                        .submitLabel(.done)
-                        .font(Font.custom("Pretendard-SemiBold", size: 18))
-                        .foregroundStyle(Color("DefaultBlack"))
-                    RectIconWrapper(icon: Image("xmark"), color: Color(hex: 0xD5D5D5), iconWidth: 12, wrapperWidth: 32, wrapperHeight: 32)
-                        .padding(.trailing, 14)
+                ForEach(Array($artists.enumerated()), id: \.offset) { index, artist in
+                    HStack {
+                        Circle()
+                            .fill(Color(hex: 0xF2F2F2))
+                            .frame(width: 48, height: 48)
+                            .overlay {
+                                Text("?")
+                                    .font(Font.custom("Pretendard-SemiBold", size: 20))
+                                    .foregroundStyle(Color(hex: 0xD7D7D7))
+                            }
+                            .padding(.all, 6)
+                        TextField("name", text: artist.name)
+                            .submitLabel(.done)
+                            .font(Font.custom("Pretendard-SemiBold", size: 18))
+                            .foregroundStyle(Color("DefaultBlack"))
+                        Button(action: {
+                            artists.remove(at: index)
+                        }, label: {
+                            RectIconWrapper(icon: Image("xmark"), color: Color(hex: 0xD5D5D5), iconWidth: 12, wrapperWidth: 32, wrapperHeight: 32)
+                                .padding(.trailing, 14)
+                        })
+                    }
+                    .background(Color("G1"))
+                    .clipShape(RoundedRectangle(cornerRadius: 100.0))
+                    .padding(.horizontal, 16)
                 }
-                .background(Color("G1"))
-                .clipShape(RoundedRectangle(cornerRadius: 100.0))
-                .padding(.horizontal, 16)
+                Button(action: {
+                    artists.append(Artist(name: "", isGroup: false))
+                }, label: {
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 100.0, style: .circular)
+                            .inset(by: 1)
+                            .stroke(Color("G2"), lineWidth: 2)
+                            .fill(.clear)
+                            .frame(maxWidth: .infinity, minHeight: 60)
+                            .padding(.all, 0)
+
+                        Image("plus")
+                            .foregroundStyle(Color("G3"))
+                    }
+                    .padding(.horizontal, 16)
+                })
             }
         }
     }
