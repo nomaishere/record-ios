@@ -33,6 +33,7 @@ struct AddAlbum_Import: View {
                 .padding(.horizontal, 24)
                 FileListView(fileURLs: importManager.selectedFilesURL)
                 
+                Spacer()
             } else {
                 HStack {
                     Text("Choose Method")
@@ -81,6 +82,9 @@ struct AddAlbum_Import: View {
                     Spacer()
                 }
                 .padding(.horizontal, 16)
+                
+                Spacer()
+
             }
         }
         

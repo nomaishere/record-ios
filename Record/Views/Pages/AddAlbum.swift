@@ -71,57 +71,83 @@ struct AddAlbum: View {
             case .TRACKLIST:
                 AddAlbum_Tracklist(trackTempDatas: importManager.makeTracktempDatas())
             case .METADATA:
-                AddAlbum_Metadata()
+                AddAlbum_Metadata(isNextEnabled: $isNextEnabled)
+                    .ignoresSafeArea(.keyboard)
             case .CHECK:
                 AddAlbum_Check()
             }
             
-        }.environmentObject(importManager)
+        }
+        .environmentObject(importManager)
+        .ignoresSafeArea(.keyboard)
         
-        
-        VStack(spacing: 0) {
-            Color("G2")
-                .frame(height: 2)
-                .padding(.all, 0)
-            HStack(spacing: 15.5) {
-                Button(action: /*@START_MENU_TOKEN@*/{}/*@END_MENU_TOKEN@*/, label: {
-                    HStack {
-                        Image("LeftChevron")
-                            .renderingMode(.template)
-                            .frame(height: 16)
-                        Spacer()
-                            .frame(width: 6)
-                        Text("Before")
-                            .font(Font.custom("Poppins-Medium", size: 20))
-                    }
-                    .foregroundStyle(Color("G5"))
-                })
-                .padding(.leading, 8)
-                Spacer()
-                Button("Next Step", action: {
-                    withAnimation {
-                        if isNextEnabled {
-                            if(importManager.nowStep == .IMPORT) {
-                                importManager.nowStep = .TRACKLIST
+        // Wrap VStack to apply ignoreSafeArea(.keyboard)
+        VStack {
+            Spacer()
+            
+            // Bottom Navigation Bar
+            VStack(spacing: 0) {
+                Color("G2")
+                    .frame(height: 2)
+                    .padding(.all, 0)
+                HStack(spacing: 15.5) {
+                    if(importManager.nowStep != .IMPORT) {
+                        Button(action: {
+                            withAnimation {
+                                if(importManager.nowStep == .TRACKLIST) {
+                                    importManager.nowStep = .IMPORT
+                                } else if (importManager.nowStep == .METADATA) {
+                                    importManager.nowStep = .TRACKLIST
+                                } else {
+                                    importManager.nowStep = .METADATA
+                                }
                             }
-                            
-                        } else {
-                            print("bye")
-                        }
+                        }, label: {
+                            HStack {
+                                Image("LeftChevron")
+                                    .renderingMode(.template)
+                                    .frame(height: 16)
+                                Spacer()
+                                    .frame(width: 6)
+                                Text("Before")
+                                    .font(Font.custom("Poppins-Medium", size: 20))
+                            }
+                            .foregroundStyle(Color("G5"))
+                        })
+                        .padding(.leading, 8)
                     }
-                })
+                    Spacer()
+                    Button("Next Step", action: {
+                        withAnimation {
+                            if isNextEnabled {
+                                if(importManager.nowStep == .IMPORT) {
+                                    importManager.nowStep = .TRACKLIST
+                                } else if(importManager.nowStep == .TRACKLIST) {
+                                    importManager.nowStep = .METADATA
+                                } else {
+                                    importManager.nowStep = .CHECK
+                                }
+                                
+                            } else {
+                                print("bye")
+                            }
+                        }
+                    })
                     .padding(.vertical, 8.0)
                     .padding(.horizontal, 32.0)
                     .background(isNextEnabled ? Color("DefaultBlack") : Color("G3"))
                     .font(Font.custom("Poppins-Medium", size: 20))
                     .foregroundStyle(.white)
                     .clipShape(Capsule())
+                }
+                .padding(.top, 14)
+                .padding(.horizontal, 16)
             }
-            .padding(.top, 14)
-            .padding(.horizontal, 16)
+            .frame(maxWidth: .infinity, minHeight: 59, maxHeight: 59, alignment: .top)
+            .background(Color("G1"))
+            .ignoresSafeArea(.keyboard)
         }
-        .frame(maxWidth: .infinity, minHeight: 59, maxHeight: 59, alignment: .top)
-        .background(Color("G1"))
+        .ignoresSafeArea(.keyboard)
     }
 }
 

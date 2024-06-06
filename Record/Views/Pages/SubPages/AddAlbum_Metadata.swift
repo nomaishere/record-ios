@@ -10,11 +10,50 @@ import SwiftUI
 struct AddAlbum_Metadata: View {
     @EnvironmentObject var importManager: ImportManager
 
+    @Binding var isNextEnabled: Bool
+    
+    @State var title: String = ""
+    
+    @FocusState private var isFocused: Bool
+
     var body: some View {
-        Text("Metadata")
+        ScrollView {
+            Spacer()
+                .frame(height: 32)
+            VStack(spacing: 12) {
+                HStack {
+                    Text("Title")
+                        .font(Font.custom("Poppins-SemiBold", size: 20))
+                        .foregroundStyle(Color("DefaultBlack"))
+                        .padding(.leading, 24)
+                    Spacer()
+                }
+                TextField("Enter name of album", text: $title)
+                    .autocorrectionDisabled()
+                    .focused($isFocused)
+                    .submitLabel(.done)
+                    .font(Font.custom("Pretendard-SemiBold", size: 18))
+                    .foregroundStyle(Color("DefaultBlack"))
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 13.5)
+                    .background(Color("G1"))
+                    .clipShape(RoundedRectangle(cornerRadius: 4))
+                    .padding(.horizontal, 16)
+                    .onAppear {
+                        UITextField.appearance().clearButtonMode = .whileEditing
+                    }
+            }
+            Spacer()
+                .frame(height: 40)
+            
+        }
+        .padding(.vertical, -8)
+
     }
 }
 
+
+
 #Preview {
-    AddAlbum_Metadata()
+    AddAlbum_Metadata(isNextEnabled: .constant(false))
 }

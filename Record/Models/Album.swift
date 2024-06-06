@@ -10,7 +10,7 @@ import SwiftData
 
 @Model
 final class Album {
-    var name: String
+    var title: String
     @Relationship var artist: [Artist]
     @Relationship var tracks: [Track]
     
@@ -20,8 +20,8 @@ final class Album {
     var releaseDate: Date?
     
     
-    init(name: String, artist: [Artist], tracks: [Track], artwork: Data, releaseDate: Date ) {
-        self.name = name
+    init(title: String, artist: [Artist], tracks: [Track], artwork: Data, releaseDate: Date ) {
+        self.title = title
         self.artist = artist
         self.tracks = tracks
         self.artwork = artwork
