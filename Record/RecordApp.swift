@@ -5,13 +5,13 @@
 //  Created by nomamac2 on 5/24/24.
 //
 
-import SwiftUI
 import SwiftData
+import SwiftUI
 
 @main
 struct RecordApp: App {
     @ObservedObject var router = Router()
-    
+
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
             Album.self, Artist.self
@@ -28,7 +28,7 @@ struct RecordApp: App {
     var body: some Scene {
         WindowGroup {
             NavigationStack(path: $router.navPath) {
-                    ContentView()
+                ContentView()
                     .navigationDestination(for: Router.Destination.self) { destination in
                         switch destination {
                         case .home:

@@ -21,6 +21,9 @@ struct AddAlbum_Metadata: View {
         ScrollView {
             Spacer()
                 .frame(height: 32)
+            Rectangle()
+                .fill(.red)
+                .frame(height: 300)
             VStack(spacing: 12) {
                 HStack {
                     Text("Title")
@@ -76,7 +79,6 @@ struct AddAlbum_Metadata: View {
                 .padding(.horizontal, 16)
             }
         }
-        .padding(.vertical, -8)
     }
 }
 

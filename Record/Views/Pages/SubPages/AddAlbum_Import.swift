@@ -16,73 +16,75 @@ struct AddAlbum_Import: View {
     @Binding var isNextEnabled: Bool
 
     var body: some View {
-        Spacer()
-            .frame(height: 32)
-        VStack(spacing: 12) {
-            if isAnyFileSelected {
-                HStack(spacing: 0) {
-                    Text("\(importManager.selectedFilesURL.count) Tracks from ")
-                        .font(Font.custom("Poppins-SemiBold", size: 20))
-                        .foregroundStyle(Color("DefaultBlack"))
-                    Text(" Files")
-                        .font(Font.custom("Poppins-SemiBold", size: 20))
-                        .foregroundStyle(Color(hex: 0x1BA5F8))
-                    Spacer()
-                }
-                .padding(.horizontal, 24)
-                FileListView(fileURLs: importManager.selectedFilesURL)
+        ScrollView {
+            Spacer()
+                .frame(height: 32)
+            VStack(spacing: 12) {
+                if isAnyFileSelected {
+                    HStack(spacing: 0) {
+                        Text("\(importManager.selectedFilesURL.count) Tracks from ")
+                            .font(Font.custom("Poppins-SemiBold", size: 20))
+                            .foregroundStyle(Color("DefaultBlack"))
+                        Text(" Files")
+                            .font(Font.custom("Poppins-SemiBold", size: 20))
+                            .foregroundStyle(Color(hex: 0x1BA5F8))
+                        Spacer()
+                    }
+                    .padding(.horizontal, 24)
+                    FileListView(fileURLs: importManager.selectedFilesURL)
 
-                Spacer()
-            } else {
-                HStack {
-                    Text("Choose Method")
-                        .font(Font.custom("Poppins-SemiBold", size: 20))
-                        .foregroundStyle(Color("DefaultBlack"))
                     Spacer()
-                }
-                .padding(.horizontal, 24)
-                HStack {
-                    Button {
-                        showFileImporter = true
-                    } label: {
-                        VStack {
-                            HStack {
-                                Text("Files")
-                                    .font(Font.custom("Pretendard-SemiBold", size: 18))
-                                    .foregroundStyle(Color(hex: 0x1BA5F8))
-                                    .padding(.all, 16)
+                } else {
+                    HStack {
+                        Text("Choose Method")
+                            .font(Font.custom("Poppins-SemiBold", size: 20))
+                            .foregroundStyle(Color("DefaultBlack"))
+                        Spacer()
+                    }
+                    .padding(.horizontal, 24)
+                    HStack {
+                        Button {
+                            showFileImporter = true
+                        } label: {
+                            VStack {
+                                HStack {
+                                    Text("Files")
+                                        .font(Font.custom("Pretendard-SemiBold", size: 18))
+                                        .foregroundStyle(Color(hex: 0x1BA5F8))
+                                        .padding(.all, 16)
+                                    Spacer()
+                                }
                                 Spacer()
+                                HStack {
+                                    Spacer()
+                                    Image("FolderIcon")
+                                        .padding(.all, 16)
+                                }
                             }
-                            Spacer()
-                            HStack {
-                                Spacer()
-                                Image("FolderIcon")
-                                    .padding(.all, 16)
+                            .frame(width: 172, height: 172)
+                            .background(Color("G1"))
+                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                        }
+                        .fileImporter(isPresented: $showFileImporter, allowedContentTypes: [.mp3, .wav, .aiff], allowsMultipleSelection: true) { result in
+                            switch result {
+                            case .success(let files):
+                                for file in files {
+                                    importManager.selectedFilesURL.append(file)
+                                }
+                                if !importManager.selectedFilesURL.isEmpty {
+                                    isAnyFileSelected = true
+                                    isNextEnabled = true
+                                }
+                            case .failure(let error):
+                                print(error)
                             }
                         }
-                        .frame(width: 172, height: 172)
-                        .background(Color("G1"))
-                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                        Spacer()
                     }
-                    .fileImporter(isPresented: $showFileImporter, allowedContentTypes: [.mp3, .wav, .aiff], allowsMultipleSelection: true) { result in
-                        switch result {
-                        case .success(let files):
-                            for file in files {
-                                importManager.selectedFilesURL.append(file)
-                            }
-                            if !importManager.selectedFilesURL.isEmpty {
-                                isAnyFileSelected = true
-                                isNextEnabled = true
-                            }
-                        case .failure(let error):
-                            print(error)
-                        }
-                    }
+                    .padding(.horizontal, 16)
+
                     Spacer()
                 }
-                .padding(.horizontal, 16)
-
-                Spacer()
             }
         }
     }
