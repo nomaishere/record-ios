@@ -96,10 +96,54 @@ struct AddAlbum_Metadata: View {
                     .padding(.horizontal, 16)
                 })
             }
+            Spacer()
+                .frame(height: 40)
+            VStack(spacing: 12) {
+                HStack {
+                    Text("Cover")
+                        .font(Font.custom("Poppins-SemiBold", size: 20))
+                        .foregroundStyle(Color("DefaultBlack"))
+                        .padding(.leading, 24)
+                    Spacer()
+                }
+                HStack {
+                    SqaureBoxButton(text: "Photos", textColor: Color("G6"), icon: Image("PhotosIcon"), action: { print("hi") })
+                    SqaureBoxButton(text: "Files", textColor: Color(hex: 0x1AADF8), icon: Image("FolderIcon"), action: { print("hi") })
+                }
+                .padding(.horizontal, 16)
+            }
         }
     }
 }
 
 #Preview {
     AddAlbum_Metadata(isNextEnabled: .constant(false))
+}
+
+struct SqaureBoxButton: View {
+    let text: String
+    let textColor: Color
+    let icon: Image
+    var action: () -> Void
+
+    var body: some View {
+        Button(action: action, label: {
+            ZStack {
+                RoundedRectangle(cornerRadius: 8)
+                    .fill(Color("G1"))
+                    .frame(height: 64)
+                HStack(spacing: 12) {
+                    Text(text)
+                        .font(Font.custom("Pretendard-SemiBold", size: 18))
+                        .foregroundStyle(textColor)
+                        .padding(.leading, 16)
+                    Spacer()
+                    icon
+                        .resizable()
+                        .frame(width: 40, height: 40)
+                        .padding(.trailing, 12)
+                }
+            }
+        })
+    }
 }
