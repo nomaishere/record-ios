@@ -5,6 +5,7 @@
 //  Created by nomamac2 on 6/1/24.
 //
 
+import PhotosUI
 import SwiftUI
 
 struct AddAlbum_Metadata: View {
@@ -16,6 +17,8 @@ struct AddAlbum_Metadata: View {
     @State var artistName: String = ""
 
     @State var artists: [Artist] = []
+
+    @State var selectedItems: [PhotosPickerItem] = []
 
     var body: some View {
         ScrollView {
@@ -107,7 +110,27 @@ struct AddAlbum_Metadata: View {
                     Spacer()
                 }
                 HStack {
-                    SqaureBoxButton(text: "Photos", textColor: Color("G6"), icon: Image("PhotosIcon"), action: { print("hi") })
+                    PhotosPicker(selection: $selectedItems,
+                                 matching: .images)
+                    {
+                        ZStack {
+                            RoundedRectangle(cornerRadius: 8)
+                                .fill(Color("G1"))
+                                .frame(height: 64)
+                            HStack(spacing: 12) {
+                                Text("Photos")
+                                    .font(Font.custom("Pretendard-SemiBold", size: 18))
+                                    .foregroundStyle(Color("G6"))
+                                    .padding(.leading, 16)
+                                Spacer()
+                                Image("PhotosIcon")
+                                    .resizable()
+                                    .frame(width: 40, height: 40)
+                                    .padding(.trailing, 12)
+                            }
+                        }
+                    }
+
                     SqaureBoxButton(text: "Files", textColor: Color(hex: 0x1AADF8), icon: Image("FolderIcon"), action: { print("hi") })
                 }
                 .padding(.horizontal, 16)
