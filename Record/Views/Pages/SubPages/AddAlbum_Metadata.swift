@@ -69,6 +69,10 @@ class CoverImageModel: ObservableObject {
             }
         }
     }
+
+    func selectAgain() {
+        imageState = .empty
+    }
 }
 
 // View
@@ -172,9 +176,8 @@ struct AddAlbum_Metadata: View {
                         .resizable()
                         .scaledToFill()
                         .frame(width: UIScreen.main.bounds.size.width - 48, height: UIScreen.main.bounds.size.width - 48)
-                        // .frame(width: 100, height: 100)
-                        .clipped()
-                    Button(action: { print("TODO") }, label: {
+                        .clipShape(RoundedRectangle(cornerRadius: 4))
+                    Button(action: { viewModel.selectAgain() }, label: {
                         HStack(spacing: 12) {
                             RectIconWrapper(icon: Image("Reload"), color: Color("DefaultBlack"), iconWidth: 14, wrapperWidth: 14, wrapperHeight: 14)
                             Text("Select Again")
@@ -187,6 +190,7 @@ struct AddAlbum_Metadata: View {
                         .clipShape(RoundedRectangle(cornerRadius: 8))
 
                     })
+                    .padding(.top, 12)
                 case .loading:
                     ProgressView()
                 case .empty:
