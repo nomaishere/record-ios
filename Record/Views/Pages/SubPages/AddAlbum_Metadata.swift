@@ -8,30 +8,92 @@
 import PhotosUI
 import SwiftUI
 
+// View Model
+
+@MainActor
+class CoverImageModel: ObservableObject {
+    enum ImageState {
+        case empty
+        case loading(Progress)
+        case success(Image)
+        case failure(Error)
+    }
+
+    enum TransferError: Error {
+        case importFailed
+    }
+
+    struct CoverImage: Transferable {
+        let image: Image
+
+        static var transferRepresentation: some TransferRepresentation {
+            DataRepresentation(importedContentType: .image) { data in
+                // Only work when platform can import UIKit
+                guard let uiImage = UIImage(data: data) else {
+                    throw TransferError.importFailed
+                }
+                let image = Image(uiImage: uiImage)
+                return CoverImage(image: image)
+            }
+        }
+    }
+
+    @Published private(set) var imageState: ImageState = .empty
+
+    @Published var imageSelection: PhotosPickerItem? = nil {
+        didSet {
+            if let imageSelection {
+                let progress = loadTransferable(from: imageSelection)
+                imageState = .loading(progress)
+            } else {
+                imageState = .empty
+            }
+        }
+    }
+
+    private func loadTransferable(from imageSelection: PhotosPickerItem) -> Progress {
+        return imageSelection.loadTransferable(type: CoverImage.self) { result in
+            DispatchQueue.main.async {
+                guard imageSelection == self.imageSelection else {
+                    print("Failed to get the selected item")
+                    return
+                }
+                switch result {
+                case .success(let coverImage?):
+                    self.imageState = .success(coverImage.image)
+                case .success(nil):
+                    self.imageState = .empty
+                case .failure(let error):
+                    self.imageState = .failure(error)
+                }
+            }
+        }
+    }
+}
+
+// View
 struct AddAlbum_Metadata: View {
     @EnvironmentObject var importManager: ImportManager
 
     @Binding var isNextEnabled: Bool
 
     @State var title: String = ""
-    @State var artistName: String = ""
 
     @State var artists: [Artist] = []
 
     @State var selectedItems: [PhotosPickerItem] = []
 
+    @StateObject var viewModel = CoverImageModel()
+
     var body: some View {
         ScrollView {
             Spacer()
                 .frame(height: 32)
+
+            // MARK: - Title Section
+
             VStack(spacing: 12) {
-                HStack {
-                    Text("Title")
-                        .font(Font.custom("Poppins-SemiBold", size: 20))
-                        .foregroundStyle(Color("DefaultBlack"))
-                        .padding(.leading, 24)
-                    Spacer()
-                }
+                SectionHeader(text: "Title")
                 TextField("Enter name of album", text: $title)
                     .autocorrectionDisabled()
                     .submitLabel(.done)
@@ -48,14 +110,11 @@ struct AddAlbum_Metadata: View {
             }
             Spacer()
                 .frame(height: 40)
+
+            // MARK: - Artist Section
+
             VStack(spacing: 12) {
-                HStack {
-                    Text("Artist")
-                        .font(Font.custom("Poppins-SemiBold", size: 20))
-                        .foregroundStyle(Color("DefaultBlack"))
-                        .padding(.leading, 24)
-                    Spacer()
-                }
+                SectionHeader(text: "Artist")
                 ForEach(Array($artists.enumerated()), id: \.offset) { index, artist in
                     HStack {
                         Circle()
@@ -101,40 +160,71 @@ struct AddAlbum_Metadata: View {
             }
             Spacer()
                 .frame(height: 40)
+
+            // MARK: - Cover Section
+
             VStack(spacing: 12) {
-                HStack {
-                    Text("Cover")
-                        .font(Font.custom("Poppins-SemiBold", size: 20))
-                        .foregroundStyle(Color("DefaultBlack"))
-                        .padding(.leading, 24)
-                    Spacer()
-                }
-                HStack {
-                    PhotosPicker(selection: $selectedItems,
-                                 matching: .images)
-                    {
-                        ZStack {
-                            RoundedRectangle(cornerRadius: 8)
-                                .fill(Color("G1"))
-                                .frame(height: 64)
-                            HStack(spacing: 12) {
-                                Text("Photos")
-                                    .font(Font.custom("Pretendard-SemiBold", size: 18))
-                                    .foregroundStyle(Color("G6"))
-                                    .padding(.leading, 16)
-                                Spacer()
-                                Image("PhotosIcon")
-                                    .resizable()
-                                    .frame(width: 40, height: 40)
-                                    .padding(.trailing, 12)
+                SectionHeader(text: "Cover")
+
+                switch viewModel.imageState {
+                case .success(let image):
+                    image
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: UIScreen.main.bounds.size.width - 48, height: UIScreen.main.bounds.size.width - 48)
+                        // .frame(width: 100, height: 100)
+                        .clipped()
+                    Button(action: { print("TODO") }, label: {
+                        HStack(spacing: 12) {
+                            RectIconWrapper(icon: Image("Reload"), color: Color("DefaultBlack"), iconWidth: 14, wrapperWidth: 14, wrapperHeight: 14)
+                            Text("Select Again")
+                                .font(Font.custom("Poppins-Medium", size: 18))
+                                .foregroundStyle(Color("DefaultBlack"))
+                        }
+                        .padding(.vertical, 12)
+                        .padding(.horizontal, 24)
+                        .background(Color("G1"))
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
+
+                    })
+                case .loading:
+                    ProgressView()
+                case .empty:
+
+                    HStack {
+                        PhotosPicker(selection: $viewModel.imageSelection,
+                                     matching: .images)
+                        {
+                            ZStack {
+                                RoundedRectangle(cornerRadius: 8)
+                                    .fill(Color("G1"))
+                                    .frame(height: 64)
+                                HStack(spacing: 12) {
+                                    Text("Photos")
+                                        .font(Font.custom("Pretendard-SemiBold", size: 18))
+                                        .foregroundStyle(Color("G6"))
+                                        .padding(.leading, 16)
+                                    Spacer()
+                                    Image("PhotosIcon")
+                                        .resizable()
+                                        .frame(width: 40, height: 40)
+                                        .padding(.trailing, 12)
+                                }
                             }
                         }
-                    }
 
-                    SqaureBoxButton(text: "Files", textColor: Color(hex: 0x1AADF8), icon: Image("FolderIcon"), action: { print("hi") })
+                        SqaureBoxButton(text: "Files", textColor: Color(hex: 0x1AADF8), icon: Image("FolderIcon"), action: { print("hi") })
+                    }
+                    .padding(.horizontal, 16)
+                case .failure:
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .font(.system(size: 40))
+                        .foregroundColor(.white)
                 }
-                .padding(.horizontal, 16)
             }
+            // Area for scroll
+            Spacer()
+                .frame(height: 128)
         }
     }
 }
