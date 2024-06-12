@@ -9,7 +9,6 @@ import PhotosUI
 import SwiftUI
 
 // View Model
-
 @MainActor
 class CoverImageModel: ObservableObject {
     enum ImageState {
@@ -88,6 +87,8 @@ struct AddAlbum_Metadata: View {
     @State var selectedItems: [PhotosPickerItem] = []
 
     @StateObject var viewModel = CoverImageModel()
+
+    @State var isGenreSelected: Bool = false
 
     var body: some View {
         ScrollView {
@@ -226,7 +227,23 @@ struct AddAlbum_Metadata: View {
                         .foregroundColor(.white)
                 }
             }
-            // Area for scroll
+            Spacer()
+                .frame(height: 40)
+
+            // MARK: - Genre Area
+
+            VStack {
+                SectionHeader(text: "Genre")
+            }
+
+            // MARK: - SubGenre Area
+
+            if isGenreSelected {
+                Text("Sub")
+            }
+
+            // MARK: - Area for Scroll
+
             Spacer()
                 .frame(height: 128)
         }
