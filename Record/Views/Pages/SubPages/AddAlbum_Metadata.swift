@@ -195,7 +195,6 @@ struct AddAlbum_Metadata: View {
                 case .loading:
                     ProgressView()
                 case .empty:
-
                     HStack {
                         PhotosPicker(selection: $viewModel.imageSelection,
                                      matching: .images)
