@@ -1,98 +1,114 @@
 
 [
     {
-        "id": "f0fa6a90-19ee-464f-a38b-12396b110057"
-        "name": "Pop"
-        "isSubgenre": false
-        "isBuiltIn": true
+        "id": "f0fa6a90-19ee-464f-a38b-12396b110057",
+        "name": "Pop",
+        "isSubgenre": false,
+        "isBuiltIn": true,
         "subGenreID": []
         
     },
     {
-        "id": "ea626db6-f6bf-4a66-ae2c-05feb162a683"
-        "name": "Rock"
-        "isSubgenre": false
-        "isBuiltIn": true
+        "id": "ea626db6-f6bf-4a66-ae2c-05feb162a683",
+        "name": "Rock",
+        "isSubgenre": false,
+        "isBuiltIn": true,
         "subGenreID": []
         
     },
     {
-        "id": "67b34d2d-9417-44ad-8450-a13f4104ef3f"
-        "name": "Hiphop"
-        "isSubgenre": false
-        "isBuiltIn": true
+        "id": "67b34d2d-9417-44ad-8450-a13f4104ef3f",
+        "name": "Hiphop",
+        "isSubgenre": false,
+        "isBuiltIn": true,
+        "subGenreID": ["f064b5ca-d9ba-403a-a76e-5e516b992eb2", "41755c3e-7561-4035-8a7d-9f1235e01666"]
+        
+    },
+    {
+        "id": "b0d295b5-f697-4f43-8d63-afc4d240bb01",
+        "name": "Jazz",
+        "isSubgenre": false,
+        "isBuiltIn": true,
         "subGenreID": []
         
     },
     {
-        "id": "b0d295b5-f697-4f43-8d63-afc4d240bb01"
-        "name": "Jazz"
-        "isSubgenre": false
-        "isBuiltIn": true
+        "id": "71eb5c16-0ce8-484c-bdf6-99870fd323c2",
+        "name": "R&B",
+        "isSubgenre": false,
+        "isBuiltIn": true,
         "subGenreID": []
         
     },
     {
-        "id": "71eb5c16-0ce8-484c-bdf6-99870fd323c2"
-        "name": "R&B"
-        "isSubgenre": false
-        "isBuiltIn": true
+        "id": "878df20e-b817-4a98-9677-ab8c63a1ed7f",
+        "name": "Soul",
+        "isSubgenre": false,
+        "isBuiltIn": true,
         "subGenreID": []
         
     },
     {
-        "id": "878df20e-b817-4a98-9677-ab8c63a1ed7f"
-        "name": "Soul"
-        "isSubgenre": false
-        "isBuiltIn": true
+        "id": "3ee51131-6d26-4f33-9197-c0cc1094305d",
+        "name": "Funk",
+        "isSubgenre": false,
+        "isBuiltIn": true,
         "subGenreID": []
         
     },
     {
-        "id": "3ee51131-6d26-4f33-9197-c0cc1094305d"
-        "name": "Funk"
-        "isSubgenre": false
-        "isBuiltIn": true
+        "id": "33e3a76c-e72b-4935-8149-aa8a97d9292f",
+        "name": "Country",
+        "isSubgenre": false,
+        "isBuiltIn": true,
         "subGenreID": []
         
     },
     {
-        "id": "33e3a76c-e72b-4935-8149-aa8a97d9292f"
-        "name": "Country"
-        "isSubgenre": false
-        "isBuiltIn": true
+        "id": "27761399-2c8a-4560-afc7-87e623cf6ce9",
+        "name": "Raggae",
+        "isSubgenre": false,
+        "isBuiltIn": true,
         "subGenreID": []
         
     },
     {
-        "id": "27761399-2c8a-4560-afc7-87e623cf6ce9"
-        "name": "Raggae"
-        "isSubgenre": false
-        "isBuiltIn": true
+        "id": "b158ae9b-ff44-45c5-b562-c72c2f83375d",
+        "name": "Disco",
+        "isSubgenre": false,
+        "isBuiltIn": true,
         "subGenreID": []
         
     },
     {
-        "id": "b158ae9b-ff44-45c5-b562-c72c2f83375d"
-        "name": "Disco"
-        "isSubgenre": false
-        "isBuiltIn": true
+        "id": "4e0e19e1-15b9-47c6-9c6e-5604f390543b",
+        "name": "Classic",
+        "isSubgenre": false,
+        "isBuiltIn": true,
         "subGenreID": []
         
     },
     {
-        "id": "4e0e19e1-15b9-47c6-9c6e-5604f390543b"
-        "name": "Classic"
-        "isSubgenre": false
-        "isBuiltIn": true
+        "id": "138d007d-5e8a-4d27-ad2b-a3bb4abe0e07",
+        "name": "Soundtrack",
+        "isSubgenre": false,
+        "isBuiltIn": true,
         "subGenreID": []
         
     },
     {
-        "id": "138d007d-5e8a-4d27-ad2b-a3bb4abe0e07"
-        "name": "Soundtrack"
-        "isSubgenre": false
-        "isBuiltIn": true
+        "id": "f064b5ca-d9ba-403a-a76e-5e516b992eb2",
+        "name": "boom bap",
+        "isSubgenre": true,
+        "isBuiltIn": true,
+        "subGenreID": []
+        
+    },
+    {
+        "id": "41755c3e-7561-4035-8a7d-9f1235e01666",
+        "name": "trap",
+        "isSubgenre": true,
+        "isBuiltIn": true,
         "subGenreID": []
         
     },

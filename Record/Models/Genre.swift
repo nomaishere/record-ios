@@ -36,7 +36,7 @@ final class Genre: Identifiable, Codable {
 
     required init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        self.id = try container.decode(UUID.self, forKey: .id)
+        self.id = try UUID(uuidString: container.decode(String.self, forKey: .id))!
         self.name = try container.decode(String.self, forKey: .name)
         self.isSubgenre = try container.decode(Bool.self, forKey: .isSubgenre)
         self.isBuiltIn = try container.decode(Bool.self, forKey: .isBuiltIn)

@@ -6,6 +6,7 @@
 //
 
 import PhotosUI
+import SwiftData
 import SwiftUI
 
 // View Model
@@ -89,6 +90,8 @@ struct AddAlbum_Metadata: View {
     @StateObject var viewModel = CoverImageModel()
 
     @State var isGenreSelected: Bool = false
+
+    @Query var genres: [Genre]
 
     var body: some View {
         ScrollView {
@@ -233,6 +236,9 @@ struct AddAlbum_Metadata: View {
 
             VStack {
                 SectionHeader(text: "Genre")
+                ForEach(genres) { genre in
+                    Text("\(genre.name)")
+                }
             }
 
             // MARK: - SubGenre Area
