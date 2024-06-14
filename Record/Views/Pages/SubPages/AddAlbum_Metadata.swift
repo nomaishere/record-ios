@@ -9,6 +9,8 @@ import PhotosUI
 import SwiftData
 import SwiftUI
 
+import SwiftUIFlowLayout
+
 // View Model
 @MainActor
 class CoverImageModel: ObservableObject {
@@ -77,6 +79,8 @@ class CoverImageModel: ObservableObject {
 
 // View
 struct AddAlbum_Metadata: View {
+    @Environment(\.modelContext) private var modelContext
+
     @EnvironmentObject var importManager: ImportManager
 
     @Binding var isNextEnabled: Bool
@@ -234,11 +238,49 @@ struct AddAlbum_Metadata: View {
 
             // MARK: - Genre Area
 
-            VStack {
+            VStack(spacing: 0) {
                 SectionHeader(text: "Genre")
-                ForEach(genres) { genre in
-                    Text("\(genre.name)")
+                Spacer()
+                    .frame(height: 8)
+                FlowLayout(mode: .scrollable, items: genres, itemSpacing: 4) { genre in
+                    if !genre.isSubgenre {
+                        Button(action: /*@START_MENU_TOKEN@*/ {}/*@END_MENU_TOKEN@*/, label: {
+                            Text("\(genre.name)")
+                                .font(Font.custom("Poppins-SemiBold", size: 20))
+                                .foregroundStyle(Color("G3"))
+                                .padding(.horizontal, 16)
+                                .padding(.vertical, 4)
+                                .background(Color("G1"))
+                                .clipShape(RoundedRectangle(cornerRadius: 100))
+
+                        })
+                    }
                 }
+                .padding(.horizontal, 12)
+                Spacer()
+                    .frame(height: 4)
+                HStack(spacing: 0) {
+                    Button(action: /*@START_MENU_TOKEN@*/ {}/*@END_MENU_TOKEN@*/, label: {
+                        HStack(spacing: 8) {
+                            RectIconWrapper(icon: Image("plus-bold"),
+                                            color: Color("G3"), iconWidth: 17, wrapperWidth: 20, wrapperHeight: 20)
+
+                            Text("Add Genre")
+                                .font(Font.custom("Poppins-SemiBold", size: 20))
+                                .foregroundStyle(Color("G3"))
+                        }
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 4)
+                        .background(
+                            RoundedRectangle(cornerRadius: 100)
+                                .fill(.clear)
+                                .strokeBorder(Color("G2"), style: StrokeStyle(lineWidth: 4, dash: [8])))
+
+                    })
+                    .padding(.all, 0)
+                    Spacer()
+                }
+                .padding(.horizontal, 16)
             }
 
             // MARK: - SubGenre Area
@@ -256,7 +298,40 @@ struct AddAlbum_Metadata: View {
 }
 
 #Preview {
-    AddAlbum_Metadata(isNextEnabled: .constant(false))
+    var previewModelContainer: ModelContainer = {
+        let schema = Schema([
+            Album.self, Artist.self, Track.self, Genre.self
+        ])
+        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
+
+        do {
+            let container = try ModelContainer(for: schema, configurations: [modelConfiguration])
+
+            // Check application has genre data
+            let descriptor = FetchDescriptor<Genre>()
+            let existingGenres = try container.mainContext.fetchCount(descriptor)
+            guard existingGenres == 0 else { return container }
+
+            // Load built-in genre data & decode
+            guard let url = Bundle.main.url(forResource: "BuiltInGenreData", withExtension: "json") else {
+                fatalError("Failed to find users.json")
+            }
+
+            let data = try Data(contentsOf: url)
+            let genreDatas = try JSONDecoder().decode([Genre].self, from: data)
+
+            for genreData in genreDatas {
+                container.mainContext.insert(genreData)
+            }
+
+            return container
+        } catch {
+            fatalError("Could not create ModelContainer: \(error)")
+        }
+    }()
+
+    return AddAlbum_Metadata(isNextEnabled: .constant(false))
+        .modelContainer(previewModelContainer)
 }
 
 struct SqaureBoxButton: View {
