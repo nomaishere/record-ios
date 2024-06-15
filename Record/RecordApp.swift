@@ -11,39 +11,47 @@ import SwiftUI
 @main
 struct RecordApp: App {
     @ObservedObject var router = Router()
-
+    
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
             Album.self, Artist.self, Track.self, Genre.self
         ])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
-
+        
         do {
             let container = try ModelContainer(for: schema, configurations: [modelConfiguration])
-
+            
             // Check application has genre data
             let descriptor = FetchDescriptor<Genre>()
             let existingGenres = try container.mainContext.fetchCount(descriptor)
             guard existingGenres == 0 else { return container }
-
+            
             // Load built-in genre data & decode
             guard let url = Bundle.main.url(forResource: "BuiltInGenreData", withExtension: "json") else {
                 fatalError("Failed to find users.json")
             }
-
+            
             let data = try Data(contentsOf: url)
             let genreDatas = try JSONDecoder().decode([Genre].self, from: data)
-
+            
             for genreData in genreDatas {
                 container.mainContext.insert(genreData)
             }
-
+            
             return container
         } catch {
             fatalError("Could not create ModelContainer: \(error)")
         }
     }()
-
+    
+    func findFolder() {
+        let urlApp = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).last
+        let url = urlApp!.appendingPathComponent("default.store")
+        if FileManager.default.fileExists(atPath: url.path) {
+            print("swiftdata db at \(url.absoluteString)")
+        }
+    }
+    
     var body: some Scene {
         WindowGroup {
             NavigationStack(path: $router.navPath) {
@@ -56,9 +64,9 @@ struct RecordApp: App {
                             AddAlbum()
                         }
                     }
+                    .environmentObject(router)
             }
-            .environmentObject(router)
+            .modelContainer(sharedModelContainer)
         }
-        .modelContainer(sharedModelContainer)
     }
 }

@@ -24,9 +24,9 @@ final class Genre: Identifiable, Codable {
     var isSubgenre: Bool
     /// If isBuiltIn is true, it means this genre data was provided by application's develpers.
     var isBuiltIn: Bool
-    @Relationship var subgenre: [Genre]?
+    var subgenre: [Genre.ID]?
 
-    init(id: UUID, name: String, isSubgenre: Bool, isBuiltIn: Bool, subgenre: [Genre]) {
+    init(id: UUID, name: String, isSubgenre: Bool, isBuiltIn: Bool, subgenre: [Genre.ID]) {
         self.id = id
         self.name = name
         self.isSubgenre = isSubgenre
@@ -41,6 +41,13 @@ final class Genre: Identifiable, Codable {
         self.isSubgenre = try container.decode(Bool.self, forKey: .isSubgenre)
         self.isBuiltIn = try container.decode(Bool.self, forKey: .isBuiltIn)
         // TODO: decode for subgenre
+        let uuidStrings = try container.decode([String].self, forKey: .subGenreID)
+
+        if !uuidStrings.isEmpty {
+            for uuidString in uuidStrings {
+                subgenre?.append(UUID(uuidString: uuidString)!)
+            }
+        }
     }
 
     func encode(to encoder: Encoder) throws {

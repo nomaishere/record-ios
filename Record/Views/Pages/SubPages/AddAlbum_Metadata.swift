@@ -79,23 +79,20 @@ class CoverImageModel: ObservableObject {
 
 // View
 struct AddAlbum_Metadata: View {
-    @Environment(\.modelContext) private var modelContext
+    @StateObject var viewModel = CoverImageModel()
 
     @EnvironmentObject var importManager: ImportManager
-
     @Binding var isNextEnabled: Bool
 
     @State var title: String = ""
 
     @State var artists: [Artist] = []
 
-    @State var selectedItems: [PhotosPickerItem] = []
-
-    @StateObject var viewModel = CoverImageModel()
-
     @State var isGenreSelected: Bool = false
-
+    // Query user's genre data
     @Query var genres: [Genre]
+
+    @State var selectedPrimaryGenre: [Genre] = []
 
     var body: some View {
         ScrollView {
@@ -224,6 +221,7 @@ struct AddAlbum_Metadata: View {
                             }
                         }
 
+                        // TODO: Implement Cover Seletion via File app
                         SqaureBoxButton(text: "Files", textColor: Color(hex: 0x1AADF8), icon: Image("FolderIcon"), action: { print("hi") })
                     }
                     .padding(.horizontal, 16)
@@ -244,13 +242,21 @@ struct AddAlbum_Metadata: View {
                     .frame(height: 8)
                 FlowLayout(mode: .scrollable, items: genres, itemSpacing: 4) { genre in
                     if !genre.isSubgenre {
-                        Button(action: /*@START_MENU_TOKEN@*/ {}/*@END_MENU_TOKEN@*/, label: {
+                        Button(action: {
+                            if selectedPrimaryGenre.contains(genre) {
+                                if let index = selectedPrimaryGenre.firstIndex(of: genre) {
+                                    selectedPrimaryGenre.remove(at: index)
+                                }
+                            } else {
+                                selectedPrimaryGenre.append(genre)
+                            }
+                        }, label: {
                             Text("\(genre.name)")
                                 .font(Font.custom("Poppins-SemiBold", size: 20))
-                                .foregroundStyle(Color("G3"))
+                                .foregroundStyle(selectedPrimaryGenre.contains(genre) ? Color(.white) : Color("G3"))
                                 .padding(.horizontal, 16)
                                 .padding(.vertical, 4)
-                                .background(Color("G1"))
+                                .background(selectedPrimaryGenre.contains(genre) ? Color("DefaultBlack") : Color("G1"))
                                 .clipShape(RoundedRectangle(cornerRadius: 100))
 
                         })
@@ -260,7 +266,8 @@ struct AddAlbum_Metadata: View {
                 Spacer()
                     .frame(height: 4)
                 HStack(spacing: 0) {
-                    Button(action: /*@START_MENU_TOKEN@*/ {}/*@END_MENU_TOKEN@*/, label: {
+                    // TODO: Implement Cover Seletion via File app
+                    Button(action: {}, label: {
                         HStack(spacing: 8) {
                             RectIconWrapper(icon: Image("plus-bold"),
                                             color: Color("G3"), iconWidth: 17, wrapperWidth: 20, wrapperHeight: 20)
@@ -284,6 +291,23 @@ struct AddAlbum_Metadata: View {
             }
 
             // MARK: - SubGenre Area
+
+            Button("TestGenre") {
+                print("hi")
+            }
+
+            VStack {
+                ForEach(selectedPrimaryGenre) { primaryGenre in
+                    VStack(spacing: 0) {
+                        SectionHeader(text: "SubGenre")
+                        if let subgenres = primaryGenre.subgenre {
+                            FlowLayout(mode: .scrollable, items: subgenres, itemSpacing: 4) { subgenre in
+                                Text("\(subgenre)")
+                            }
+                        }
+                    }
+                }
+            }
 
             if isGenreSelected {
                 Text("Sub")
