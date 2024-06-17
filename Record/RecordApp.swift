@@ -56,8 +56,8 @@ struct RecordApp: App {
                             AddAlbum()
                         }
                     }
-                    .environmentObject(router)
             }
+            .environmentObject(router)
             .modelContainer(sharedModelContainer)
         }
     }
