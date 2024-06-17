@@ -17,7 +17,7 @@ final class ImportManager: ObservableObject {
     }
 
     // FOR TEST
-    @Published var nowStep: importSteps = .METADATA
+    @Published var nowStep: importSteps = .IMPORT
 
     var selectedFilesURL: [URL] = []
 
@@ -29,5 +29,9 @@ final class ImportManager: ObservableObject {
         }
 
         return trackTempDatas
+    }
+    
+    func addAlbumToCollection() -> Void {
+        print("hi")
     }
 }

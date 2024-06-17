@@ -88,11 +88,14 @@ struct AddAlbum: View {
                         if importManager.nowStep != .IMPORT {
                             Button(action: {
                                 withAnimation {
-                                    if importManager.nowStep == .TRACKLIST {
+                                    switch importManager.nowStep {
+                                    case .IMPORT:
+                                        break
+                                    case .TRACKLIST:
                                         importManager.nowStep = .IMPORT
-                                    } else if importManager.nowStep == .METADATA {
+                                    case .METADATA:
                                         importManager.nowStep = .TRACKLIST
-                                    } else {
+                                    case .CHECK:
                                         importManager.nowStep = .METADATA
                                     }
                                 }
@@ -111,19 +114,19 @@ struct AddAlbum: View {
                             .padding(.leading, 8)
                         }
                         Spacer()
-                        Button("Next Step", action: {
+                        Button(importManager.nowStep == .CHECK ? "Complete" : "Next Step", action: {
                             withAnimation {
                                 if isNextEnabled {
-                                    if importManager.nowStep == .IMPORT {
+                                    switch importManager.nowStep {
+                                    case .IMPORT:
                                         importManager.nowStep = .TRACKLIST
-                                    } else if importManager.nowStep == .TRACKLIST {
+                                    case .TRACKLIST:
                                         importManager.nowStep = .METADATA
-                                    } else {
+                                    case .METADATA:
                                         importManager.nowStep = .CHECK
+                                    case .CHECK:
+                                        importManager.addAlbumToCollection()
                                     }
-
-                                } else {
-                                    print("bye")
                                 }
                             }
                         })

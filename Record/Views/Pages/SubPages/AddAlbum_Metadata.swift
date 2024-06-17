@@ -16,14 +16,11 @@ struct AddAlbum_Metadata: View {
     @StateObject var viewModel = CoverImageViewModel()
 
     @EnvironmentObject var importManager: ImportManager
+    @Query var genres: [Genre]
     @Binding var isNextEnabled: Bool
 
     @State var title: String = ""
-
     @State var artists: [Artist] = []
-
-    @Query var genres: [Genre]
-
     @State var selectedPrimaryGenre: [Genre] = []
     @State var selectedSubgenres: [Genre] = []
 
@@ -37,6 +34,61 @@ struct AddAlbum_Metadata: View {
             }
         }
         return tempGenres
+    }
+
+    func checkMetadataEditComplete() -> Bool {
+        if isTitleEditComplete() {
+            if isArtistEditComplete() {
+                if isCoverEditComplete() {
+                    if isGenreEditComplete() {
+                        return true
+                    }
+                }
+            }
+        }
+        return false
+    }
+
+    func isTitleEditComplete() -> Bool {
+        if title.isEmpty {
+            return false
+        } else {
+            return true
+        }
+    }
+
+    func isArtistEditComplete() -> Bool {
+        if artists.isEmpty {
+            return false
+        } else {
+            for artist in artists {
+                if artist.name.isEmpty {
+                    return false
+                }
+            }
+            return true
+        }
+    }
+
+    func isCoverEditComplete() -> Bool {
+        switch viewModel.imageState {
+        case .success:
+            return true
+        case .empty:
+            return false
+        case .loading:
+            return false
+        case .failure:
+            return false
+        }
+    }
+
+    func isGenreEditComplete() -> Bool {
+        if selectedPrimaryGenre.isEmpty {
+            return false
+        } else {
+            return true
+        }
     }
 
     var body: some View {
@@ -119,7 +171,6 @@ struct AddAlbum_Metadata: View {
 
             VStack(spacing: 12) {
                 SectionHeader(text: "Cover")
-
                 switch viewModel.imageState {
                 case .success(let image):
                     image
@@ -191,6 +242,8 @@ struct AddAlbum_Metadata: View {
                             if selectedPrimaryGenre.contains(genre) {
                                 if let index = selectedPrimaryGenre.firstIndex(of: genre) {
                                     selectedPrimaryGenre.remove(at: index)
+
+                                    // TODO: Delete Subgenre of deleted primary genre
                                 }
                             } else {
                                 selectedPrimaryGenre.append(genre)
@@ -277,11 +330,23 @@ struct AddAlbum_Metadata: View {
             Spacer()
                 .frame(height: 128)
         }
+        .onChange(of: title) {
+            isNextEnabled = checkMetadataEditComplete()
+        }
+        .onChange(of: artists) {
+            isNextEnabled = checkMetadataEditComplete()
+        }
+        .onReceive(viewModel.$imageState) { _ in
+            isNextEnabled = checkMetadataEditComplete()
+        }
+        .onChange(of: selectedPrimaryGenre) {
+            isNextEnabled = checkMetadataEditComplete()
+        }
     }
 }
 
 #Preview {
-    var previewModelContainer: ModelContainer = {
+    let previewModelContainer: ModelContainer = {
         let schema = Schema([
             Album.self, Artist.self, Track.self, Genre.self
         ])
