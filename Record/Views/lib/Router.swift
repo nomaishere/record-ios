@@ -16,7 +16,6 @@ final class Router: ObservableObject {
     
     @Published var navPath = NavigationPath()
     
-    // What is 'to' keyword
     func navigate(to destination: Destination) {
         navPath.append(destination)
     }

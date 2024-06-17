@@ -44,14 +44,6 @@ struct RecordApp: App {
         }
     }()
     
-    func findFolder() {
-        let urlApp = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).last
-        let url = urlApp!.appendingPathComponent("default.store")
-        if FileManager.default.fileExists(atPath: url.path) {
-            print("swiftdata db at \(url.absoluteString)")
-        }
-    }
-    
     var body: some Scene {
         WindowGroup {
             NavigationStack(path: $router.navPath) {

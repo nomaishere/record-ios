@@ -11,75 +11,9 @@ import SwiftUI
 
 import SwiftUIFlowLayout
 
-// View Model
-@MainActor
-class CoverImageModel: ObservableObject {
-    enum ImageState {
-        case empty
-        case loading(Progress)
-        case success(Image)
-        case failure(Error)
-    }
-
-    enum TransferError: Error {
-        case importFailed
-    }
-
-    struct CoverImage: Transferable {
-        let image: Image
-
-        static var transferRepresentation: some TransferRepresentation {
-            DataRepresentation(importedContentType: .image) { data in
-                // Only work when platform can import UIKit
-                guard let uiImage = UIImage(data: data) else {
-                    throw TransferError.importFailed
-                }
-                let image = Image(uiImage: uiImage)
-                return CoverImage(image: image)
-            }
-        }
-    }
-
-    @Published private(set) var imageState: ImageState = .empty
-
-    @Published var imageSelection: PhotosPickerItem? = nil {
-        didSet {
-            if let imageSelection {
-                let progress = loadTransferable(from: imageSelection)
-                imageState = .loading(progress)
-            } else {
-                imageState = .empty
-            }
-        }
-    }
-
-    private func loadTransferable(from imageSelection: PhotosPickerItem) -> Progress {
-        return imageSelection.loadTransferable(type: CoverImage.self) { result in
-            DispatchQueue.main.async {
-                guard imageSelection == self.imageSelection else {
-                    print("Failed to get the selected item")
-                    return
-                }
-                switch result {
-                case .success(let coverImage?):
-                    self.imageState = .success(coverImage.image)
-                case .success(nil):
-                    self.imageState = .empty
-                case .failure(let error):
-                    self.imageState = .failure(error)
-                }
-            }
-        }
-    }
-
-    func selectAgain() {
-        imageState = .empty
-    }
-}
-
 // View
 struct AddAlbum_Metadata: View {
-    @StateObject var viewModel = CoverImageModel()
+    @StateObject var viewModel = CoverImageViewModel()
 
     @EnvironmentObject var importManager: ImportManager
     @Binding var isNextEnabled: Bool
@@ -88,11 +22,22 @@ struct AddAlbum_Metadata: View {
 
     @State var artists: [Artist] = []
 
-    @State var isGenreSelected: Bool = false
-    // Query user's genre data
     @Query var genres: [Genre]
 
     @State var selectedPrimaryGenre: [Genre] = []
+    @State var selectedSubgenres: [Genre] = []
+
+    func querySubgenresByIDs(ids: [Genre.ID]) -> [Genre] {
+        var tempGenres: [Genre] = []
+        for genre in genres {
+            for id in ids {
+                if id == genre.id {
+                    tempGenres.append(genre)
+                }
+            }
+        }
+        return tempGenres
+    }
 
     var body: some View {
         ScrollView {
@@ -289,28 +234,42 @@ struct AddAlbum_Metadata: View {
                 }
                 .padding(.horizontal, 16)
             }
+            Spacer()
+                .frame(height: 40)
 
             // MARK: - SubGenre Area
 
-            Button("TestGenre") {
-                print("hi")
-            }
-
             VStack {
                 ForEach(selectedPrimaryGenre) { primaryGenre in
-                    VStack(spacing: 0) {
-                        SectionHeader(text: "SubGenre")
-                        if let subgenres = primaryGenre.subgenre {
-                            FlowLayout(mode: .scrollable, items: subgenres, itemSpacing: 4) { subgenre in
-                                Text("\(subgenre)")
+                    if !primaryGenre.subgenre.isEmpty {
+                        VStack(spacing: 0) {
+                            SectionHeader(text: "SubGenre of \(primaryGenre.name)")
+
+                            FlowLayout(mode: .scrollable, items: querySubgenresByIDs(ids: primaryGenre.subgenre), itemSpacing: 4) { subgenre in
+                                Button(action: {
+                                    if selectedSubgenres.contains(subgenre) {
+                                        if let index = selectedSubgenres.firstIndex(of: subgenre) {
+                                            selectedSubgenres.remove(at: index)
+                                        }
+                                    } else {
+                                        selectedSubgenres.append(subgenre)
+                                    }
+                                }, label: {
+                                    Text("\(subgenre.name)")
+                                        .font(Font.custom("Poppins-SemiBold", size: 20))
+                                        .foregroundStyle(selectedSubgenres.contains(subgenre) ? Color(.white) : Color("G3"))
+                                        .padding(.horizontal, 16)
+                                        .padding(.vertical, 4)
+                                        .background(selectedSubgenres.contains(subgenre) ? Color("DefaultBlack") : Color("G1"))
+                                        .clipShape(RoundedRectangle(cornerRadius: 4))
+                                })
                             }
+                            .padding(.horizontal, 12)
+                            Spacer()
+                                .frame(height: 40)
                         }
                     }
                 }
-            }
-
-            if isGenreSelected {
-                Text("Sub")
             }
 
             // MARK: - Area for Scroll
