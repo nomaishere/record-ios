@@ -21,7 +21,7 @@
         "name": "Hiphop",
         "isSubgenre": false,
         "isBuiltIn": true,
-        "subGenreID": ["f064b5ca-d9ba-403a-a76e-5e516b992eb2", "41755c3e-7561-4035-8a7d-9f1235e01666"]
+        "subGenreID": ["f064b5ca-d9ba-403a-a76e-5e516b992eb2", "41755c3e-7561-4035-8a7d-9f1235e01666", "e8b9007d-ade0-496f-82b5-fec60a2c8e51", "5b61b8f6-7103-4783-af50-88aa3f271fb6", "aef57eb9-4d99-4d1b-8ed1-08944fca9ed0", "bce86d16-8727-4028-89a1-85a21c0b1c75", "2cfe7d43-452d-4903-864f-86ba41c1b78b", "e34967e0-610f-4803-ae60-29ad29604946", "ae537c03-1f50-42da-914f-8338c8a128f5", "5915407d-bd49-4d4b-a5d5-2d8d58b208cc"]
         
     },
     {
@@ -107,6 +107,70 @@
     {
         "id": "41755c3e-7561-4035-8a7d-9f1235e01666",
         "name": "trap",
+        "isSubgenre": true,
+        "isBuiltIn": true,
+        "subGenreID": []
+        
+    },
+    {
+        "id": "e8b9007d-ade0-496f-82b5-fec60a2c8e51",
+        "name": "drill",
+        "isSubgenre": true,
+        "isBuiltIn": true,
+        "subGenreID": []
+        
+    },
+    {
+        "id": "5b61b8f6-7103-4783-af50-88aa3f271fb6",
+        "name": "cloud",
+        "isSubgenre": true,
+        "isBuiltIn": true,
+        "subGenreID": []
+        
+    },
+    {
+        "id": "aef57eb9-4d99-4d1b-8ed1-08944fca9ed0",
+        "name": "emo",
+        "isSubgenre": true,
+        "isBuiltIn": true,
+        "subGenreID": []
+        
+    },
+    {
+        "id": "bce86d16-8727-4028-89a1-85a21c0b1c75",
+        "name": "g-funk",
+        "isSubgenre": true,
+        "isBuiltIn": true,
+        "subGenreID": []
+        
+    },
+    {
+        "id": "2cfe7d43-452d-4903-864f-86ba41c1b78b",
+        "name": "memphis",
+        "isSubgenre": true,
+        "isBuiltIn": true,
+        "subGenreID": []
+        
+    },
+    {
+        "id": "e34967e0-610f-4803-ae60-29ad29604946",
+        "name": "conscious",
+        "isSubgenre": true,
+        "isBuiltIn": true,
+        "subGenreID": []
+        
+    },
+    {
+        "id": "ae537c03-1f50-42da-914f-8338c8a128f5",
+        "name": "experimental",
+        "isSubgenre": true,
+        "isBuiltIn": true,
+        "subGenreID": []
+        
+    },
+    {
+        "id": "5915407d-bd49-4d4b-a5d5-2d8d58b208cc",
+        "name": "abstract",
         "isSubgenre": true,
         "isBuiltIn": true,
         "subGenreID": []
