@@ -19,8 +19,7 @@ struct NavigationItem: View {
     var iconWidth: CGFloat
     var tab: Tab
     @Binding var selectedTab: Tab
-    
-    
+
     var body: some View {
         VStack(spacing: 2) {
             RectIconWrapper(icon: icon, color: tab == selectedTab ? Color("G6") : Color("G3"), iconWidth: iconWidth, wrapperWidth: 32, wrapperHeight: 32)
@@ -36,9 +35,8 @@ struct NavigationItem: View {
 }
 
 struct NavigationBar: View {
-    
     @Binding var selectedTab: Tab
-    
+
     var body: some View {
         VStack(spacing: 0) {
             Color("G2")
@@ -48,7 +46,6 @@ struct NavigationBar: View {
                 NavigationItem(icon: Image("Collection"), title: Text("Collection"), iconWidth: 22, tab: .Collection, selectedTab: $selectedTab)
                 NavigationItem(icon: Image("Playlist"), title: Text("Playlist"), iconWidth: 30, tab: .Playlist, selectedTab: $selectedTab)
                 NavigationItem(icon: Image("More"), title: Text("More"), iconWidth: 20, tab: .More, selectedTab: $selectedTab)
-                
             }
             .padding(.top, 6)
         }
@@ -56,4 +53,3 @@ struct NavigationBar: View {
         .background(Color("G1"))
     }
 }
-
