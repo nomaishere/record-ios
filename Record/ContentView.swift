@@ -10,12 +10,15 @@ import SwiftUI
 
 struct ContentView: View {
     @State var selectedTab: Tab = .Collection
+    @State var playerBarZIndex: Double = 0
 
     var body: some View {
         ZStack(alignment: .bottom) {
             DomainView(selectedTab: $selectedTab)
-            MiniPlayerBar()
-                .zIndex(0) // increase this
+
+            Player(playerBarZIndex: $playerBarZIndex)
+                .ignoresSafeArea()
+                .zIndex(playerBarZIndex) // increase this
             NavigationBar(selectedTab: $selectedTab)
         }
     }
@@ -43,15 +46,56 @@ struct DomainView: View {
     ContentView()
 }
 
-struct MiniPlayerBar: View {
-    @State private var isDragging = false
+struct Player: View {
+    @State private var isDragging: Bool = false
+    @State private var doOnceLock: Bool = false
+    @State private var testHeight: CGFloat = 64
+    @State private var testWidth: CGFloat = UIScreen.main.bounds.size.width - 16
+    @State private var bottomPadding: CGFloat = 67
+
+    @Binding var playerBarZIndex: Double
+
+    enum PlayerMode {
+        case minibar
+        case expanded
+    }
+
+    @State private var playerMode: PlayerMode = .minibar
+
+    @State private var isMinibarItemRender: Bool = true
 
     var drag: some Gesture {
         DragGesture(minimumDistance: 10)
             .onChanged { value in
                 self.isDragging = true
                 if value.translation.height < -30 {
-                    print("hi")
+                    if !self.doOnceLock {
+                        self.doOnceLock.toggle()
+                        withAnimation(.easeOut(duration: 0.25)) {
+                            self.testWidth = UIScreen.main.bounds.size.width
+                            self.testHeight = UIScreen.main.bounds.size.height
+                            self.bottomPadding = 0
+                            playerBarZIndex = 1
+                            self.isMinibarItemRender.toggle() // Erase Minibar Item
+                        } completion: {
+                            self.doOnceLock.toggle()
+                            self.isMinibarItemRender = false
+                        }
+                    }
+                } else if value.translation.height > 30 {
+                    if !self.doOnceLock {
+                        self.doOnceLock.toggle()
+                        withAnimation(.easeOut(duration: 0.25)) {
+                            self.testWidth = UIScreen.main.bounds.size.width - 16
+                            self.testHeight = 64
+                            self.bottomPadding = 67
+
+                        } completion: {
+                            playerBarZIndex = 0
+                            self.doOnceLock.toggle()
+                            self.isMinibarItemRender = true
+                        }
+                    }
                 }
             }
             .onEnded { _ in self.isDragging = false }
@@ -59,23 +103,30 @@ struct MiniPlayerBar: View {
 
     var body: some View {
         ZStack {
-            Image("modm")
+            Image("ugrshigh")
                 .resizable()
                 .scaledToFill()
-            HStack {
-                Text("Somozu Combat")
-                    .font(Font.custom("Poppins-SemiBold", size: 20))
-                    .foregroundStyle(Color(.white))
-                    .padding(.leading, 12)
-                Spacer()
-                Button(action: {}, label: { RectIconWrapper(icon: Image("Pause"), color: Color(.white), iconWidth: 17, wrapperWidth: 17, wrapperHeight: 20) })
-                    .padding(.trailing, 24)
+            switch playerMode {
+            case .minibar:
+                if isMinibarItemRender {
+                    HStack {
+                        Text("Somozu Combat")
+                            .font(Font.custom("Poppins-SemiBold", size: 20))
+                            .foregroundStyle(Color(.white))
+                            .padding(.leading, 12)
+                        Spacer()
+                        Button(action: {}, label: { RectIconWrapper(icon: Image("Pause"), color: Color(.white), iconWidth: 17, wrapperWidth: 17, wrapperHeight: 20) })
+                            .padding(.trailing, 24)
+                    }
+                }
+
+            case .expanded:
+                Text("Hi")
             }
         }
-        .frame(height: 64)
+        .frame(width: testWidth, height: testHeight)
         .clipShape(RoundedRectangle(cornerRadius: 4))
-        .padding(.horizontal, 8)
-        .padding(.bottom, 59 + 8)
+        .padding(.bottom, bottomPadding)
         .gesture(drag)
     }
 }
