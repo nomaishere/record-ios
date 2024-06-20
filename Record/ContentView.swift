@@ -9,18 +9,25 @@ import SwiftData
 import SwiftUI
 
 struct ContentView: View {
+    @Environment(\.safeAreaInsets) private var safeAreaInsets
+
     @State var selectedTab: Tab = .Collection
 
-    @State var isPlayerExpanded: Bool = false
+    @StateObject var viewModel = PlayerViewModel()
 
     var body: some View {
         ZStack(alignment: .bottom) {
             DomainView(selectedTab: $selectedTab)
+                .padding(.top, safeAreaInsets.top)
             PlayerView()
-                .ignoresSafeArea()
-                .zIndex(isPlayerExpanded ? 1 : 0) // increase this
+                .environmentObject(viewModel)
+                .zIndex(viewModel.playerMode == .minibar ? 0 : 1) // increase this
+
             NavigationBar(selectedTab: $selectedTab)
+
+            // .ignoresSafeArea()
         }
+        .ignoresSafeArea()
     }
 }
 
@@ -54,13 +61,16 @@ struct PlayerView: View {
      @State private var testWidth: CGFloat = UIScreen.main.bounds.size.width - 16
      @State private var bottomPadding: CGFloat = 67
      */
-    @StateObject var viewModel = PlayerViewModel()
+
+    @EnvironmentObject var viewModel: PlayerViewModel
 
     var body: some View {
         ZStack {
-            Image("ugrshigh")
-                .resizable()
-                .scaledToFill()
+            Color.clear
+                .background(
+                    Image("ugrshigh")
+                        .resizable()
+                        .scaledToFill())
             switch viewModel.playerMode {
             case .minibar:
                 if viewModel.isMinibarItemRender {
@@ -80,9 +90,12 @@ struct PlayerView: View {
 
             case .expanded:
                 Text("Hi")
+            case .animated:
+                Text("ss")
             }
         }
         .frame(width: viewModel.viewWidth, height: viewModel.viewHeight)
+        // .frame(width: UIScreen.main.bounds.size.width, height: UIScreen.main.bounds.size.height)
         .clipShape(RoundedRectangle(cornerRadius: 4))
         .padding(.bottom, viewModel.bottomPadding)
         .gesture(viewModel.dragGesture)

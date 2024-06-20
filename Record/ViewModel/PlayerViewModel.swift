@@ -12,15 +12,17 @@ class PlayerViewModel: ObservableObject {
     enum PlayerMode {
         case minibar
         case expanded
+        case animated
     }
+
+    @Published var playerMode: PlayerMode = .minibar
 
     @Published var isDragging: Bool = false
     @Published var doOnceLock: Bool = false
     @Published var viewHeight: CGFloat = 64
     @Published var viewWidth: CGFloat = UIScreen.main.bounds.size.width - 16
-    @Published var bottomPadding: CGFloat = 67
+    @Published var bottomPadding: CGFloat = 59
 
-    @Published var playerMode: PlayerMode = .minibar
     @Published var isMinibarItemRender: Bool = true
 
     // @Binding var playerBarZIndex: Double
@@ -32,13 +34,15 @@ class PlayerViewModel: ObservableObject {
                 if value.translation.height < -30 {
                     if !self.doOnceLock {
                         self.doOnceLock.toggle()
-                        withAnimation(.easeOut(duration: 0.25)) {
+                        self.playerMode = .animated
+                        withAnimation(.easeOut(duration: 3)) {
                             self.viewWidth = UIScreen.main.bounds.size.width
                             self.viewHeight = UIScreen.main.bounds.size.height
+                            // self.viewHeight = 300
                             self.bottomPadding = 0
-                            // playerBarZIndex = 1
                             self.isMinibarItemRender.toggle() // Erase Minibar Item
                         } completion: {
+                            self.playerMode = .expanded
                             self.doOnceLock.toggle()
                             self.isMinibarItemRender = false
                         }
@@ -46,7 +50,7 @@ class PlayerViewModel: ObservableObject {
                 } else if value.translation.height > 30 {
                     if !self.doOnceLock {
                         self.doOnceLock.toggle()
-                        withAnimation(.easeOut(duration: 0.25)) {
+                        withAnimation(.easeOut(duration: 3)) {
                             self.viewWidth = UIScreen.main.bounds.size.width - 16
                             self.viewHeight = 64
                             self.bottomPadding = 67

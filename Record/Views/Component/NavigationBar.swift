@@ -37,6 +37,8 @@ struct NavigationItem: View {
 struct NavigationBar: View {
     @Binding var selectedTab: Tab
 
+    @Environment(\.safeAreaInsets) private var safeAreaInsets
+
     var body: some View {
         VStack(spacing: 0) {
             Color("G2")
@@ -49,7 +51,7 @@ struct NavigationBar: View {
             }
             .padding(.top, 6)
         }
-        .frame(maxWidth: .infinity, minHeight: 59, maxHeight: 59, alignment: .top)
+        .frame(width: .infinity, height: safeAreaInsets.bottom + 59, alignment: .top)
         .background(Color("G1"))
     }
 }
