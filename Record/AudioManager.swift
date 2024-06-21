@@ -78,7 +78,6 @@ final class AudioManager {
     }
 
     func play() {
-        print("hi")
         if let player = player {
             player.play()
         }

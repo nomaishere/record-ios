@@ -8,7 +8,6 @@
 import SwiftData
 import SwiftUI
 
-
 struct ContentView: View {
     @Environment(\.safeAreaInsets) private var safeAreaInsets
 
@@ -161,7 +160,7 @@ struct PlayerView: View {
                         Text("Rockstar Lifestyle")
                             .font(Font.custom("Pretendard-SemiBold", size: 20))
                             .foregroundStyle(Color(.white))
-                            .padding(.leading, 12)
+                            .padding(.leading, 16)
                         Spacer()
                         Button(action: {
                             AudioManager.sharedInstance.startAudio()
@@ -186,11 +185,47 @@ struct PlayerView: View {
                                 .fill(Color(hex: 0x6F6F6F, opacity: 0.1))
                                 .frame(width: 280, height: 60)
 
-                            HStack(spacing: 77) {
-                                RectIconWrapper(icon: Image("Previous"), color: trackThemeColor, iconWidth: 21, wrapperWidth: 21, wrapperHeight: 24)
-                                RectIconWrapper(icon: Image("Pause_Thin"), color: trackThemeColor, iconWidth: 19.4, wrapperWidth: 20, wrapperHeight: 27)
-                                RectIconWrapper(icon: Image("Next"), color: trackThemeColor, iconWidth: 21, wrapperWidth: 21, wrapperHeight: 24)
+                            HStack(spacing: 0) {
+                                VStack {
+                                    Spacer()
+                                    HStack(spacing: 0) {
+                                        Spacer()
+                                        RectIconWrapper(icon: Image("Previous"), color: trackThemeColor, iconWidth: 21, wrapperWidth: 21, wrapperHeight: 24)
+                                            .padding(.trailing, 32)
+                                    }
+                                    Spacer()
+                                }
+                                .contentShape(Rectangle())
+                                .onTapGesture {
+                                    print("hi")
+                                }
+                                Spacer()
+                                VStack {
+                                    Spacer()
+                                    RectIconWrapper(icon: Image("Pause_Thin"), color: trackThemeColor, iconWidth: 19.4, wrapperWidth: 20, wrapperHeight: 27)
+                                        .padding(.horizontal, 32)
+                                    Spacer()
+                                }
+                                .contentShape(Rectangle())
+                                .onTapGesture {
+                                    print("hi")
+                                }
+                                Spacer()
+                                VStack {
+                                    Spacer()
+                                    HStack(spacing: 0) {
+                                        RectIconWrapper(icon: Image("Next"), color: trackThemeColor, iconWidth: 21, wrapperWidth: 21, wrapperHeight: 24)
+                                            .padding(.leading, 32)
+                                        Spacer()
+                                    }
+                                    Spacer()
+                                }
+                                .contentShape(Rectangle())
+                                .onTapGesture {
+                                    print("hi")
+                                }
                             }
+                            .frame(width: 280, height: 60)
                         }
                     }
                     Spacer()
@@ -198,11 +233,10 @@ struct PlayerView: View {
                 }
 
             case .animated:
-                Text("ss")
+                Color.clear
             }
         }
         .frame(width: viewWidth, height: viewHeight)
-        // .frame(width: UIScreen.main.bounds.size.width, height: UIScreen.main.bounds.size.height)
         .clipShape(RoundedRectangle(cornerRadius: 4))
         .padding(.bottom, bottomPadding)
         .gesture(dragGesture)
