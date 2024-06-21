@@ -8,18 +8,20 @@
 import SwiftData
 import SwiftUI
 
+
 struct ContentView: View {
     @Environment(\.safeAreaInsets) private var safeAreaInsets
 
     @State var selectedTab: Tab = .Collection
 
-    @State var isPlayerMinimized: Bool = true
+    // @State var isPlayerMinimized: Bool = true
+    @State var isPlayerMinimized: Bool = false
 
     var body: some View {
         ZStack(alignment: .bottom) {
             DomainView(selectedTab: $selectedTab)
                 .padding(.top, safeAreaInsets.top)
-            PlayerView(isPlayerMinimized: $isPlayerMinimized, bottomPadding: safeAreaInsets.bottom + 59 + 8)
+            PlayerView(isPlayerMinimized: $isPlayerMinimized, safeAreaInsetBottom: safeAreaInsets.bottom, playerMode: .expanded)
                 .zIndex(isPlayerMinimized ? 0 : 1) // increase this
 
             NavigationBar(selectedTab: $selectedTab)
@@ -60,10 +62,10 @@ struct PlayerView: View {
     @Binding var isPlayerMinimized: Bool
     @Environment(\.safeAreaInsets) private var safeAreaInsets
 
-    @State var playerMode: PlayerMode = .minibar
+    @State var playerMode: PlayerMode
 
-    @State var viewHeight: CGFloat = 64
-    @State var viewWidth: CGFloat = UIScreen.main.bounds.size.width - 16
+    @State var viewWidth: CGFloat
+    @State var viewHeight: CGFloat
     @State var bottomPadding: CGFloat
 
     @State var isMinibarItemRender: Bool = true
@@ -73,10 +75,28 @@ struct PlayerView: View {
 
     let minibarBottomPadding: CGFloat
 
-    init(isPlayerMinimized: Binding<Bool>, bottomPadding: CGFloat) {
+    @State var trackThemeColor: Color = .init(hex: 0xDB4928)
+
+    init(isPlayerMinimized: Binding<Bool>, safeAreaInsetBottom: CGFloat, playerMode: PlayerMode) {
         _isPlayerMinimized = isPlayerMinimized
-        _bottomPadding = State(initialValue: bottomPadding)
-        minibarBottomPadding = bottomPadding
+        minibarBottomPadding = safeAreaInsetBottom + 59 + 8
+        _playerMode = State(initialValue: playerMode)
+
+        switch playerMode {
+        case .minibar:
+            _viewWidth = State(initialValue: UIScreen.main.bounds.size.width - 16)
+            _viewHeight = State(initialValue: 64)
+            _bottomPadding = State(initialValue: safeAreaInsetBottom + 59 + 8)
+        case .expanded:
+            _viewWidth = State(initialValue: UIScreen.main.bounds.size.width)
+            _viewHeight = State(initialValue: UIScreen.main.bounds.size.height)
+            _bottomPadding = State(initialValue: 0)
+        case .animated:
+            // Error Case
+            _viewWidth = State(initialValue: 0)
+            _viewHeight = State(initialValue: 0)
+            _bottomPadding = State(initialValue: 0)
+        }
     }
 
     var dragGesture: some Gesture {
@@ -138,8 +158,8 @@ struct PlayerView: View {
             case .minibar:
                 if isMinibarItemRender {
                     HStack {
-                        Text("Somozu Combat")
-                            .font(Font.custom("Poppins-SemiBold", size: 20))
+                        Text("Rockstar Lifestyle")
+                            .font(Font.custom("Pretendard-SemiBold", size: 20))
                             .foregroundStyle(Color(.white))
                             .padding(.leading, 12)
                         Spacer()
@@ -152,7 +172,31 @@ struct PlayerView: View {
                 }
 
             case .expanded:
-                Text("Hi")
+                VStack {
+                    Spacer()
+                    VStack(spacing: 4) {
+                        Text("Rockstar Lifestyle")
+                            .font(Font.custom("Pretendard-Bold", size: 20))
+                            .foregroundStyle(trackThemeColor)
+                        ZStack {
+                            BackdropBlurView(radius: 16)
+                                .frame(width: 280, height: 60)
+                                .clipShape(RoundedRectangle(cornerRadius: 8))
+                            RoundedRectangle(cornerRadius: 8)
+                                .fill(Color(hex: 0x6F6F6F, opacity: 0.1))
+                                .frame(width: 280, height: 60)
+
+                            HStack(spacing: 77) {
+                                RectIconWrapper(icon: Image("Previous"), color: trackThemeColor, iconWidth: 21, wrapperWidth: 21, wrapperHeight: 24)
+                                RectIconWrapper(icon: Image("Pause_Thin"), color: trackThemeColor, iconWidth: 19.4, wrapperWidth: 20, wrapperHeight: 27)
+                                RectIconWrapper(icon: Image("Next"), color: trackThemeColor, iconWidth: 21, wrapperWidth: 21, wrapperHeight: 24)
+                            }
+                        }
+                    }
+                    Spacer()
+                        .frame(height: 96)
+                }
+
             case .animated:
                 Text("ss")
             }
