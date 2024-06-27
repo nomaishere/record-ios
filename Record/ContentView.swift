@@ -5,6 +5,7 @@
 //  Created by nomamac2 on 5/24/24.
 //
 
+import MediaPlayer
 import SwiftData
 import SwiftUI
 
@@ -12,8 +13,6 @@ struct ContentView: View {
     @Environment(\.safeAreaInsets) private var safeAreaInsets
 
     @State var selectedTab: Tab = .Collection
-
-    // @State var isPlayerMinimized: Bool = true
     @State var isPlayerMinimized: Bool = false
 
     var body: some View {
@@ -165,6 +164,7 @@ struct PlayerView: View {
                         Button(action: {
                             AudioManager.sharedInstance.startAudio()
                             AudioManager.sharedInstance.play()
+                            AudioManager.sharedInstance.updateNowPlayingInfo()
                         }, label: { RectIconWrapper(icon: Image("Pause"), color: Color(.white), iconWidth: 17, wrapperWidth: 17, wrapperHeight: 20) })
                             .padding(.trailing, 24)
                     }
@@ -177,56 +177,7 @@ struct PlayerView: View {
                         Text("Rockstar Lifestyle")
                             .font(Font.custom("Pretendard-Bold", size: 20))
                             .foregroundStyle(trackThemeColor)
-                        ZStack {
-                            BackdropBlurView(radius: 16)
-                                .frame(width: 280, height: 60)
-                                .clipShape(RoundedRectangle(cornerRadius: 8))
-                            RoundedRectangle(cornerRadius: 8)
-                                .fill(Color(hex: 0x6F6F6F, opacity: 0.1))
-                                .frame(width: 280, height: 60)
-
-                            HStack(spacing: 0) {
-                                VStack {
-                                    Spacer()
-                                    HStack(spacing: 0) {
-                                        Spacer()
-                                        RectIconWrapper(icon: Image("Previous"), color: trackThemeColor, iconWidth: 21, wrapperWidth: 21, wrapperHeight: 24)
-                                            .padding(.trailing, 32)
-                                    }
-                                    Spacer()
-                                }
-                                .contentShape(Rectangle())
-                                .onTapGesture {
-                                    print("hi")
-                                }
-                                Spacer()
-                                VStack {
-                                    Spacer()
-                                    RectIconWrapper(icon: Image("Pause_Thin"), color: trackThemeColor, iconWidth: 19.4, wrapperWidth: 20, wrapperHeight: 27)
-                                        .padding(.horizontal, 32)
-                                    Spacer()
-                                }
-                                .contentShape(Rectangle())
-                                .onTapGesture {
-                                    print("hi")
-                                }
-                                Spacer()
-                                VStack {
-                                    Spacer()
-                                    HStack(spacing: 0) {
-                                        RectIconWrapper(icon: Image("Next"), color: trackThemeColor, iconWidth: 21, wrapperWidth: 21, wrapperHeight: 24)
-                                            .padding(.leading, 32)
-                                        Spacer()
-                                    }
-                                    Spacer()
-                                }
-                                .contentShape(Rectangle())
-                                .onTapGesture {
-                                    print("hi")
-                                }
-                            }
-                            .frame(width: 280, height: 60)
-                        }
+                        BasicControllerView(trackThemeColor: $trackThemeColor)
                     }
                     Spacer()
                         .frame(height: 96)
@@ -240,5 +191,76 @@ struct PlayerView: View {
         .clipShape(RoundedRectangle(cornerRadius: 4))
         .padding(.bottom, bottomPadding)
         .gesture(dragGesture)
+    }
+
+    private func setupRemoteControls() {
+        let commands = MPRemoteCommandCenter.shared()
+
+        commands.playCommand.addTarget { _ in
+            AudioManager.sharedInstance.pause()
+            return .success
+        }
+
+        commands.playCommand.addTarget { _ in
+            AudioManager.sharedInstance.play()
+            return .success
+        }
+    }
+}
+
+struct BasicControllerView: View {
+    @Binding var trackThemeColor: Color
+
+    var body: some View {
+        ZStack {
+            BackdropBlurView(radius: 16)
+                .frame(width: 280, height: 60)
+                .clipShape(RoundedRectangle(cornerRadius: 8))
+            RoundedRectangle(cornerRadius: 8)
+                .fill(Color(hex: 0x6F6F6F, opacity: 0.1))
+                .frame(width: 280, height: 60)
+
+            HStack(spacing: 0) {
+                VStack {
+                    Spacer()
+                    HStack(spacing: 0) {
+                        Spacer()
+                        RectIconWrapper(icon: Image("Previous"), color: trackThemeColor, iconWidth: 21, wrapperWidth: 21, wrapperHeight: 24)
+                            .padding(.trailing, 32)
+                    }
+                    Spacer()
+                }
+                .contentShape(Rectangle())
+                .onTapGesture {
+                    print("hi")
+                }
+                Spacer()
+                VStack {
+                    Spacer()
+                    RectIconWrapper(icon: Image("Pause_Thin"), color: trackThemeColor, iconWidth: 19.4, wrapperWidth: 20, wrapperHeight: 27)
+                        .padding(.horizontal, 32)
+                    Spacer()
+                }
+                .contentShape(Rectangle())
+                .onTapGesture {
+                    print("hi")
+                }
+                Spacer()
+                VStack {
+                    Spacer()
+                    HStack(spacing: 0) {
+                        RectIconWrapper(icon: Image("Next"), color: trackThemeColor, iconWidth: 21, wrapperWidth: 21, wrapperHeight: 24)
+                            .padding(.leading, 32)
+                        Spacer()
+                    }
+                    Spacer()
+                }
+                .contentShape(Rectangle())
+                .onTapGesture {
+                    print("hi")
+                }
+            }
+            .frame(width: 280, height: 60)
+        }
     }
 }
