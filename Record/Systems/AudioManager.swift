@@ -19,10 +19,8 @@ final class AudioManager {
     private var session = AVAudioSession.sharedInstance()
     private var canellable: AnyCancellable?
 
-    // private var nowPlayingSession = MPNowPlayingSession()
-    // var avPlayerViewController: AVPlayerViewController = .init()
-
-    // private var nowTrack: Track
+    /// Default Queue
+    private var nowPlayableTrackQueue: [Track] = []
 
     private init() {}
 
@@ -83,7 +81,6 @@ final class AudioManager {
     func updateNowPlayingInfo() {
         guard let avPlayer = avPlayer, let currentItem = avPlayer.currentItem else { return }
 
-        print("start making nowplayinginfo")
         let artworkImage = UIImage(named: "modm_highres")!
 
         let nowPlayingInfo: [String: Any] = [
