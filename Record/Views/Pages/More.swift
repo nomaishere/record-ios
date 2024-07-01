@@ -16,7 +16,7 @@ struct More: View {
                 .font(Font.custom("ProFont For Powerline", size: 32))
                 .foregroundStyle(Color("DefaultBlack"))
             Spacer()
-            Button("SETTING", action: {print("create")})
+            Button("Setting", action: { print("create") })
                 .padding(.vertical, 4.0)
                 .padding(.horizontal, 24)
                 .background(Color("DefaultBlack"))
