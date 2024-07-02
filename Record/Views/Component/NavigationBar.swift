@@ -51,7 +51,7 @@ struct NavigationBar: View {
             }
             .padding(.top, 6)
         }
-        .frame(width: .infinity, height: safeAreaInsets.bottom + 59, alignment: .top)
+        .frame(maxWidth: .infinity, minHeight: safeAreaInsets.bottom + 59, maxHeight: safeAreaInsets.bottom + 59, alignment: .top)
         .background(Color("G1"))
     }
 }
