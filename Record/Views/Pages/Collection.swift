@@ -59,11 +59,7 @@ struct Collection: View {
             Spacer()
                 .frame(height: 16)
             Button(action: {
-                let unknownArtist = Artist(name: "Unknown Artist", isGroup: false)
-
-                let track1 = Track(title: "Modm Intro", audioLocalURL: URL.documentsDirectory, duration: 30.0, artwork: URL.documentsDirectory.appending(components: "modm", "modm_cover.png"), album: nil, artists: [unknownArtist], trackNumber: 1, themeColor: "28DD9A")
-
-                AudioManager.sharedInstance.playTracksWithCleaningQueue(tracks: [track1])
+                AudioManager.sharedInstance.playTracksAfterCleanQueue(tracks: DemoDataInjector.sharedInstance.makePlayableDemoTrack())
 
             }, label: {
                 /*

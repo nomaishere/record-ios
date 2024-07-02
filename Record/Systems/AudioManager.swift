@@ -16,34 +16,48 @@ final class AudioManager {
     static let sharedInstance = AudioManager()
 
     private var avPlayer: AVPlayer?
-    private var session = AVAudioSession.sharedInstance()
+    private var avQueuePlayer: AVQueuePlayer
+    private var avAudioSession = AVAudioSession.sharedInstance()
     private var canellable: AnyCancellable?
 
-    /// Default Queue
-    private var nowPlayableTrackQueue: [Track] = []
+    let playableQueue: PlayableQueue
 
-    private init() {}
+    enum PlayerState {
+        case stopped
+        case playing
+        case paused
+    }
+
+    private var playerState: PlayerState = .stopped {
+        didSet {
+            NSLog("%@", "**** Set player state \(playerState)")
+        }
+    }
+
+    // MARK: - Config Data
+
+    let nowPlayableBehavior: NowPlayable
+
+    // MARK: - Initializer
+
+    private init() {
+        NSLog("Initialize AudioManager")
+        self.nowPlayableBehavior = IOSNowPlayableBehavior()
+        self.playableQueue = PlayableQueue.sharedInstance
+        self.avQueuePlayer = AVQueuePlayer()
+        avQueuePlayer.allowsExternalPlayback = true
+
+        setupRemoteControls()
+    }
 
     deinit {
         canellable?.cancel()
     }
 
-    private func activateSession() {
-        do {
-            try session.setCategory(
-                .playback,
-                mode: .default,
-                options: []
-            )
-        } catch _ {}
+    private func activateSession() throws {
+        try avAudioSession.setCategory(.playback, mode: .default)
 
-        do {
-            try session.setActive(true, options: .notifyOthersOnDeactivation)
-        } catch _ {}
-
-        do {
-            try session.overrideOutputAudioPort(.speaker)
-        } catch _ {}
+        try avAudioSession.setActive(true, options: .notifyOthersOnDeactivation)
     }
 
     func prepareMetadata() -> [AVMetadataItem] {
@@ -96,12 +110,14 @@ final class AudioManager {
         MPNowPlayingInfoCenter.default().nowPlayingInfo = nowPlayingInfo
     }
 
+    // NOTE: Depreacted Method
     func startAudio() {
-        activateSession()
+        do {
+            try activateSession()
+        } catch {}
 
         // TODO: change the url to whatever audio you want to play
 
-        // let url = URL(string: "https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3")
         let path = Bundle.main.path(forResource: "01 Modm Intro.aif", ofType: nil)!
         let url = URL(filePath: path)
 
@@ -130,11 +146,13 @@ final class AudioManager {
 
     func deactivateSession() {
         do {
-            try session.setActive(false, options: .notifyOthersOnDeactivation)
+            try avAudioSession.setActive(false, options: .notifyOthersOnDeactivation)
         } catch let error as NSError {
             print("Failed to deactivate audio session: \(error.localizedDescription)")
         }
     }
+
+    // MARK: - Method for view
 
     func play() {
         if let player = avPlayer {
@@ -154,5 +172,50 @@ final class AudioManager {
         }
 
         return player.currentItem?.duration.seconds ?? 0
+    }
+
+    /// Delete all tracks in queue (include now-playing track) and start playing tracks.
+    ///
+    /// Usually called when user click a "playing album" button.
+    func playTracksAfterCleanQueue(tracks: [Track]) {
+        switch playerState {
+        case .stopped:
+            NSLog("start playing \(tracks.count) tracks")
+            playableQueue.addTracksAtEndofQueue(tracks: tracks)
+
+            for track in tracks {
+                avQueuePlayer.insert(AVPlayerItem(url: track.audioLocalURL), after: nil)
+            }
+
+            do {
+                try activateSession()
+            } catch {}
+
+            avQueuePlayer.play()
+
+        case .playing:
+            pause()
+            playableQueue.deleteAllTracksInQueue()
+            playableQueue.addTracksAtEndofQueue(tracks: tracks)
+
+        case .paused:
+            playableQueue.deleteAllTracksInQueue()
+            playableQueue.addTracksAtEndofQueue(tracks: tracks)
+        }
+        // play()
+    }
+}
+
+private func setupRemoteControls() {
+    let commands = MPRemoteCommandCenter.shared()
+
+    commands.playCommand.addTarget { _ in
+        AudioManager.sharedInstance.pause()
+        return .success
+    }
+
+    commands.playCommand.addTarget { _ in
+        AudioManager.sharedInstance.play()
+        return .success
     }
 }

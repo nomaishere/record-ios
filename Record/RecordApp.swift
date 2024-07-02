@@ -80,8 +80,7 @@ struct RecordApp: App {
 
     init() {
         _ = AudioManager.sharedInstance
-        let demo = DemoDataInjector()
-        demo.storeDemoAlbumAtDocument()
+        DemoDataInjector.sharedInstance.storeDemoAlbumAtDocument()
     }
 
     var body: some Scene {
