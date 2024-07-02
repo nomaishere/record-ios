@@ -12,23 +12,23 @@ import SwiftData
 final class Track: Identifiable {
     var id: UUID = UUID()
     var title: String
-    @Attribute(.externalStorage) var audioData: Data
+    var audioLocalURL: URL
 
     /// length of the audio file(track). 1 = 1s
     var duration: Double
 
     var artwork: URL
 
-    var album: Album
+    var album: Album?
     var artists: [Artist]
     var trackNumber: Int
 
     /// hex
     var themeColor: String
 
-    init(title: String, audioData: Data, duration: Double, artwork: URL, album: Album, artists: [Artist], trackNumber: Int, themeColor: String) {
+    init(title: String, audioLocalURL: URL, duration: Double, artwork: URL, album: Album?, artists: [Artist], trackNumber: Int, themeColor: String) {
         self.title = title
-        self.audioData = audioData
+        self.audioLocalURL = audioLocalURL
         self.duration = duration
         self.artwork = artwork
         self.album = album

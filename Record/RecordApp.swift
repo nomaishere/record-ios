@@ -78,6 +78,12 @@ struct RecordApp: App {
         }
     }()
 
+    init() {
+        _ = AudioManager.sharedInstance
+        let demo = DemoDataInjector()
+        demo.storeDemoAlbumAtDocument()
+    }
+
     var body: some Scene {
         WindowGroup {
             NavigationStack(path: $router.navPath) {

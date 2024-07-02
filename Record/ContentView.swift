@@ -13,13 +13,13 @@ struct ContentView: View {
     @Environment(\.safeAreaInsets) private var safeAreaInsets
 
     @State var selectedTab: Tab = .Collection
-    @State var isPlayerMinimized: Bool = false
+    @State var isPlayerMinimized: Bool = true
 
     var body: some View {
         ZStack(alignment: .bottom) {
             DomainView(selectedTab: $selectedTab)
                 .padding(.top, safeAreaInsets.top)
-            PlayerView(isPlayerMinimized: $isPlayerMinimized, safeAreaInsetBottom: safeAreaInsets.bottom, playerMode: .expanded)
+            PlayerView(isPlayerMinimized: $isPlayerMinimized, safeAreaInsetBottom: safeAreaInsets.bottom, playerMode: .minibar)
                 .zIndex(isPlayerMinimized ? 0 : 1) // increase this
 
             NavigationBar(selectedTab: $selectedTab)
@@ -221,7 +221,6 @@ struct PlayerView: View {
                                         AudioManager.sharedInstance.pause()
                                         isPlaying.toggle()
                                     } else {
-                                        setupRemoteControls()
                                         AudioManager.sharedInstance.startAudio()
                                         AudioManager.sharedInstance.play()
                                         AudioManager.sharedInstance.updateNowPlayingInfo()
@@ -258,19 +257,5 @@ struct PlayerView: View {
         .clipShape(RoundedRectangle(cornerRadius: 4))
         .padding(.bottom, bottomPadding)
         .gesture(dragGesture)
-    }
-
-    private func setupRemoteControls() {
-        let commands = MPRemoteCommandCenter.shared()
-
-        commands.playCommand.addTarget { _ in
-            AudioManager.sharedInstance.pause()
-            return .success
-        }
-
-        commands.playCommand.addTarget { _ in
-            AudioManager.sharedInstance.play()
-            return .success
-        }
     }
 }

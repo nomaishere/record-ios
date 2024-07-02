@@ -5,15 +5,13 @@
 //  Created by nomamac2 on 5/24/24.
 //
 
-import SwiftUI
 import SwiftData
+import SwiftUI
 
 struct Collection: View {
-    
     @Query var albums: [Album]
     @EnvironmentObject var router: Router
-    
-    
+
     var body: some View {
         VStack(alignment: .center) {
             Spacer()
@@ -23,7 +21,7 @@ struct Collection: View {
                     .font(Font.custom("ProFont For Powerline", size: 32))
                     .foregroundStyle(Color("DefaultBlack"))
                 Spacer()
-                Button("Add", action: {router.navigate(to: .addalbum)})
+                Button("Add", action: { router.navigate(to: .addalbum) })
                     .padding(.vertical, 4.0)
                     .padding(.horizontal, 24)
                     .background(Color("DefaultBlack"))
@@ -38,7 +36,7 @@ struct Collection: View {
                     RoundedRectangle(cornerRadius: 4)
                         .fill(Color("G1"))
                         .frame(height: 48)
-                    
+
                     Text("Search")
                         .font(Font.custom("Poppins-Medium", size: 18))
                         .multilineTextAlignment(.leading)
@@ -47,7 +45,7 @@ struct Collection: View {
                 }
                 Spacer()
                     .frame(width: 18)
-                Button() {
+                Button {
                     print("order")
                 } label: {
                     Image("Order")
@@ -60,6 +58,23 @@ struct Collection: View {
             .padding(.horizontal, 16.0)
             Spacer()
                 .frame(height: 16)
+            Button(action: {
+                let unknownArtist = Artist(name: "Unknown Artist", isGroup: false)
+
+                let track1 = Track(title: "Modm Intro", audioLocalURL: URL.documentsDirectory, duration: 30.0, artwork: URL.documentsDirectory.appending(components: "modm", "modm_cover.png"), album: nil, artists: [unknownArtist], trackNumber: 1, themeColor: "28DD9A")
+
+                AudioManager.sharedInstance.playTracksWithCleaningQueue(tracks: [track1])
+
+            }, label: {
+                /*
+                 AsyncImage(url: URL.documentsDirectory.appending(path: "modm_cover.png"))
+                     .scaledToFit()
+                     .frame(width: 200, height: 200)
+                     .clipped()
+                  */
+
+                Text("Play MODM")
+            })
             AlbumGridList(albums: [])
         }
     }
