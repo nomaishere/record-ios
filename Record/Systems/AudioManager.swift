@@ -12,6 +12,7 @@ import Foundation
 import MediaPlayer
 
 /// AudioManager is highest-level controller that manager all feature about audio.
+///
 final class AudioManager {
     static let sharedInstance = AudioManager()
 
@@ -34,15 +35,14 @@ final class AudioManager {
         }
     }
 
-    // MARK: - Config Data
+    let nowPlayableBehavior: NowPlayable = IOSNowPlayableBehavior()
 
-    let nowPlayableBehavior: NowPlayable
+    private var avPlayerItemObserver: NSKeyValueObservation!
 
     // MARK: - Initializer
 
     private init() {
         NSLog("Initialize AudioManager")
-        self.nowPlayableBehavior = IOSNowPlayableBehavior()
         self.playableQueue = PlayableQueue.sharedInstance
         self.avQueuePlayer = AVQueuePlayer()
         avQueuePlayer.allowsExternalPlayback = true
@@ -92,20 +92,20 @@ final class AudioManager {
         return metadatas
     }
 
-    func updateNowPlayingInfo() {
-        guard let avPlayer = avPlayer, let currentItem = avPlayer.currentItem else { return }
+    func updateNowPlayingStaticMetadata(_ metadata: NowPlayableStaticMetadata) {
+        var nowPlayingInfo = [String: Any]()
 
-        let artworkImage = UIImage(named: "modm_highres")!
+        // nowPlayingInfo[MPMediaItemPropertyArtwork] = MPMediaItemArtwork(boundsSize: CGSize(width: 300, height: 300)) { _ in artworkImage },
 
-        let nowPlayingInfo: [String: Any] = [
-            MPMediaItemPropertyTitle: "thisis Title",
-            MPMediaItemPropertyArtist: "ArtistName",
-            MPMediaItemPropertyArtwork: MPMediaItemArtwork(boundsSize: CGSize(width: 300, height: 300)) { _ in artworkImage },
-            MPMediaItemPropertyAlbumTitle: "Album Title",
-            MPMediaItemPropertyPlaybackDuration: currentItem.duration.seconds,
-            MPNowPlayingInfoPropertyElapsedPlaybackTime: avPlayer.currentTime().seconds,
-            MPNowPlayingInfoPropertyPlaybackRate: avPlayer.rate
-        ]
+        NSLog("Set Track Metadata: title \(metadata.title)")
+        nowPlayingInfo[MPNowPlayingInfoPropertyAssetURL] = metadata.assetURL
+        nowPlayingInfo[MPNowPlayingInfoPropertyMediaType] = metadata.mediaType.rawValue
+        nowPlayingInfo[MPNowPlayingInfoPropertyIsLiveStream] = metadata.isLiveStream
+        nowPlayingInfo[MPMediaItemPropertyTitle] = metadata.title
+        nowPlayingInfo[MPMediaItemPropertyArtist] = metadata.artist
+        nowPlayingInfo[MPMediaItemPropertyArtwork] = metadata.artwork
+        nowPlayingInfo[MPMediaItemPropertyAlbumArtist] = metadata.albumArtist
+        nowPlayingInfo[MPMediaItemPropertyAlbumTitle] = metadata.albumTitle
 
         MPNowPlayingInfoCenter.default().nowPlayingInfo = nowPlayingInfo
     }
@@ -190,7 +190,11 @@ final class AudioManager {
             do {
                 try activateSession()
             } catch {}
-
+            avPlayerItemObserver = avQueuePlayer.observe(\.currentItem, options: .initial) {
+                [unowned self] _, _ in
+                self.handleAvPlayerItemChange()
+            }
+            playerState = .playing
             avQueuePlayer.play()
 
         case .playing:
@@ -203,6 +207,24 @@ final class AudioManager {
             playableQueue.addTracksAtEndofQueue(tracks: tracks)
         }
         // play()
+    }
+
+    private func handleAvPlayerItemChange() {
+        guard playerState != .stopped else { return }
+
+        guard let currentItem = avQueuePlayer.currentItem else {
+            NSLog("AVQueuePlayer End Playing!")
+            avPlayerItemObserver = nil
+            playerState = .stopped
+            // TODO: Deactivate seesion
+            return
+        }
+
+        NSLog("Next Track Started!")
+
+        // TODO: Update NowPlayingInfo here using MPNowPlayingInfoCenter.default()
+        // let metadata =
+        // updateNowPlayingStaticMetadata(metadata: metadata)
     }
 }
 
