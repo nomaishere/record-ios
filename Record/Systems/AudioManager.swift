@@ -13,8 +13,8 @@ import MediaPlayer
 
 /// AudioManager is highest-level controller that manager all feature about audio.
 ///
-final class AudioManager {
-    static let sharedInstance = AudioManager()
+final class AudioManager: ObservableObject {
+    // static let sharedInstance = AudioManager()
 
     private var avPlayer: AVPlayer?
     private var avQueuePlayer: AVQueuePlayer
@@ -37,17 +37,20 @@ final class AudioManager {
 
     let nowPlayableBehavior: NowPlayable = IOSNowPlayableBehavior()
 
+    // `true` if the current session has been interrupted by another app.
+    private var isInterrupted: Bool = false
+
     private var avPlayerItemObserver: NSKeyValueObservation!
 
     // MARK: - Initializer
 
-    private init() {
+    init() {
         NSLog("Initialize AudioManager")
         self.playableQueue = PlayableQueue.sharedInstance
         self.avQueuePlayer = AVQueuePlayer()
         avQueuePlayer.allowsExternalPlayback = true
 
-        setupRemoteControls()
+        // setupRemoteControls()
     }
 
     deinit {
@@ -155,14 +158,28 @@ final class AudioManager {
     // MARK: - Method for view
 
     func play() {
-        if let player = avPlayer {
-            player.play()
-        }
+        avQueuePlayer.play()
+        playerState = .playing
     }
 
     func pause() {
-        if let player = avPlayer {
-            player.pause()
+        avQueuePlayer.pause()
+        playerState = .paused
+    }
+
+    func stop() {
+        avQueuePlayer.pause()
+        playerState = .stopped
+    }
+
+    func togglePlayPause() {
+        switch playerState {
+        case .stopped:
+            play()
+        case .playing:
+            pause()
+        case .paused:
+            play()
         }
     }
 
@@ -195,7 +212,23 @@ final class AudioManager {
                 self.handleAvPlayerItemChange()
             }
             playerState = .playing
+
+            var registeredCommands = [] as [NowPlayableCommand]
+            var enabledCommands = [] as [NowPlayableCommand]
+
+            /*
+             for group in ConfigModel.shared.commandCollections {
+                 registeredCommands.append(contentsOf: group.commands.compactMap { $0.shouldRegister ? $0.command : nil })
+                 enabledCommands.append(contentsOf: group.commands.compactMap { $0.shouldDisable ? $0.command : nil })
+             }
+              */
+
+            do {
+                try nowPlayableBehavior.handleNowPlayableConfiguration(commands: registeredCommands, disabledCommands: enabledCommands, commandHandler: handleCommand(command:event:), interruptionHandler: handleInterrupt(with:))
+            } catch {}
+
             avQueuePlayer.play()
+            handleAvPlayerItemChange()
 
         case .playing:
             pause()
@@ -222,22 +255,97 @@ final class AudioManager {
 
         NSLog("Next Track Started!")
 
-        // TODO: Update NowPlayingInfo here using MPNowPlayingInfoCenter.default()
-        // let metadata =
-        // updateNowPlayingStaticMetadata(metadata: metadata)
+        // Update NowPlayable Metadata
+        guard let currentNowPlayableStaticMetadata = playableQueue.getCurrentNowPlayableStaticMetadata() else { return }
+        updateNowPlayingStaticMetadata(currentNowPlayableStaticMetadata)
     }
-}
 
-private func setupRemoteControls() {
-    let commands = MPRemoteCommandCenter.shared()
-
-    commands.playCommand.addTarget { _ in
-        AudioManager.sharedInstance.pause()
+    private func handleCommand(command: NowPlayableCommand, event: MPRemoteCommandEvent) -> MPRemoteCommandHandlerStatus {
+        switch command {
+        case .pause:
+            pause()
+        case .play:
+            play()
+        case .stop:
+            stop()
+        case .togglePausePlay:
+            togglePlayPause()
+        case .nextTrack:
+            break
+        case .previousTrack:
+            break
+        case .changeRepeatMode:
+            break
+        case .changeShuffleMode:
+            break
+        case .changePlaybackRate:
+            break
+        case .seekBackward:
+            break
+        case .seekForward:
+            break
+        case .skipBackward:
+            NSLog("Skip Backward")
+        case .skipForward:
+            NSLog("Skip Forward")
+        case .changePlaybackPosition:
+            break
+        case .rating:
+            break
+        case .like:
+            break
+        case .dislike:
+            break
+        case .bookmark:
+            break
+        case .enableLanguageOption:
+            break
+        case .disableLanguageOption:
+            break
+        }
         return .success
     }
 
-    commands.playCommand.addTarget { _ in
-        AudioManager.sharedInstance.play()
-        return .success
+    private func handleInterrupt(with interruption: NowPlayableInterruption) {
+        switch interruption {
+        case .began:
+            isInterrupted = true
+        case .ended(let shouldPlay):
+            isInterrupted = false
+
+            switch playerState {
+            case .stopped:
+                break
+
+            case .playing where shouldPlay:
+                avQueuePlayer.play()
+
+            case .playing:
+                playerState = .paused
+
+            case .paused:
+                break
+            }
+        case .failed(let error):
+            print(error.localizedDescription)
+            // optOut here
+            // avPlayerItemObserver = nil
+        }
     }
+
+    /*
+     private func setupRemoteControls() {
+         let commands = MPRemoteCommandCenter.shared()
+
+         commands.playCommand.addTarget { _ in
+             pause()
+             return .success
+         }
+
+         commands.playCommand.addTarget { _ in
+             play()
+             return .success
+         }
+     }
+      */
 }

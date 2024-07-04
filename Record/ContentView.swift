@@ -19,7 +19,7 @@ struct ContentView: View {
         ZStack(alignment: .bottom) {
             DomainView(selectedTab: $selectedTab)
                 .padding(.top, safeAreaInsets.top)
-            PlayerView(isPlayerMinimized: $isPlayerMinimized, safeAreaInsetBottom: safeAreaInsets.bottom, playerMode: .minibar)
+            PlayerView(isPlayerMinimized: $isPlayerMinimized, safeAreaInsetBottom: safeAreaInsets.bottom, playerMode: .vanished)
                 .zIndex(isPlayerMinimized ? 0 : 1) // increase this
 
             NavigationBar(selectedTab: $selectedTab)
@@ -55,7 +55,10 @@ struct PlayerView: View {
         case minibar
         case expanded
         case animated
+        case vanished
     }
+
+    @EnvironmentObject var audioManager: AudioManager
 
     @Binding var isPlayerMinimized: Bool
     @Environment(\.safeAreaInsets) private var safeAreaInsets
@@ -94,6 +97,10 @@ struct PlayerView: View {
             _bottomPadding = State(initialValue: 0)
         case .animated:
             // Error Case
+            _viewWidth = State(initialValue: 0)
+            _viewHeight = State(initialValue: 0)
+            _bottomPadding = State(initialValue: 0)
+        case .vanished:
             _viewWidth = State(initialValue: 0)
             _viewHeight = State(initialValue: 0)
             _bottomPadding = State(initialValue: 0)
@@ -165,9 +172,8 @@ struct PlayerView: View {
                             .padding(.leading, 16)
                         Spacer()
                         Button(action: {
-                            AudioManager.sharedInstance.startAudio()
-                            AudioManager.sharedInstance.play()
-                            AudioManager.sharedInstance.updateNowPlayingInfo()
+                            audioManager.startAudio()
+                            audioManager.play()
                         }, label: { RectIconWrapper(icon: Image("Pause"), color: Color(.white), iconWidth: 17, wrapperWidth: 17, wrapperHeight: 20) })
                             .padding(.trailing, 24)
                     }
@@ -218,12 +224,11 @@ struct PlayerView: View {
                                 .contentShape(Rectangle())
                                 .onTapGesture {
                                     if isPlaying {
-                                        AudioManager.sharedInstance.pause()
+                                        audioManager.pause()
                                         isPlaying.toggle()
                                     } else {
-                                        AudioManager.sharedInstance.startAudio()
-                                        AudioManager.sharedInstance.play()
-                                        AudioManager.sharedInstance.updateNowPlayingInfo()
+                                        audioManager.startAudio()
+                                        audioManager.play()
                                         isPlaying.toggle()
                                     }
                                 }
@@ -250,6 +255,8 @@ struct PlayerView: View {
                 }
 
             case .animated:
+                Color.clear
+            case .vanished:
                 Color.clear
             }
         }

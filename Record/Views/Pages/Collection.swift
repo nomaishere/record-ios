@@ -11,6 +11,7 @@ import SwiftUI
 struct Collection: View {
     @Query var albums: [Album]
     @EnvironmentObject var router: Router
+    @EnvironmentObject var audioManager: AudioManager
 
     var body: some View {
         VStack(alignment: .center) {
@@ -59,7 +60,7 @@ struct Collection: View {
             Spacer()
                 .frame(height: 16)
             Button(action: {
-                AudioManager.sharedInstance.playTracksAfterCleanQueue(tracks: DemoDataInjector.sharedInstance.makePlayableDemoTrack())
+                audioManager.playTracksAfterCleanQueue(tracks: DemoDataInjector.sharedInstance.makePlayableDemoTrack())
 
             }, label: {
                 /*

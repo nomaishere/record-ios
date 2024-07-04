@@ -45,6 +45,7 @@ private extension UIEdgeInsets {
 @main
 struct RecordApp: App {
     @ObservedObject var router = Router()
+    @ObservedObject var audioManager = AudioManager()
 
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
@@ -79,7 +80,6 @@ struct RecordApp: App {
     }()
 
     init() {
-        _ = AudioManager.sharedInstance
         DemoDataInjector.sharedInstance.storeDemoAlbumAtDocument()
     }
 
@@ -97,6 +97,7 @@ struct RecordApp: App {
                     }
             }
             .environmentObject(router)
+            .environmentObject(audioManager)
             .modelContainer(sharedModelContainer)
         }
     }
