@@ -29,7 +29,7 @@ final class AudioManager: ObservableObject {
         case paused
     }
 
-    private var playerState: PlayerState = .stopped {
+    @Published var playerState: PlayerState = .stopped {
         didSet {
             NSLog("%@", "**** Set player state \(playerState)")
         }
@@ -49,8 +49,6 @@ final class AudioManager: ObservableObject {
         self.playableQueue = PlayableQueue.sharedInstance
         self.avQueuePlayer = AVQueuePlayer()
         avQueuePlayer.allowsExternalPlayback = true
-
-        // setupRemoteControls()
     }
 
     deinit {
@@ -332,20 +330,4 @@ final class AudioManager: ObservableObject {
             // avPlayerItemObserver = nil
         }
     }
-
-    /*
-     private func setupRemoteControls() {
-         let commands = MPRemoteCommandCenter.shared()
-
-         commands.playCommand.addTarget { _ in
-             pause()
-             return .success
-         }
-
-         commands.playCommand.addTarget { _ in
-             play()
-             return .success
-         }
-     }
-      */
 }

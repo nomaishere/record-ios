@@ -46,8 +46,12 @@ struct DomainView: View {
     }
 }
 
-#Preview {
-    ContentView()
+struct ContentView_Preview: PreviewProvider {
+    static let audioManager = AudioManager()
+    static var previews: some View {
+        ContentView()
+            .environmentObject(audioManager)
+    }
 }
 
 struct PlayerView: View {
@@ -211,10 +215,13 @@ struct PlayerView: View {
                                 Spacer()
                                 VStack {
                                     Spacer()
-                                    if isPlaying {
+                                    switch audioManager.playerState {
+                                    case .stopped:
+                                        Color.clear
+                                    case .playing:
                                         RectIconWrapper(icon: Image("Pause_Thin"), color: trackThemeColor, iconWidth: 19.4, wrapperWidth: 20, wrapperHeight: 27)
                                             .padding(.horizontal, 32)
-                                    } else {
+                                    case .paused:
                                         RectIconWrapper(icon: Image("Play"), color: trackThemeColor, iconWidth: 20, wrapperWidth: 20, wrapperHeight: 27)
                                             .padding(.horizontal, 32)
                                     }
@@ -258,6 +265,17 @@ struct PlayerView: View {
                 Color.clear
             case .vanished:
                 Color.clear
+                    .onReceive(audioManager.$playerState) { state in
+                        NSLog("player state change. \(state) ")
+                        if state == .playing {
+                            playerMode = .minibar
+                            viewWidth = UIScreen.main.bounds.size.width - 16
+                            viewHeight = 64
+                            withAnimation {
+                                bottomPadding = safeAreaInsets.bottom + 59 + 8
+                            }
+                        } else {}
+                    }
             }
         }
         .frame(width: viewWidth, height: viewHeight)
