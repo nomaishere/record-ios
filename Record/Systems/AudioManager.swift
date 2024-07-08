@@ -16,10 +16,8 @@ import MediaPlayer
 final class AudioManager: ObservableObject {
     // static let sharedInstance = AudioManager()
 
-    private var avPlayer: AVPlayer?
     private var avQueuePlayer: AVQueuePlayer
     private var avAudioSession = AVAudioSession.sharedInstance()
-    private var canellable: AnyCancellable?
 
     let playableQueue: PlayableQueue
 
@@ -51,46 +49,12 @@ final class AudioManager: ObservableObject {
         avQueuePlayer.allowsExternalPlayback = true
     }
 
-    deinit {
-        canellable?.cancel()
-    }
+    deinit {}
 
     private func activateSession() throws {
         try avAudioSession.setCategory(.playback, mode: .default)
 
         try avAudioSession.setActive(true, options: .notifyOthersOnDeactivation)
-    }
-
-    func prepareMetadata() -> [AVMetadataItem] {
-        var metadatas: [AVMetadataItem] = []
-
-        let title = AVMutableMetadataItem()
-        title.identifier = .commonIdentifierTitle
-        title.value = "Somozu Combat" as NSString
-        title.extendedLanguageTag = "und" // undetermined
-        metadatas.append(title)
-
-        let artist = AVMutableMetadataItem()
-        artist.identifier = .commonIdentifierArtist
-        artist.value = "Khundi Panda" as NSString
-        artist.extendedLanguageTag = "und"
-        metadatas.append(artist)
-
-        /*
-         let artwork = AVMutableMetadataItem()
-         if let image = UIImage(named: "modm_highres") {
-             if let imageData = image.jpegData(compressionQuality: 1.0) {
-                 artwork.identifier = .commonIdentifierArtwork
-                 artwork.value = imageData as NSData
-                 artwork.dataType = kCMMetadataBaseDataType_JPEG as String
-                 artwork.extendedLanguageTag = "und"
-             }
-         }
-         metadatas.append(artwork)
-          */
-
-        // let artwork = AVMutableMetadataItem()
-        return metadatas
     }
 
     func updateNowPlayingStaticMetadata(_ metadata: NowPlayableStaticMetadata) {
@@ -109,48 +73,6 @@ final class AudioManager: ObservableObject {
         nowPlayingInfo[MPMediaItemPropertyAlbumTitle] = metadata.albumTitle
 
         MPNowPlayingInfoCenter.default().nowPlayingInfo = nowPlayingInfo
-    }
-
-    // NOTE: Depreacted Method
-    func startAudio() {
-        do {
-            try activateSession()
-        } catch {}
-
-        // TODO: change the url to whatever audio you want to play
-
-        let path = Bundle.main.path(forResource: "01 Modm Intro.aif", ofType: nil)!
-        let url = URL(filePath: path)
-
-        let playerItem = AVPlayerItem(url: url)
-        // let playerAsset = AVAsset(url: url)
-
-        // var test = AVPlayerItem(url: url)
-
-        if let avPlayer = avPlayer {
-            avPlayer.replaceCurrentItem(with: playerItem)
-        } else {
-            avPlayer = AVPlayer(playerItem: playerItem)
-        }
-
-        canellable = NotificationCenter.default.publisher(for: .AVPlayerItemDidPlayToEndTime)
-            .sink { [weak self] _ in
-                guard let me = self else { return }
-
-                me.deactivateSession()
-            }
-
-        if let player = avPlayer {
-            player.play()
-        }
-    }
-
-    func deactivateSession() {
-        do {
-            try avAudioSession.setActive(false, options: .notifyOthersOnDeactivation)
-        } catch let error as NSError {
-            print("Failed to deactivate audio session: \(error.localizedDescription)")
-        }
     }
 
     // MARK: - Method for view
@@ -179,14 +101,6 @@ final class AudioManager: ObservableObject {
         case .paused:
             play()
         }
-    }
-
-    func getPlaybackDuration() -> Double {
-        guard let player = avPlayer else {
-            return 0
-        }
-
-        return player.currentItem?.duration.seconds ?? 0
     }
 
     /// Delete all tracks in queue (include now-playing track) and start playing tracks.
