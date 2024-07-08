@@ -60,4 +60,10 @@ class PlayableQueue {
         guard let currentNowPlayableStaticMetadata = nowPlayableStaticMetadatas.first else { return nil }
         return currentNowPlayableStaticMetadata
     }
+
+    func handleNowPlayingItemMoveNext() {
+        queueOfTracks.removeFirst()
+        avPlayerItems.removeFirst()
+        nowPlayableStaticMetadatas.removeFirst()
+    }
 }

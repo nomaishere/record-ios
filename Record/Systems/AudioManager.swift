@@ -47,11 +47,29 @@ final class AudioManager: ObservableObject {
         self.playableQueue = PlayableQueue.sharedInstance
         self.avQueuePlayer = AVQueuePlayer()
         avQueuePlayer.allowsExternalPlayback = true
+
+        let MPRemoteCommandCenter = MPRemoteCommandCenter.shared()
+
+        /*
+         MPRemoteCommandCenter.playCommand.addTarget { [unowned self] _ in
+             if self.avQueuePlayer.rate == 0.0 {
+                 self.play()
+                 return .success
+             }
+             return .commandFailed
+         }*/
+
+        MPRemoteCommandCenter.togglePlayPauseCommand.addTarget { [unowned self] _ in
+            self.togglePlayPause()
+            return .success
+        }
     }
 
     deinit {}
 
     private func activateSession() throws {
+        // TODO: Add NotificationCenter.default.addObserver(forName: AVAudioSession.interruptionNotification, object: audioSession, queue: .main)
+
         try avAudioSession.setCategory(.playback, mode: .default)
 
         try avAudioSession.setActive(true, options: .notifyOthersOnDeactivation)
@@ -125,18 +143,8 @@ final class AudioManager: ObservableObject {
             }
             playerState = .playing
 
-            var registeredCommands = [] as [NowPlayableCommand]
-            var enabledCommands = [] as [NowPlayableCommand]
-
-            /*
-             for group in ConfigModel.shared.commandCollections {
-                 registeredCommands.append(contentsOf: group.commands.compactMap { $0.shouldRegister ? $0.command : nil })
-                 enabledCommands.append(contentsOf: group.commands.compactMap { $0.shouldDisable ? $0.command : nil })
-             }
-              */
-
             do {
-                try nowPlayableBehavior.handleNowPlayableConfiguration(commands: registeredCommands, disabledCommands: enabledCommands, commandHandler: handleCommand(command:event:), interruptionHandler: handleInterrupt(with:))
+                // try nowPlayableBehavior.handleNowPlayableConfiguration(commands: registeredCommands, disabledCommands: enabledCommands, commandHandler: handleCommand(command:event:), interruptionHandler: handleInterrupt(with:))
             } catch {}
 
             avQueuePlayer.play()
@@ -165,7 +173,8 @@ final class AudioManager: ObservableObject {
             return
         }
 
-        NSLog("Next Track Started!")
+        // Notify to Queue that Now Playing Item was changed
+        // playableQueue.handleNowPlayingItemMoveNext()
 
         // Update NowPlayable Metadata
         guard let currentNowPlayableStaticMetadata = playableQueue.getCurrentNowPlayableStaticMetadata() else { return }
