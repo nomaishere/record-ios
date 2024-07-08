@@ -163,20 +163,34 @@ struct PlayerView: View {
         ZStack {
             Color.clear
                 .background(
-                    Image("ugrshigh")
-                        .resizable()
-                        .scaledToFill())
+                    /*
+                     Image("modm_highres")
+                         .resizable()
+                         .scaledToFill()
+                      */
+
+                    AsyncImage(url: audioManager.nowPlayingTrack?.artwork) { phase in
+                        if let image = phase.image {
+                            image
+                                .resizable()
+                                .scaledToFill()
+                        } else if phase.error != nil {
+                            Color.red
+                        } else {
+                            Color.blue
+                        }
+                    }
+                )
             switch playerMode {
             case .minibar:
                 if isMinibarItemRender {
                     HStack {
-                        Text("Rockstar Lifestyle")
+                        Text("\(audioManager.nowPlayingTrack!.title)")
                             .font(Font.custom("Pretendard-SemiBold", size: 20))
                             .foregroundStyle(Color(.white))
                             .padding(.leading, 16)
                         Spacer()
                         Button(action: {
-                            audioManager.startAudio()
                             audioManager.play()
                         }, label: { RectIconWrapper(icon: Image("Pause"), color: Color(.white), iconWidth: 17, wrapperWidth: 17, wrapperHeight: 20) })
                             .padding(.trailing, 24)
@@ -187,7 +201,7 @@ struct PlayerView: View {
                 VStack {
                     Spacer()
                     VStack(spacing: 4) {
-                        Text("Rockstar Lifestyle")
+                        Text("\(audioManager.nowPlayingTrack!.title)")
                             .font(Font.custom("Pretendard-Bold", size: 20))
                             .foregroundStyle(trackThemeColor)
                         ZStack {
@@ -234,7 +248,6 @@ struct PlayerView: View {
                                         audioManager.pause()
                                         isPlaying.toggle()
                                     } else {
-                                        audioManager.startAudio()
                                         audioManager.play()
                                         isPlaying.toggle()
                                     }

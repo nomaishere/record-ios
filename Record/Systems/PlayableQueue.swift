@@ -39,6 +39,14 @@ class PlayableQueue {
 
     // MARK: - Queue Control Method
 
+    func getNowPlayingTrack() -> Track? {
+        if !queueOfTracks.isEmpty {
+            return queueOfTracks.first
+        } else {
+            return nil
+        }
+    }
+
     // This methods shouldn't be called directly in view. View can control audio by AudioManager.
     func deleteAllTracksInQueue() {
         queueOfTracks.removeAll()

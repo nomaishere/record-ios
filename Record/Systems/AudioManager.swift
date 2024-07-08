@@ -33,6 +33,8 @@ final class AudioManager: ObservableObject {
         }
     }
 
+    @Published var nowPlayingTrack: Track?
+
     let nowPlayableBehavior: NowPlayable = IOSNowPlayableBehavior()
 
     // `true` if the current session has been interrupted by another app.
@@ -44,6 +46,7 @@ final class AudioManager: ObservableObject {
 
     init() {
         NSLog("Initialize AudioManager")
+        self.nowPlayingTrack = nil
         self.playableQueue = PlayableQueue.sharedInstance
         self.avQueuePlayer = AVQueuePlayer()
         avQueuePlayer.allowsExternalPlayback = true
@@ -175,6 +178,9 @@ final class AudioManager: ObservableObject {
 
         // Notify to Queue that Now Playing Item was changed
         // playableQueue.handleNowPlayingItemMoveNext()
+
+        // Update nowPlayingTrack (Published Variable)
+        nowPlayingTrack = playableQueue.getNowPlayingTrack()
 
         // Update NowPlayable Metadata
         guard let currentNowPlayableStaticMetadata = playableQueue.getCurrentNowPlayableStaticMetadata() else { return }
