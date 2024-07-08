@@ -7,6 +7,7 @@
 
 import AVFoundation
 import Foundation
+import MediaPlayer
 
 /// Note: PlayableQueue doesn't know music is playing now.
 class PlayableQueue {
@@ -17,6 +18,7 @@ class PlayableQueue {
     /// This array must be updated by out-of-app event like nowplayable command
     private var queueOfTracks: [Track]
     private var avPlayerItems: [AVPlayerItem]
+    /// player can find a proper nowPlayableStaticMetadata by using avQueuePlayer.currentItem(return AVPlayerItem)
     private var nowPlayableStaticMetadatas: [NowPlayableStaticMetadata]
 
     // TODO:
@@ -44,11 +46,18 @@ class PlayableQueue {
 
     func addTracksAtEndofQueue(tracks: [Track]) {
         queueOfTracks.append(contentsOf: tracks)
-        /*
+
         for track in tracks {
             avPlayerItems.append(AVPlayerItem(url: track.audioLocalURL))
             // TODO: append nowPlayableStaticMetadatas here
+            let image = UIImage(named: "modm_highres")!
+            let temp = NowPlayableStaticMetadata(assetURL: track.audioLocalURL, mediaType: MPNowPlayingInfoMediaType.audio, isLiveStream: false, title: track.title, artist: "Khundi Panda", artwork: MPMediaItemArtwork(boundsSize: image.size) { _ in image }, albumArtist: "todo", albumTitle: "todo") // TODO: Support Multiple Artist
+            nowPlayableStaticMetadatas.append(temp)
         }
-         */
+    }
+
+    func getCurrentNowPlayableStaticMetadata() -> NowPlayableStaticMetadata? {
+        guard let currentNowPlayableStaticMetadata = nowPlayableStaticMetadatas.first else { return nil }
+        return currentNowPlayableStaticMetadata
     }
 }
