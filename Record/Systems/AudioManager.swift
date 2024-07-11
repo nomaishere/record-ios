@@ -94,9 +94,6 @@ final class AudioManager: ObservableObject {
     func updateNowPlayingStaticMetadata(_ metadata: NowPlayableStaticMetadata) {
         var nowPlayingInfo = [String: Any]()
 
-        // nowPlayingInfo[MPMediaItemPropertyArtwork] = MPMediaItemArtwork(boundsSize: CGSize(width: 300, height: 300)) { _ in artworkImage },
-
-        NSLog("Set Track Metadata: title \(metadata.title)")
         nowPlayingInfo[MPNowPlayingInfoPropertyAssetURL] = metadata.assetURL
         nowPlayingInfo[MPNowPlayingInfoPropertyMediaType] = metadata.mediaType.rawValue
         nowPlayingInfo[MPNowPlayingInfoPropertyIsLiveStream] = metadata.isLiveStream
@@ -143,11 +140,10 @@ final class AudioManager: ObservableObject {
     func playTracksAfterCleanQueue(tracks: [Track]) {
         switch playerState {
         case .stopped:
-            let endIndex = playableQueue.avPlayerItems.endIndex
             playableQueue.addTracksAtEndofQueue(tracks: tracks)
 
             for (index, track) in tracks.enumerated() {
-                avQueuePlayer.insert(playableQueue.avPlayerItems[endIndex + index], after: nil)
+                avQueuePlayer.insert(playableQueue.avPlayerItems[index], after: nil)
             }
 
             do {
@@ -189,12 +185,9 @@ final class AudioManager: ObservableObject {
         }
 
         if currentIndex == playableQueue.nowPlayingIndex {
-            NSLog("No Change")
         } else if currentIndex == playableQueue.nowPlayingIndex + 1 {
-            NSLog("Next track started")
             playableQueue.handleNowPlayingItemMoveNext()
         } else if currentIndex == playableQueue.nowPlayingIndex - 1 {
-            NSLog("Previous track started")
             playableQueue.handleNowPlayingItemMovePrevious()
         } else {
             NSLog("[AudioManager] : AVQueuePlayer currentItem doesn't point previous, now, or next.")
@@ -206,52 +199,6 @@ final class AudioManager: ObservableObject {
         // Update NowPlayable Metadata
         guard let currentNowPlayableStaticMetadata = playableQueue.getCurrentNowPlayableStaticMetadata() else { return }
         updateNowPlayingStaticMetadata(currentNowPlayableStaticMetadata)
-    }
-
-    private func handleCommand(command: NowPlayableCommand, event: MPRemoteCommandEvent) -> MPRemoteCommandHandlerStatus {
-        switch command {
-        case .pause:
-            pause()
-        case .play:
-            play()
-        case .stop:
-            stop()
-        case .togglePausePlay:
-            togglePlayPause()
-        case .nextTrack:
-            break
-        case .previousTrack:
-            break
-        case .changeRepeatMode:
-            break
-        case .changeShuffleMode:
-            break
-        case .changePlaybackRate:
-            break
-        case .seekBackward:
-            break
-        case .seekForward:
-            break
-        case .skipBackward:
-            NSLog("Skip Backward")
-        case .skipForward:
-            NSLog("Skip Forward")
-        case .changePlaybackPosition:
-            break
-        case .rating:
-            break
-        case .like:
-            break
-        case .dislike:
-            break
-        case .bookmark:
-            break
-        case .enableLanguageOption:
-            break
-        case .disableLanguageOption:
-            break
-        }
-        return .success
     }
 
     private func handleInterrupt(with interruption: NowPlayableInterruption) {
