@@ -41,6 +41,8 @@ final class AudioManager: ObservableObject {
     private var isInterrupted: Bool = false
 
     private var avPlayerItemObserver: NSKeyValueObservation!
+    private var rateObserver: NSKeyValueObservation!
+    private var statusObserver: NSObjectProtocol!
 
     // MARK: - Initializer
 
@@ -52,16 +54,6 @@ final class AudioManager: ObservableObject {
         avQueuePlayer.allowsExternalPlayback = true
 
         let MPRemoteCommandCenter = MPRemoteCommandCenter.shared()
-
-        /*
-         MPRemoteCommandCenter.playCommand.addTarget { [unowned self] _ in
-             if self.avQueuePlayer.rate == 0.0 {
-                 self.play()
-                 return .success
-             }
-             return .commandFailed
-         }*/
-
         MPRemoteCommandCenter.togglePlayPauseCommand.addTarget { [unowned self] _ in
             self.togglePlayPause()
             return .success
@@ -77,13 +69,27 @@ final class AudioManager: ObservableObject {
             return .success
         }
 
-        self.avPlayerItemObserver = avQueuePlayer.observe(\.currentItem, options: .initial) {
-            [unowned self] _, _ in
-            self.handleAvPlayerItemChange()
-        }
+        addObserverAtAvQueuePlayer()
     }
 
     deinit {}
+
+    func addObserverAtAvQueuePlayer() {
+        avPlayerItemObserver = avQueuePlayer.observe(\.currentItem, options: .initial) {
+            [unowned self] _, _ in
+            self.handleAvPlayerItemChange()
+        }
+
+        rateObserver = avQueuePlayer.observe(\.rate, options: .initial) {
+            [unowned self] _, _ in
+            self.handlePlaybackChange()
+        }
+
+        statusObserver = avQueuePlayer.observe(\.currentItem?.status, options: .initial) {
+            [unowned self] _, _ in
+            self.handlePlaybackChange()
+        }
+    }
 
     private func activateSession() throws {
         // TODO: Add NotificationCenter.default.addObserver(forName: AVAudioSession.interruptionNotification, object: audioSession, queue: .main)
@@ -109,7 +115,19 @@ final class AudioManager: ObservableObject {
         MPNowPlayingInfoCenter.default().nowPlayingInfo = nowPlayingInfo
     }
 
-    // MARK: - Method for view
+    func updateNowPlayingPlaybackInfo(_ metadata: NowPlayableDynamicMetadata) {
+        var nowPlayingInfo = MPNowPlayingInfoCenter.default().nowPlayingInfo ?? [String: Any]()
+
+        NSLog("%@", "**** Set playback info: rate \(metadata.rate), position \(metadata.position), duration \(metadata.duration)")
+        nowPlayingInfo[MPMediaItemPropertyPlaybackDuration] = metadata.duration
+        nowPlayingInfo[MPNowPlayingInfoPropertyElapsedPlaybackTime] = metadata.position
+        nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackRate] = metadata.rate
+        nowPlayingInfo[MPNowPlayingInfoPropertyDefaultPlaybackRate] = 1.0
+
+        MPNowPlayingInfoCenter.default().nowPlayingInfo = nowPlayingInfo
+    }
+
+    // MARK: - Playback Control
 
     func play() {
         avQueuePlayer.play()
@@ -156,16 +174,18 @@ final class AudioManager: ObservableObject {
             avQueuePlayer.insert(currentItem, after: avQueuePlayer.currentItem)
 
             /*
-            avQueuePlayer.insert(previousItem, after: nil)
-            for item in currentItems {
-                avQueuePlayer.insert(item, after: nil)
-            }
-             */
+             avQueuePlayer.insert(previousItem, after: nil)
+             for item in currentItems {
+                 avQueuePlayer.insert(item, after: nil)
+             }
+              */
             NSLog("\(avQueuePlayer.items().count) items in avQueuePlayer in previousTrack()")
 
             play()
         }
     }
+
+    // MARK: - Useful Method
 
     /// Delete all tracks in queue (include now-playing track) and start playing tracks.
     ///
@@ -175,7 +195,7 @@ final class AudioManager: ObservableObject {
         case .stopped:
             playableQueue.addTracksAtEndofQueue(tracks: tracks)
 
-            for (index, track) in tracks.enumerated() {
+            for (index, _) in tracks.enumerated() {
                 avQueuePlayer.insert(playableQueue.avPlayerItems[index], after: nil)
             }
 
@@ -201,6 +221,8 @@ final class AudioManager: ObservableObject {
         }
         // play()
     }
+
+    // MARK: - Handler for Observer
 
     private func handleAvPlayerItemChange() {
         guard playerState != .stopped else { return }
@@ -232,6 +254,21 @@ final class AudioManager: ObservableObject {
         // Update NowPlayable Metadata
         guard let currentNowPlayableStaticMetadata = playableQueue.getCurrentNowPlayableStaticMetadata() else { return }
         updateNowPlayingStaticMetadata(currentNowPlayableStaticMetadata)
+    }
+
+    private func handlePlaybackChange() {
+        NSLog("handlePlaybackChange")
+        guard playerState != .stopped else { return }
+
+        guard let currentItem = avQueuePlayer.currentItem else { return }
+
+        guard currentItem.status == .readyToPlay else { return }
+
+        let dynamicMetadata = NowPlayableDynamicMetadata(rate: avQueuePlayer.rate,
+                                                         position: Float(currentItem.currentTime().seconds),
+                                                         duration: Float(currentItem.duration.seconds))
+
+        updateNowPlayingPlaybackInfo(dynamicMetadata)
     }
 
     private func handleInterrupt(with interruption: NowPlayableInterruption) {

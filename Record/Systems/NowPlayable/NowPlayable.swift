@@ -125,9 +125,7 @@ extension NowPlayable {
         nowPlayingInfo[MPNowPlayingInfoPropertyElapsedPlaybackTime] = metadata.position
         nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackRate] = metadata.rate
         nowPlayingInfo[MPNowPlayingInfoPropertyDefaultPlaybackRate] = 1.0
-        nowPlayingInfo[MPNowPlayingInfoPropertyCurrentLanguageOptions] = metadata.currentLanguageOptions
-        nowPlayingInfo[MPNowPlayingInfoPropertyAvailableLanguageOptions] = metadata.availableLanguageOptionGroups
-        
+    
         nowPlayingInfoCenter.nowPlayingInfo = nowPlayingInfo
     }
 }

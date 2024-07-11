@@ -25,7 +25,4 @@ struct NowPlayableDynamicMetadata {
     let rate: Float // MPNowPlayingInfoPropertyPlaybackRate
     let position: Float // MPNowPlayingInfoPropertyElapsedPlaybackTime
     let duration: Float // MPMediaItemPropertyPlaybackDuration
-
-    let currentLanguageOptions: [MPNowPlayingInfoLanguageOption] // MPNowPlayingInfoPropertyCurrentLanguageOptions
-    let availableLanguageOptionGroups: [MPNowPlayingInfoLanguageOptionGroup] // MPNowPlayingInfoPropertyAvailableLanguageOptions
 }
