@@ -27,6 +27,7 @@ class PlayableQueue {
 
     /// Index of now playing track.
     public private(set) var nowPlayingIndex: Int
+    public private(set) var lenghtOfQueue: Int
 
     // TODO:
     private var doesAppHasUnfinishedQueue: Bool = false
@@ -39,15 +40,24 @@ class PlayableQueue {
             avPlayerItems = []
             nowPlayableStaticMetadatas = []
             nowPlayingIndex = 0
+            lenghtOfQueue = 0
+
         } else {
             queueOfTracks = []
             avPlayerItems = []
             nowPlayableStaticMetadatas = []
             nowPlayingIndex = 0
+            lenghtOfQueue = 0
         }
     }
 
     // MARK: - Getter
+
+    func getPreviousAVPlayerItem() -> AVPlayerItem? {
+        if doesPreviousTrackExist() {
+            return avPlayerItems[nowPlayingIndex - 1]
+        } else { return nil }
+    }
 
     func getNowPlayingTrack() -> Track? {
         if !queueOfTracks.isEmpty {
@@ -85,6 +95,24 @@ class PlayableQueue {
             let image = UIImage(named: "modm_highres")!
             let temp = NowPlayableStaticMetadata(assetURL: track.audioLocalURL, mediaType: MPNowPlayingInfoMediaType.audio, isLiveStream: false, title: track.title, artist: "Khundi Panda", artwork: MPMediaItemArtwork(boundsSize: image.size) { _ in image }, albumArtist: "todo", albumTitle: "todo") // TODO: Support Multiple Artist
             nowPlayableStaticMetadatas.append(temp)
+
+            lenghtOfQueue += 1
+        }
+    }
+
+    func doesNextTrackExist() -> Bool {
+        if nowPlayingIndex < lenghtOfQueue - 1 {
+            return true
+        } else {
+            return false
+        }
+    }
+
+    func doesPreviousTrackExist() -> Bool {
+        if nowPlayingIndex > 0 {
+            return true
+        } else {
+            return false
         }
     }
 

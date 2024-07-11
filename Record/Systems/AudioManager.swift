@@ -68,11 +68,13 @@ final class AudioManager: ObservableObject {
         }
 
         MPRemoteCommandCenter.nextTrackCommand.addTarget { [unowned self] _ in
-            .success
+            self.nextTrack()
+            return .success
         }
 
         MPRemoteCommandCenter.previousTrackCommand.addTarget { [unowned self] _ in
-            .success
+            self.previousTrack()
+            return .success
         }
 
         self.avPlayerItemObserver = avQueuePlayer.observe(\.currentItem, options: .initial) {
@@ -94,6 +96,7 @@ final class AudioManager: ObservableObject {
     func updateNowPlayingStaticMetadata(_ metadata: NowPlayableStaticMetadata) {
         var nowPlayingInfo = [String: Any]()
 
+        NSLog("Update to \(metadata.title)")
         nowPlayingInfo[MPNowPlayingInfoPropertyAssetURL] = metadata.assetURL
         nowPlayingInfo[MPNowPlayingInfoPropertyMediaType] = metadata.mediaType.rawValue
         nowPlayingInfo[MPNowPlayingInfoPropertyIsLiveStream] = metadata.isLiveStream
@@ -130,6 +133,36 @@ final class AudioManager: ObservableObject {
         case .playing:
             pause()
         case .paused:
+            play()
+        }
+    }
+
+    func nextTrack() {
+        if playableQueue.doesNextTrackExist() {
+            playableQueue.handleNowPlayingItemMoveNext()
+            avQueuePlayer.advanceToNextItem()
+        }
+    }
+
+    func previousTrack() {
+        if playableQueue.doesPreviousTrackExist() {
+            let currentItems = avQueuePlayer.items() // 5, 3번째 트랙 재생중
+            let currentItem = avQueuePlayer.currentItem!
+            let previousItem = playableQueue.getPreviousAVPlayerItem()!
+            playableQueue.handleNowPlayingItemMovePrevious()
+
+            avQueuePlayer.insert(previousItem, after: currentItem)
+            avQueuePlayer.advanceToNextItem()
+            avQueuePlayer.insert(currentItem, after: avQueuePlayer.currentItem)
+
+            /*
+            avQueuePlayer.insert(previousItem, after: nil)
+            for item in currentItems {
+                avQueuePlayer.insert(item, after: nil)
+            }
+             */
+            NSLog("\(avQueuePlayer.items().count) items in avQueuePlayer in previousTrack()")
+
             play()
         }
     }
@@ -173,9 +206,11 @@ final class AudioManager: ObservableObject {
         guard playerState != .stopped else { return }
 
         guard let currentItem = avQueuePlayer.currentItem else {
+            NSLog("\(avQueuePlayer.items().count) items in avQueuePlayer")
             avPlayerItemObserver = nil
             playerState = .stopped
             // TODO: Deactivate seesion
+
             return
         }
 
@@ -186,9 +221,7 @@ final class AudioManager: ObservableObject {
 
         if currentIndex == playableQueue.nowPlayingIndex {
         } else if currentIndex == playableQueue.nowPlayingIndex + 1 {
-            playableQueue.handleNowPlayingItemMoveNext()
         } else if currentIndex == playableQueue.nowPlayingIndex - 1 {
-            playableQueue.handleNowPlayingItemMovePrevious()
         } else {
             NSLog("[AudioManager] : AVQueuePlayer currentItem doesn't point previous, now, or next.")
         }
