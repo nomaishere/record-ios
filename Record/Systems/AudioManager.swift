@@ -29,7 +29,7 @@ final class AudioManager: ObservableObject {
 
     @Published var playerState: PlayerState = .stopped {
         didSet {
-            NSLog("%@", "**** Set player state \(playerState)")
+            // NSLog("%@", "**** Set player state \(playerState)")
         }
     }
 
@@ -48,7 +48,7 @@ final class AudioManager: ObservableObject {
         NSLog("Initialize AudioManager")
         self.nowPlayingTrack = nil
         self.playableQueue = PlayableQueue.sharedInstance
-        self.avQueuePlayer = AVQueuePlayer()
+        self.avQueuePlayer = AVQueuePlayer(items: [])
         avQueuePlayer.allowsExternalPlayback = true
 
         let MPRemoteCommandCenter = MPRemoteCommandCenter.shared()
@@ -65,6 +65,19 @@ final class AudioManager: ObservableObject {
         MPRemoteCommandCenter.togglePlayPauseCommand.addTarget { [unowned self] _ in
             self.togglePlayPause()
             return .success
+        }
+
+        MPRemoteCommandCenter.nextTrackCommand.addTarget { [unowned self] _ in
+            .success
+        }
+
+        MPRemoteCommandCenter.previousTrackCommand.addTarget { [unowned self] _ in
+            .success
+        }
+
+        self.avPlayerItemObserver = avQueuePlayer.observe(\.currentItem, options: .initial) {
+            [unowned self] _, _ in
+            self.handleAvPlayerItemChange()
         }
     }
 
@@ -130,27 +143,22 @@ final class AudioManager: ObservableObject {
     func playTracksAfterCleanQueue(tracks: [Track]) {
         switch playerState {
         case .stopped:
-            NSLog("start playing \(tracks.count) tracks")
+            let endIndex = playableQueue.avPlayerItems.endIndex
             playableQueue.addTracksAtEndofQueue(tracks: tracks)
 
-            for track in tracks {
-                avQueuePlayer.insert(AVPlayerItem(url: track.audioLocalURL), after: nil)
+            for (index, track) in tracks.enumerated() {
+                avQueuePlayer.insert(playableQueue.avPlayerItems[endIndex + index], after: nil)
             }
 
             do {
                 try activateSession()
             } catch {}
-            avPlayerItemObserver = avQueuePlayer.observe(\.currentItem, options: .initial) {
-                [unowned self] _, _ in
-                self.handleAvPlayerItemChange()
-            }
-            playerState = .playing
 
             do {
                 // try nowPlayableBehavior.handleNowPlayableConfiguration(commands: registeredCommands, disabledCommands: enabledCommands, commandHandler: handleCommand(command:event:), interruptionHandler: handleInterrupt(with:))
             } catch {}
 
-            avQueuePlayer.play()
+            play()
             handleAvPlayerItemChange()
 
         case .playing:
@@ -169,15 +177,28 @@ final class AudioManager: ObservableObject {
         guard playerState != .stopped else { return }
 
         guard let currentItem = avQueuePlayer.currentItem else {
-            NSLog("AVQueuePlayer End Playing!")
             avPlayerItemObserver = nil
             playerState = .stopped
             // TODO: Deactivate seesion
             return
         }
 
-        // Notify to Queue that Now Playing Item was changed
-        // playableQueue.handleNowPlayingItemMoveNext()
+        guard let currentIndex = playableQueue.avPlayerItems.firstIndex(where: { $0 == currentItem }) else {
+            NSLog("[AudioManager] : No matching AVPlayerItem in queue")
+            return
+        }
+
+        if currentIndex == playableQueue.nowPlayingIndex {
+            NSLog("No Change")
+        } else if currentIndex == playableQueue.nowPlayingIndex + 1 {
+            NSLog("Next track started")
+            playableQueue.handleNowPlayingItemMoveNext()
+        } else if currentIndex == playableQueue.nowPlayingIndex - 1 {
+            NSLog("Previous track started")
+            playableQueue.handleNowPlayingItemMovePrevious()
+        } else {
+            NSLog("[AudioManager] : AVQueuePlayer currentItem doesn't point previous, now, or next.")
+        }
 
         // Update nowPlayingTrack (Published Variable)
         nowPlayingTrack = playableQueue.getNowPlayingTrack()
