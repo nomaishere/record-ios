@@ -20,7 +20,6 @@ class DemoDataInjector {
         if let image = image {
             if let data = image.pngData() {
                 try? data.write(to: url)
-                NSLog("Store Image!")
             }
         } else {
             // try? FileManager.default.removeItem(at: self)

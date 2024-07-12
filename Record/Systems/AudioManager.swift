@@ -14,8 +14,6 @@ import MediaPlayer
 /// AudioManager is highest-level controller that manager all feature about audio.
 ///
 final class AudioManager: ObservableObject {
-    // static let sharedInstance = AudioManager()
-
     private var avQueuePlayer: AVQueuePlayer
     private var avAudioSession = AVAudioSession.sharedInstance()
 
@@ -53,6 +51,13 @@ final class AudioManager: ObservableObject {
         self.avQueuePlayer = AVQueuePlayer(items: [])
         avQueuePlayer.allowsExternalPlayback = true
 
+        addHandlerAtMPRemoteCommandCenter()
+        addObserverAtAvQueuePlayer()
+    }
+
+    deinit {}
+
+    func addHandlerAtMPRemoteCommandCenter() {
         let MPRemoteCommandCenter = MPRemoteCommandCenter.shared()
         MPRemoteCommandCenter.togglePlayPauseCommand.addTarget { [unowned self] _ in
             self.togglePlayPause()
@@ -82,11 +87,7 @@ final class AudioManager: ObservableObject {
             self.changePlaybackPosition(to: event.positionTime)
             return .success
         }
-
-        addObserverAtAvQueuePlayer()
     }
-
-    deinit {}
 
     func addObserverAtAvQueuePlayer() {
         avPlayerItemObserver = avQueuePlayer.observe(\.currentItem, options: .initial) {
@@ -113,10 +114,11 @@ final class AudioManager: ObservableObject {
         try avAudioSession.setActive(true, options: .notifyOthersOnDeactivation)
     }
 
+    // MARK: - Method For Updating MPNowPlayingInfoCenter
+
     func updateNowPlayingStaticMetadata(_ metadata: NowPlayableStaticMetadata) {
         var nowPlayingInfo = [String: Any]()
 
-        NSLog("Update to \(metadata.title)")
         nowPlayingInfo[MPNowPlayingInfoPropertyAssetURL] = metadata.assetURL
         nowPlayingInfo[MPNowPlayingInfoPropertyMediaType] = metadata.mediaType.rawValue
         nowPlayingInfo[MPNowPlayingInfoPropertyIsLiveStream] = metadata.isLiveStream
@@ -132,7 +134,6 @@ final class AudioManager: ObservableObject {
     func updateNowPlayingPlaybackInfo(_ metadata: NowPlayableDynamicMetadata) {
         var nowPlayingInfo = MPNowPlayingInfoCenter.default().nowPlayingInfo ?? [String: Any]()
 
-        NSLog("%@", "**** Set playback info: rate \(metadata.rate), position \(metadata.position), duration \(metadata.duration)")
         nowPlayingInfo[MPMediaItemPropertyPlaybackDuration] = metadata.duration
         nowPlayingInfo[MPNowPlayingInfoPropertyElapsedPlaybackTime] = metadata.position
         nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackRate] = metadata.rate
@@ -228,9 +229,7 @@ final class AudioManager: ObservableObject {
                 try activateSession()
             } catch {}
 
-            do {
-                // try nowPlayableBehavior.handleNowPlayableConfiguration(commands: registeredCommands, disabledCommands: enabledCommands, commandHandler: handleCommand(command:event:), interruptionHandler: handleInterrupt(with:))
-            } catch {}
+            // TODO: Attach Interrupt Handler
 
             play()
             handleAvPlayerItemChange()
@@ -244,7 +243,6 @@ final class AudioManager: ObservableObject {
             playableQueue.deleteAllTracksInQueue()
             playableQueue.addTracksAtEndofQueue(tracks: tracks)
         }
-        // play()
     }
 
     // MARK: - Handler for Observer
@@ -282,7 +280,6 @@ final class AudioManager: ObservableObject {
     }
 
     private func handlePlaybackChange() {
-        NSLog("handlePlaybackChange")
         guard playerState != .stopped else { return }
 
         guard let currentItem = avQueuePlayer.currentItem else { return }
@@ -296,6 +293,7 @@ final class AudioManager: ObservableObject {
         updateNowPlayingPlaybackInfo(dynamicMetadata)
     }
 
+    // TODO: Attach Interrupt Handler
     private func handleInterrupt(with interruption: NowPlayableInterruption) {
         switch interruption {
         case .began:
