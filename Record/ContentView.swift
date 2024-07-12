@@ -234,7 +234,7 @@ struct PlayerView: View {
                                 }
                                 .contentShape(Rectangle())
                                 .onTapGesture {
-                                    print("hi")
+                                    audioManager.previousTrack()
                                 }
                                 Spacer()
                                 VStack {
@@ -275,7 +275,7 @@ struct PlayerView: View {
                                 }
                                 .contentShape(Rectangle())
                                 .onTapGesture {
-                                    print("hi")
+                                    audioManager.nextTrack()
                                 }
                             }
                             .frame(width: 280, height: 60)
