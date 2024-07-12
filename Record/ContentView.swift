@@ -80,7 +80,7 @@ struct PlayerView: View {
 
     let minibarBottomPadding: CGFloat
 
-    @State var trackThemeColor: Color = .init(hex: 0xDB4928)
+    @State var trackThemeColor: Color = .init(hex: 0x28DD9A)
 
     // Temporary
     @State var isPlaying: Bool = false
@@ -163,12 +163,6 @@ struct PlayerView: View {
         ZStack {
             Color.clear
                 .background(
-                    /*
-                     Image("modm_highres")
-                         .resizable()
-                         .scaledToFill()
-                      */
-
                     AsyncImage(url: audioManager.nowPlayingTrack?.artwork) { phase in
                         if let image = phase.image {
                             image
@@ -185,15 +179,31 @@ struct PlayerView: View {
             case .minibar:
                 if isMinibarItemRender {
                     HStack {
-                        Text("\(audioManager.nowPlayingTrack!.title)")
-                            .font(Font.custom("Pretendard-SemiBold", size: 20))
-                            .foregroundStyle(Color(.white))
-                            .padding(.leading, 16)
+                        Group {
+                            if let nowPlayintTrack = audioManager.nowPlayingTrack {
+                                Text("\(nowPlayintTrack.title)")
+
+                            } else { Text("error")
+                            }
+                        }
+                        .font(Font.custom("Pretendard-SemiBold", size: 20))
+                        .foregroundStyle(Color(.white))
+                        .padding(.leading, 16)
                         Spacer()
-                        Button(action: {
-                            audioManager.play()
-                        }, label: { RectIconWrapper(icon: Image("Pause"), color: Color(.white), iconWidth: 17, wrapperWidth: 17, wrapperHeight: 20) })
-                            .padding(.trailing, 24)
+                        switch audioManager.playerState {
+                        case .stopped:
+                            Color.clear
+                        case .playing:
+                            Button(action: {
+                                audioManager.pause()
+                            }, label: { RectIconWrapper(icon: Image("Pause"), color: Color(.white), iconWidth: 17, wrapperWidth: 17, wrapperHeight: 20) })
+                                .padding(.trailing, 24)
+                        case .paused:
+                            Button(action: {
+                                audioManager.play()
+                            }, label: { RectIconWrapper(icon: Image("Play"), color: Color(.white), iconWidth: 17, wrapperWidth: 17, wrapperHeight: 20) })
+                                .padding(.trailing, 24)
+                        }
                     }
                 }
 
@@ -244,12 +254,13 @@ struct PlayerView: View {
                                 }
                                 .contentShape(Rectangle())
                                 .onTapGesture {
-                                    if isPlaying {
+                                    switch audioManager.playerState {
+                                    case .stopped:
                                         audioManager.pause()
-                                        isPlaying.toggle()
-                                    } else {
+                                    case .playing:
+                                        audioManager.pause()
+                                    case .paused:
                                         audioManager.play()
-                                        isPlaying.toggle()
                                     }
                                 }
                                 Spacer()
@@ -279,7 +290,6 @@ struct PlayerView: View {
             case .vanished:
                 Color.clear
                     .onReceive(audioManager.$playerState) { state in
-                        NSLog("player state change. \(state) ")
                         if state == .playing {
                             playerMode = .minibar
                             viewWidth = UIScreen.main.bounds.size.width - 16
