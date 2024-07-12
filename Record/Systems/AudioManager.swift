@@ -69,6 +69,20 @@ final class AudioManager: ObservableObject {
             return .success
         }
 
+        /*
+         MPRemoteCommandCenter.changePlaybackPositionCommand.addTarget { [unowned self] _ in
+             self.changePlaybackPosition()
+             return .success
+         }*/
+
+        MPRemoteCommandCenter.changePlaybackPositionCommand.addTarget { [unowned self] event in
+
+            guard let event = event as? MPChangePlaybackPositionCommandEvent else { return .commandFailed }
+
+            self.changePlaybackPosition(to: event.positionTime)
+            return .success
+        }
+
         addObserverAtAvQueuePlayer()
     }
 
@@ -182,6 +196,17 @@ final class AudioManager: ObservableObject {
             NSLog("\(avQueuePlayer.items().count) items in avQueuePlayer in previousTrack()")
 
             play()
+        }
+    }
+
+    func changePlaybackPosition(to position: TimeInterval) {
+        guard playerState != .stopped else { return }
+
+        avQueuePlayer.seek(to: CMTime(seconds: position, preferredTimescale: 1), toleranceBefore: .zero, toleranceAfter: .zero) {
+            isFinished in
+            if isFinished {
+                self.handlePlaybackChange()
+            }
         }
     }
 
