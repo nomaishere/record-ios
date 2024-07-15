@@ -80,8 +80,6 @@ struct PlayerView: View {
 
     let minibarBottomPadding: CGFloat
 
-    @State var trackThemeColor: Color = .init(hex: 0x28DD9A)
-
     // Temporary
     @State var isPlaying: Bool = false
 
@@ -208,81 +206,85 @@ struct PlayerView: View {
                 }
 
             case .expanded:
-                VStack {
-                    Spacer()
-                    VStack(spacing: 4) {
-                        Text("\(audioManager.nowPlayingTrack!.title)")
-                            .font(Font.custom("Pretendard-Bold", size: 20))
-                            .foregroundStyle(trackThemeColor)
-                        ZStack {
-                            BackdropBlurView(radius: 16)
-                                .frame(width: 280, height: 60)
-                                .clipShape(RoundedRectangle(cornerRadius: 8))
-                            RoundedRectangle(cornerRadius: 8)
-                                .fill(Color(hex: 0x6F6F6F, opacity: 0.1))
-                                .frame(width: 280, height: 60)
-
-                            HStack(spacing: 0) {
-                                VStack {
-                                    Spacer()
-                                    HStack(spacing: 0) {
+                if let nowPlayingTrack = audioManager.nowPlayingTrack {
+                    VStack {
+                        Spacer()
+                        VStack(spacing: 4) {
+                            Text("\(nowPlayingTrack.title)")
+                                .font(Font.custom("Pretendard-Bold", size: 20))
+                                .foregroundStyle(Color(hexString: nowPlayingTrack.themeColor))
+                            ZStack {
+                                BackdropBlurView(radius: 16)
+                                    .frame(width: 280, height: 60)
+                                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                                RoundedRectangle(cornerRadius: 8)
+                                    .fill(Color(hex: 0x6F6F6F, opacity: 0.1))
+                                    .frame(width: 280, height: 60)
+                                HStack(spacing: 0) {
+                                    VStack {
                                         Spacer()
-                                        RectIconWrapper(icon: Image("Previous"), color: trackThemeColor, iconWidth: 21, wrapperWidth: 21, wrapperHeight: 24)
-                                            .padding(.trailing, 32)
-                                    }
-                                    Spacer()
-                                }
-                                .contentShape(Rectangle())
-                                .onTapGesture {
-                                    audioManager.previousTrack()
-                                }
-                                Spacer()
-                                VStack {
-                                    Spacer()
-                                    switch audioManager.playerState {
-                                    case .stopped:
-                                        Color.clear
-                                    case .playing:
-                                        RectIconWrapper(icon: Image("Pause_Thin"), color: trackThemeColor, iconWidth: 19.4, wrapperWidth: 20, wrapperHeight: 27)
-                                            .padding(.horizontal, 32)
-                                    case .paused:
-                                        RectIconWrapper(icon: Image("Play"), color: trackThemeColor, iconWidth: 20, wrapperWidth: 20, wrapperHeight: 27)
-                                            .padding(.horizontal, 32)
-                                    }
-
-                                    Spacer()
-                                }
-                                .contentShape(Rectangle())
-                                .onTapGesture {
-                                    switch audioManager.playerState {
-                                    case .stopped:
-                                        audioManager.pause()
-                                    case .playing:
-                                        audioManager.pause()
-                                    case .paused:
-                                        audioManager.play()
-                                    }
-                                }
-                                Spacer()
-                                VStack {
-                                    Spacer()
-                                    HStack(spacing: 0) {
-                                        RectIconWrapper(icon: Image("Next"), color: trackThemeColor, iconWidth: 21, wrapperWidth: 21, wrapperHeight: 24)
-                                            .padding(.leading, 32)
+                                        HStack(spacing: 0) {
+                                            Spacer()
+                                            RectIconWrapper(icon: Image("Previous"), color: Color(hexString: nowPlayingTrack.themeColor), iconWidth: 21, wrapperWidth: 21, wrapperHeight: 24)
+                                                .padding(.trailing, 32)
+                                        }
                                         Spacer()
                                     }
+                                    .contentShape(Rectangle())
+                                    .onTapGesture {
+                                        audioManager.previousTrack()
+                                    }
                                     Spacer()
+                                    VStack {
+                                        Spacer()
+                                        switch audioManager.playerState {
+                                        case .stopped:
+                                            Color.clear
+                                        case .playing:
+                                            RectIconWrapper(icon: Image("Pause_Thin"), color: Color(hexString: nowPlayingTrack.themeColor), iconWidth: 19.4, wrapperWidth: 20, wrapperHeight: 27)
+                                                .padding(.horizontal, 32)
+                                        case .paused:
+                                            RectIconWrapper(icon: Image("Play"), color: Color(hexString: nowPlayingTrack.themeColor), iconWidth: 20, wrapperWidth: 20, wrapperHeight: 27)
+                                                .padding(.horizontal, 32)
+                                        }
+
+                                        Spacer()
+                                    }
+                                    .contentShape(Rectangle())
+                                    .onTapGesture {
+                                        switch audioManager.playerState {
+                                        case .stopped:
+                                            audioManager.pause()
+                                        case .playing:
+                                            audioManager.pause()
+                                        case .paused:
+                                            audioManager.play()
+                                        }
+                                    }
+                                    Spacer()
+                                    VStack {
+                                        Spacer()
+                                        HStack(spacing: 0) {
+                                            RectIconWrapper(icon: Image("Next"), color: Color(hexString: nowPlayingTrack.themeColor), iconWidth: 21, wrapperWidth: 21, wrapperHeight: 24)
+                                                .padding(.leading, 32)
+                                            Spacer()
+                                        }
+                                        Spacer()
+                                    }
+                                    .contentShape(Rectangle())
+                                    .onTapGesture {
+                                        audioManager.nextTrack()
+                                    }
                                 }
-                                .contentShape(Rectangle())
-                                .onTapGesture {
-                                    audioManager.nextTrack()
-                                }
+                                .frame(width: 280, height: 60)
                             }
-                            .frame(width: 280, height: 60)
                         }
+                        Spacer()
+                            .frame(height: 96)
                     }
-                    Spacer()
-                        .frame(height: 96)
+
+                } else {
+                    Text("Error: nowPlayingTrack is nil")
                 }
 
             case .animated:
