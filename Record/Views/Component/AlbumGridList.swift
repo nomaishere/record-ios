@@ -9,18 +9,20 @@ import SwiftUI
 
 struct AlbumGridList: View {
     let columns = [GridItem(.flexible(), spacing: 16), GridItem(.flexible(), spacing: 16)]
-    var albums: [Image]
-    
+    var albums: [Album]
+
     var body: some View {
         LazyVGrid(columns: columns, spacing: 16) {
-            ForEach(albums.indices, id:\.self) {value in
-                ClickableAlbumCover(cover: albums[value])
+            ForEach(albums, id: \.self) { album in
+                ClickableAlbumCover(album: album)
             }
         }
         .padding(.horizontal, 16.0)
     }
 }
 
-#Preview {
-    AlbumGridList(albums: [Image("mmtbs"), Image("mb"), Image("tpab"),Image("bomm") ])
-}
+/*
+ #Preview {
+ AlbumGridList(albums: [Image("mmtbs"), Image("mb"), Image("tpab"), Image("bomm")])
+ }
+ */

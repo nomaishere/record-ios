@@ -8,17 +8,21 @@
 import SwiftUI
 
 struct ClickableAlbumCover: View {
-    var cover: Image
-    
-    var body: some View {
-        cover
-            .resizable()
-            .scaledToFit()
-            .clipShape(RoundedRectangle(cornerRadius: 4))
-            .scaledToFit()
-    }
-}
+    var album: Album
 
-#Preview {
-    ClickableAlbumCover(cover: Image("tpab"))
+    var body: some View {
+        AsyncImage(url: album.artwork) { phase in
+            if let image = phase.image {
+                image
+                    .resizable()
+                    .scaledToFit()
+                    .clipShape(RoundedRectangle(cornerRadius: 4))
+                    .scaledToFit()
+            } else if phase.error != nil {
+                Color.red
+            } else {
+                Color.blue
+            }
+        }
+    }
 }

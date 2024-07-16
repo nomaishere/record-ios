@@ -14,14 +14,12 @@ final class Album: Identifiable {
     var title: String
     @Relationship var artist: [Artist]
     @Relationship var tracks: [Track]
-    
-    @Attribute(.externalStorage) var artwork: Data
-    
-    
+
+    var artwork: URL
+
     var releaseDate: Date?
-    
-    
-    init(title: String, artist: [Artist], tracks: [Track], artwork: Data, releaseDate: Date ) {
+
+    init(title: String, artist: [Artist], tracks: [Track], artwork: URL, releaseDate: Date) {
         self.title = title
         self.artist = artist
         self.tracks = tracks

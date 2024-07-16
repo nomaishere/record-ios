@@ -63,16 +63,9 @@ struct Collection: View {
                 audioManager.playTracksAfterCleanQueue(tracks: DemoDataInjector.sharedInstance.makePlayableDemoTrack())
 
             }, label: {
-                /*
-                 AsyncImage(url: URL.documentsDirectory.appending(path: "modm_cover.png"))
-                     .scaledToFit()
-                     .frame(width: 200, height: 200)
-                     .clipped()
-                  */
-
                 Text("Play MODM")
             })
-            AlbumGridList(albums: [])
+            AlbumGridList(albums: albums)
         }
     }
 }
