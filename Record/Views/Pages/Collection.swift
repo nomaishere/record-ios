@@ -28,73 +28,85 @@ struct Collection: View {
     var body: some View {
         if isAlbumViewPopup {
             if let album = selectedAlbum {
-                VStack(spacing: 0) {
-                    HStack {
-                        Button(action: {
-                            isAlbumViewPopup = false
-                            selectedAlbum = nil
-                        }, label: {
-                            HStack(spacing: 10) {
-                                RectIconWrapper(icon: Image("LeftChevron"), color: Color("G3"), iconWidth: 8, wrapperWidth: 8, wrapperHeight: 14)
-                                Text("Collection")
+                ScrollView {
+                    VStack(spacing: 0) {
+                        HStack {
+                            Button(action: {
+                                isAlbumViewPopup = false
+                                selectedAlbum = nil
+                            }, label: {
+                                HStack(spacing: 10) {
+                                    RectIconWrapper(icon: Image("LeftChevron"), color: Color("G5"), iconWidth: 8, wrapperWidth: 8, wrapperHeight: 14)
+                                    Text("Collection")
+                                        .font(Font.custom("Pretendard-Medium", size: 18))
+                                        .foregroundStyle(Color("G5"))
+                                }
+                                .padding(.horizontal, 16)
+                                .frame(height: 36)
+                                .background(RoundedRectangle(cornerRadius: 100)
+                                    .fill(Color("G1")))
+                            })
+                            Spacer()
+                            Button(action: /*@START_MENU_TOKEN@*/ {}/*@END_MENU_TOKEN@*/, label: {
+                                HStack(spacing: 10) {
+                                    RectIconWrapper(icon: Image("Play"), color: Color(.white), iconWidth: 12, wrapperWidth: 12, wrapperHeight: 14.18)
+                                    Text("Play")
+                                        .font(Font.custom("Pretendard-Medium", size: 18))
+                                        .foregroundStyle(Color(.white))
+                                }
+                                .padding(.horizontal, 16)
+                                .frame(height: 36)
+                                .background(RoundedRectangle(cornerRadius: 100)
+                                    .fill(Color(hexString: album.themeColor)))
+                            })
+                        }
+                        .padding(.horizontal, 16)
+                    }
+                    Spacer()
+                        .frame(height: 24)
+                    AsyncImage(url: URL.documentsDirectory.appending(path: album.artwork.absoluteString)) { phase in
+                        if let image = phase.image {
+                            image
+                                .resizable()
+                                .scaledToFit()
+                                .clipShape(RoundedRectangle(cornerRadius: 4))
+                                .scaledToFit()
+                        } else if phase.error != nil {
+                            Color.red
+                        } else {}
+                    }
+                    .frame(width: 249, height: 249)
+                    Spacer()
+                        .frame(height: 12)
+                    Text("\(album.title)")
+                        .font(Font.custom("Pretendard-SemiBold", size: 20))
+                        .foregroundStyle(Color(hexString: album.themeColor))
+                    Spacer()
+                        .frame(height: 4)
+                    Text("\(album.artist.first!.name)")
+                        .font(Font.custom("Pretendard-Medium", size: 18))
+                        .foregroundStyle(Color("G5"))
+                    Spacer()
+                        .frame(height: 24)
+                    VStack(spacing: 18) {
+                        ForEach(album.tracks.sorted(by: { $0.trackNumber < $1.trackNumber }), id: \.self) { track in
+                            HStack(spacing: 0) {
+                                Text("\(track.trackNumber)")
                                     .font(Font.custom("Pretendard-Medium", size: 18))
                                     .foregroundStyle(Color("G3"))
+                                    .frame(width: 24)
+                                Spacer()
+                                    .frame(width: 12)
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text("\(track.title)")
+                                        .font(Font.custom("Pretendard-Medium", size: 18))
+                                        .foregroundStyle(Color("DefaultBlack"))
+                                        .lineLimit(1)
+                                        .truncationMode(.tail)
+                                }
+                                .frame(maxWidth: .infinity, alignment: .leading)
                             }
-                            .padding(.horizontal, 16)
-                            .frame(height: 36)
-                            .background(RoundedRectangle(cornerRadius: 100)
-                                .fill(Color("G1")))
-                        })
-                        Spacer()
-                        Button(action: /*@START_MENU_TOKEN@*/ {}/*@END_MENU_TOKEN@*/, label: {
-                            HStack(spacing: 10) {
-                                RectIconWrapper(icon: Image("Play"), color: Color(.white), iconWidth: 12, wrapperWidth: 12, wrapperHeight: 14.18)
-                                Text("Play")
-                                    .font(Font.custom("Pretendard-Medium", size: 18))
-                                    .foregroundStyle(Color(.white))
-                            }
-                            .padding(.horizontal, 16)
-                            .frame(height: 36)
-                            .background(RoundedRectangle(cornerRadius: 100)
-                                .fill(Color(hexString: album.themeColor)))
-                        })
-                    }
-                    .padding(.horizontal, 16)
-                }
-                Spacer()
-                    .frame(height: 24)
-                AsyncImage(url: URL.documentsDirectory.appending(path: album.artwork.absoluteString)) { phase in
-                    if let image = phase.image {
-                        image
-                            .resizable()
-                            .scaledToFit()
-                            .clipShape(RoundedRectangle(cornerRadius: 4))
-                            .scaledToFit()
-                    } else if phase.error != nil {
-                        Color.red
-                    } else {}
-                }
-                .frame(width: 249, height: 249)
-                Spacer()
-                    .frame(height: 12)
-                Text("\(album.title)")
-                    .font(Font.custom("Pretendard-SemiBold", size: 20))
-                    .foregroundStyle(Color(hexString: album.themeColor))
-                Spacer()
-                    .frame(height: 4)
-                Text("\(album.artist.first!.name)")
-                    .font(Font.custom("Pretendard-Medium", size: 18))
-                    .foregroundStyle(Color("G5"))
-                Spacer()
-                    .frame(height: 24)
-                Text("\(album.tracks.count)")
-                VStack(spacing: 18) {
-                    ForEach(album.tracks, id: \.self) { track in
-                        HStack {
-                            VStack(spacing: 4) {
-                                Text("hi")
-                                Text("\(track.title)")
-                            }
+                            .padding(.horizontal, 24)
                         }
                     }
                 }
