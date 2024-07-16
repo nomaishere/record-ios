@@ -10,11 +10,12 @@ import SwiftUI
 struct AlbumGridList: View {
     let columns = [GridItem(.flexible(), spacing: 16), GridItem(.flexible(), spacing: 16)]
     var albums: [Album]
+    var onTabGestureHander: (Album) -> Void
 
     var body: some View {
         LazyVGrid(columns: columns, spacing: 16) {
             ForEach(albums, id: \.self) { album in
-                ClickableAlbumCover(album: album)
+                ClickableAlbumCover(album: album, onTabGestureHander: onTabGestureHander)
             }
         }
         .padding(.horizontal, 16.0)

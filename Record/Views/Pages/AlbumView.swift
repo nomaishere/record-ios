@@ -7,12 +7,10 @@
 
 import SwiftUI
 
-struct Album: View {
+struct AlbumView: View {
+    let album: Album
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        
+        Text("\(album.title)")
     }
-}
-
-#Preview {
-    Album()
 }

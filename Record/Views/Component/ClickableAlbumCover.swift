@@ -9,6 +9,7 @@ import SwiftUI
 
 struct ClickableAlbumCover: View {
     var album: Album
+    var onTabGestureHander: (Album) -> Void
 
     var body: some View {
         AsyncImage(url: URL.documentsDirectory.appending(path: album.artwork.absoluteString)) { phase in
@@ -23,6 +24,9 @@ struct ClickableAlbumCover: View {
             } else {
                 Color.blue
             }
+        }
+        .onTapGesture {
+            onTabGestureHander(self.album)
         }
     }
 }
