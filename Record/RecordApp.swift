@@ -75,14 +75,21 @@ struct RecordApp: App {
             // Load built-in genre data & decode
 
             // All Demo Album
-            NSLog("start")
             let existingAlbums = try container.mainContext.fetchCount(FetchDescriptor<Album>())
             if existingAlbums == 0 {
                 let demoArtist = Artist(name: "C418", isGroup: false)
-                let demoTrack: [Track] = DemoDataInjector.sharedInstance.makeDemoTracksOfDemoAlbum(artist: demoArtist)
-                let demoAlbum = Album(title: "Minecraft - Volume Alpha", artist: [demoArtist], tracks: demoTrack, artwork: URL(string: "msva_cover.png")!, releaseDate: Date())
+                let demoAlbum = Album(title: "Minecraft - Volume Alpha", artist: [demoArtist], tracks: [], artwork: URL(string: "msva_cover.png")!, releaseDate: Date(), themeColor: "66A53D")
+                let demoTrack = DemoDataInjector.sharedInstance.makeDemoTracksOfDemoAlbum(artist: demoArtist, album: demoAlbum)
 
                 container.mainContext.insert(demoAlbum)
+
+                /*
+                 let descriptor = FetchDescriptor<Album>(
+                     predicate: #Predicate { $0.title == "Minecraft - Volume Alpha" }
+                 )
+                 let result = try container.mainContext.fetch(descriptor)
+                  */
+                demoAlbum.tracks = demoTrack
             }
 
             return container

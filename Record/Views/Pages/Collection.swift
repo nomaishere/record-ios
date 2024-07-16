@@ -10,6 +10,8 @@ import SwiftUI
 
 struct Collection: View {
     @Query var albums: [Album]
+    @Query var artists: [Artist]
+    @Query var tracks: [Track]
     @EnvironmentObject var router: Router
     @EnvironmentObject var audioManager: AudioManager
 
@@ -143,6 +145,7 @@ struct Collection: View {
                 .padding(.horizontal, 16.0)
                 Spacer()
                     .frame(height: 16)
+
                 Button(action: {
                     audioManager.playTracksAfterCleanQueue(tracks: DemoDataInjector.sharedInstance.makePlayableDemoTrack())
 

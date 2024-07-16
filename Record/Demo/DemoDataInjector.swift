@@ -13,18 +13,15 @@ class DemoDataInjector {
     static let sharedInstance = DemoDataInjector()
 
     func saveDemoAlbumImage() {
-        NSLog("save")
         let coverURL = URL.documentsDirectory.appending(path: "msva_cover.png")
         saveImage(UIImage(named: "msva"), at: coverURL)
     }
 
-    func makeDemoTracksOfDemoAlbum(artist: Artist) -> [Track] {
+    func makeDemoTracksOfDemoAlbum(artist: Artist, album: Album) -> [Track] {
         let coverURL = URL(string: "msva_cover.png")!
-        NSLog("\(coverURL.absoluteString)")
-        NSLog("\(coverURL.relativeString)")
 
         var tracks: [Track] = []
-        var trackNames = ["Key", "Door", "Subwoofer Lullaby", "Death", "Living Mice", "Moog City", "Haggstrom", "Minecraft", "Oxygène", "Équinoxe", "Mice on Venus", "Dry Hands", "Wet Hands", "Clark", "Chris", "Thirteen", "Excuse", "Sweden", "Cat", "Dog", "Danny", "Beginning", "Droopy Likes Ricochet", "Droopy Likes Your Face"]
+        let trackNames = ["Key", "Door", "Subwoofer Lullaby", "Death", "Living Mice", "Moog City", "Haggstrom", "Minecraft", "Oxygène", "Équinoxe", "Mice on Venus", "Dry Hands", "Wet Hands", "Clark", "Chris", "Thirteen", "Excuse", "Sweden", "Cat", "Dog", "Danny", "Beginning", "Droopy Likes Ricochet", "Droopy Likes Your Face"]
 
         for (index, trackName) in trackNames.enumerated() {
             var urlString = String(index + 1)
@@ -33,7 +30,7 @@ class DemoDataInjector {
             }
             urlString = "\(urlString) - \(trackName).mp3"
             guard let audioLocalURL = URL(string: urlString) else { return [] }
-            tracks.append(Track(title: trackName, audioLocalURL: audioLocalURL, duration: 30.0, artwork: coverURL, album: nil, artists: [artist], trackNumber: index + 1, themeColor: "66A53D"))
+            tracks.append(Track(title: trackName, audioLocalURL: audioLocalURL, duration: 30.0, artwork: coverURL, album: album, artists: [artist], trackNumber: index + 1, themeColor: "66A53D"))
         }
 
         return tracks
