@@ -59,28 +59,41 @@ struct RecordApp: App {
             // Check application has genre data
             let descriptor = FetchDescriptor<Genre>()
             let existingGenres = try container.mainContext.fetchCount(descriptor)
-            guard existingGenres == 0 else { return container }
+            if existingGenres == 0 {
+                guard let url = Bundle.main.url(forResource: "BuiltInGenreData", withExtension: "json") else {
+                    fatalError("Failed to find users.json")
+                }
 
-            // Load built-in genre data & decode
-            guard let url = Bundle.main.url(forResource: "BuiltInGenreData", withExtension: "json") else {
-                fatalError("Failed to find users.json")
+                let data = try Data(contentsOf: url)
+                let genreDatas = try JSONDecoder().decode([Genre].self, from: data)
+
+                for genreData in genreDatas {
+                    container.mainContext.insert(genreData)
+                }
             }
 
-            let data = try Data(contentsOf: url)
-            let genreDatas = try JSONDecoder().decode([Genre].self, from: data)
+            // Load built-in genre data & decode
 
-            for genreData in genreDatas {
-                container.mainContext.insert(genreData)
+            // All Demo Album
+            NSLog("start")
+            let existingAlbums = try container.mainContext.fetchCount(FetchDescriptor<Album>())
+            if existingAlbums == 0 {
+                let demoArtist = Artist(name: "C418", isGroup: false)
+                let demoTrack: [Track] = DemoDataInjector.sharedInstance.makeDemoTracksOfDemoAlbum(artist: demoArtist)
+                let demoAlbum = Album(title: "Minecraft - Volume Alpha", artist: [demoArtist], tracks: demoTrack, artwork: URL(string: "msva_cover.png")!, releaseDate: Date())
+
+                container.mainContext.insert(demoAlbum)
             }
 
             return container
         } catch {
             fatalError("Could not create ModelContainer: \(error)")
         }
+
     }()
 
     init() {
-        DemoDataInjector.sharedInstance.storeDemoAlbumAtDocument()
+        DemoDataInjector.sharedInstance.saveDemoAlbumImage()
     }
 
     var body: some Scene {

@@ -6,14 +6,37 @@
 //
 
 import Foundation
+import SwiftData
 import UIKit
 
 class DemoDataInjector {
     static let sharedInstance = DemoDataInjector()
 
-    func storeDemoAlbumAtDocument() {
-        let coverURL = URL.documentsDirectory.appending(path: "modm_cover.png")
-        saveImage(UIImage(named: "modm_highres"), at: coverURL)
+    func saveDemoAlbumImage() {
+        NSLog("save")
+        let coverURL = URL.documentsDirectory.appending(path: "msva_cover.png")
+        saveImage(UIImage(named: "msva"), at: coverURL)
+    }
+
+    func makeDemoTracksOfDemoAlbum(artist: Artist) -> [Track] {
+        let coverURL = URL(string: "msva_cover.png")!
+        NSLog("\(coverURL.absoluteString)")
+        NSLog("\(coverURL.relativeString)")
+
+        var tracks: [Track] = []
+        var trackNames = ["Key", "Door", "Subwoofer Lullaby", "Death", "Living Mice", "Moog City", "Haggstrom", "Minecraft", "Oxygène", "Équinoxe", "Mice on Venus", "Dry Hands", "Wet Hands", "Clark", "Chris", "Thirteen", "Excuse", "Sweden", "Cat", "Dog", "Danny", "Beginning", "Droopy Likes Ricochet", "Droopy Likes Your Face"]
+
+        for (index, trackName) in trackNames.enumerated() {
+            var urlString = String(index + 1)
+            if index + 1 <= 9 {
+                urlString = "0" + urlString
+            }
+            urlString = "\(urlString) - \(trackName).mp3"
+            guard let audioLocalURL = URL(string: urlString) else { return [] }
+            tracks.append(Track(title: trackName, audioLocalURL: audioLocalURL, duration: 30.0, artwork: coverURL, album: nil, artists: [artist], trackNumber: index + 1, themeColor: "66A53D"))
+        }
+
+        return tracks
     }
 
     func saveImage(_ image: UIImage?, at url: URL) {
@@ -27,6 +50,9 @@ class DemoDataInjector {
     }
 
     func makePlayableDemoTrack() -> [Track] {
+        let coverURL = URL.documentsDirectory.appending(path: "modm_cover.png")
+        saveImage(UIImage(named: "modm_highres"), at: coverURL)
+
         var tracks: [Track] = []
 
         let demoArtist = Artist(name: "Khundi Panda", isGroup: false)

@@ -11,7 +11,7 @@ struct ClickableAlbumCover: View {
     var album: Album
 
     var body: some View {
-        AsyncImage(url: album.artwork) { phase in
+        AsyncImage(url: URL.documentsDirectory.appending(path: album.artwork.absoluteString)) { phase in
             if let image = phase.image {
                 image
                     .resizable()
