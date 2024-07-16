@@ -18,12 +18,14 @@ final class Album: Identifiable {
     var artwork: URL
 
     var releaseDate: Date?
+    var themeColor: String
 
-    init(title: String, artist: [Artist], tracks: [Track], artwork: URL, releaseDate: Date) {
+    init(title: String, artist: [Artist], tracks: [Track], artwork: URL, releaseDate: Date, themeColor: String) {
         self.title = title
         self.artist = artist
         self.tracks = tracks
         self.artwork = artwork
         self.releaseDate = releaseDate
+        self.themeColor = themeColor
     }
 }
