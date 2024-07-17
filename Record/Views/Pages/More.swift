@@ -52,9 +52,13 @@ struct More: View {
                 let existingAlbums = try modelContext.fetchCount(FetchDescriptor<Album>())
                 if existingAlbums == 0 {
                     let demoArtist = Artist(name: "C418", isGroup: false)
+
+                    // Default Strategy: Making Model -> Saving Files -> Updating Model's Data
                     let demoAlbum = Album(title: "Minecraft - Volume Alpha", artist: [demoArtist], tracks: [], artwork: URL(string: "msva_cover.png")!, releaseDate: Date(), themeColor: "66A53D")
+                    StorageManager.shared.createAlbumDirectory(title: "Minecraft - Volume Alpha")
                     let demoTrack = DemoDataInjector.sharedInstance.makeDemoTracksOfDemoAlbum(artist: demoArtist, album: demoAlbum)
                     modelContext.insert(demoAlbum)
+
                     demoAlbum.tracks = demoTrack
                 }
             } catch {}

@@ -45,7 +45,7 @@ final class AudioManager: ObservableObject {
     // MARK: - Initializer
 
     init() {
-        NSLog("Initialize AudioManager")
+        NSLog("AudioManager: Initialize AudioManager")
         self.nowPlayingTrack = nil
         self.playableQueue = PlayableQueue.sharedInstance
         self.avQueuePlayer = AVQueuePlayer(items: [])

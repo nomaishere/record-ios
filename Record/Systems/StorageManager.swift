@@ -23,7 +23,7 @@ final class StorageManager {
     func setup() {
         // Check does albums directory exist
         NSLog("StorageManager: Start storage setup")
-        if FileManager.default.fileExists(atPath: URL.documentsDirectory.appending(component: "albums").path()) {
+        if !FileManager.default.fileExists(atPath: URL.documentsDirectory.appending(component: "albums").path()) {
             NSLog("StorageManager: There was no albums directory at document, now system create that")
             do {
                 try FileManager.default.createDirectory(atPath: URL.documentsDirectory.appending(component: "albums").path(), withIntermediateDirectories: false)
@@ -76,7 +76,7 @@ final class StorageManager {
         do {
             // try FileManager.default.copyItem(at: origin, to: dstURL)
 
-            try FileManager.default.copyItem(at: Bundle.main.url(forResource: "01 - Key", withExtension: "mp3")!, to: URL.documentsDirectory.appending(component: "albums/\(title).mp3"))
+            try FileManager.default.copyItem(at: origin, to: URL.documentsDirectory.appending(component: "albums/\(encodedAlbumTitle)/\(title).mp3"))
 
         } catch {
             NSLog("\(error)")

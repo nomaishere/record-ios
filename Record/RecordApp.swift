@@ -75,15 +75,16 @@ struct RecordApp: App {
             // Load built-in genre data & decode
 
             // All Demo Album
-            let existingAlbums = try container.mainContext.fetchCount(FetchDescriptor<Album>())
-            if existingAlbums == 0 {
-                let demoArtist = Artist(name: "C418", isGroup: false)
-                let demoAlbum = Album(title: "Minecraft - Volume Alpha", artist: [demoArtist], tracks: [], artwork: URL(string: "msva_cover.png")!, releaseDate: Date(), themeColor: "66A53D")
-                let demoTrack = DemoDataInjector.sharedInstance.makeDemoTracksOfDemoAlbum(artist: demoArtist, album: demoAlbum)
+            /*
+             let existingAlbums = try container.mainContext.fetchCount(FetchDescriptor<Album>())
+             if existingAlbums == 0 {
+                 let demoArtist = Artist(name: "C418", isGroup: false)
+                 let demoAlbum = Album(title: "Minecraft - Volume Alpha", artist: [demoArtist], tracks: [], artwork: URL(string: "msva_cover.png")!, releaseDate: Date(), themeColor: "66A53D")
+                 let demoTrack = DemoDataInjector.sharedInstance.makeDemoTracksOfDemoAlbum(artist: demoArtist, album: demoAlbum)
 
-                container.mainContext.insert(demoAlbum)
-                demoAlbum.tracks = demoTrack
-            }
+                 container.mainContext.insert(demoAlbum)
+                 demoAlbum.tracks = demoTrack
+             }*/
 
             return container
         } catch {
@@ -93,6 +94,7 @@ struct RecordApp: App {
     }()
 
     init() {
+        StorageManager.shared.setup()
         DemoDataInjector.sharedInstance.saveDemoAlbumImage()
     }
 
