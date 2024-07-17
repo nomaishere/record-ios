@@ -158,23 +158,9 @@ struct Collection: View {
                 Spacer()
                     .frame(height: 16)
 
-                Button(action: {
-                    audioManager.playTracksAfterCleanQueue(tracks: DemoDataInjector.sharedInstance.makePlayableDemoTrack())
-
-                }, label: {
-                    Text("Play MODM")
-                })
-                Button(action: {
-                    if let originURL = Bundle.main.url(forResource: "01 - Key", withExtension: "mp3") {
-                        do {
-                            try FileManager.default.copyItem(at: originURL, to: URL.documentsDirectory.appending(component: "test"))
-                        } catch {}
-                    }
-
-                }, label: {
-                    Text("Text Bundle")
-                })
-                AlbumGridList(albums: albums, onTabGestureHander: handleAlbumOnTabGesture)
+                ScrollView {
+                    AlbumGridList(albums: albums, onTabGestureHander: handleAlbumOnTabGesture)
+                }
             }
         }
     }
