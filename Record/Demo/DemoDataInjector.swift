@@ -24,16 +24,65 @@ class DemoDataInjector {
         let trackNames = ["Key", "Door", "Subwoofer Lullaby", "Death", "Living Mice", "Moog City", "Haggstrom", "Minecraft", "Oxygène", "Équinoxe", "Mice on Venus", "Dry Hands", "Wet Hands", "Clark", "Chris", "Thirteen", "Excuse", "Sweden", "Cat", "Dog", "Danny", "Beginning", "Droopy Likes Ricochet", "Droopy Likes Your Face"]
 
         for (index, trackName) in trackNames.enumerated() {
-            var urlString = String(index + 1)
+            var fileName = String(index + 1)
             if index + 1 <= 9 {
-                urlString = "0" + urlString
+                fileName = "0" + fileName
             }
-            urlString = "\(urlString) - \(trackName).mp3"
-            guard let audioLocalURL = URL(string: urlString) else { return [] }
-            tracks.append(Track(title: trackName, audioLocalURL: audioLocalURL, duration: 30.0, artwork: coverURL, album: album, artists: [artist], trackNumber: index + 1, themeColor: "66A53D"))
+            fileName = "\(fileName) - \(trackName)"
+            do {
+                //let originPath = Bundle.main.path(forResource: "\(fileName)", ofType: "mp3")!
+                // let originURL = URL(filePath: originPath)
+
+                if let originURL = Bundle.main.url(forResource: fileName, withExtension: "mp3") {
+                    let savedAudioFileURL = try saveTrackAudioFileAtDocumentByOriginURL(origin: originURL, title: trackName, album: album)
+                    tracks.append(Track(title: trackName, audioLocalURL: savedAudioFileURL, duration: 30.0, artwork: coverURL, album: album, artists: [artist], trackNumber: index + 1, themeColor: "66A53D"))
+                } else {
+                    NSLog("System: Failed to find files at ")
+                }
+
+            } catch {
+                // NSLog("System: Failed to save file ")
+            }
         }
 
         return tracks
+    }
+
+    enum saveTrackAudioFileError: Error {
+        case notSuppportedFeature
+        case encodeFailed
+        case alreadyFileExisted
+        case copyFailed
+    }
+
+    func saveTrackAudioFileAtDocumentByOriginURL(origin: URL, title: String, album: Album?) throws -> URL {
+        guard let album = album else {
+            NSLog("System: Application doesn't support saving tracks that don't belong to any album. ")
+            throw saveTrackAudioFileError.notSuppportedFeature
+        }
+
+        guard let encodedAlbumTitle = album.title.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) else {
+            NSLog("System: Failed to encode album title")
+            throw saveTrackAudioFileError.encodeFailed
+        }
+
+        guard let encodedTrackTitle = title.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) else {
+            NSLog("System: Failed to encode album title")
+            throw saveTrackAudioFileError.encodeFailed
+        }
+        let dstURLWithoutDocument = URL(string: "albums/\(encodedAlbumTitle)/\(encodedTrackTitle)")!
+        let dstURL = URL.documentsDirectory.appending(path: dstURLWithoutDocument.path(percentEncoded: true))
+
+        if FileManager.default.fileExists(atPath: dstURL.path(percentEncoded: true)) {
+            throw saveTrackAudioFileError.alreadyFileExisted
+        }
+        do {
+            try FileManager.default.copyItem(at: origin, to: dstURL)
+        } catch {
+            NSLog("System: Failed to copy files at \(origin) to \(dstURL): \(error)")
+            throw saveTrackAudioFileError.copyFailed
+        }
+        return dstURLWithoutDocument
     }
 
     func saveImage(_ image: UIImage?, at url: URL) {

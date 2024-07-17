@@ -10,8 +10,6 @@ import SwiftUI
 
 struct Collection: View {
     @Query var albums: [Album]
-    @Query var artists: [Artist]
-    @Query var tracks: [Track]
     @EnvironmentObject var router: Router
     @EnvironmentObject var audioManager: AudioManager
 
@@ -47,7 +45,9 @@ struct Collection: View {
                                     .fill(Color("G1")))
                             })
                             Spacer()
-                            Button(action: /*@START_MENU_TOKEN@*/ {}/*@END_MENU_TOKEN@*/, label: {
+                            Button(action: {
+                                audioManager.playTracksAfterCleanQueue(tracks: album.tracks.sorted(by: { $0.trackNumber < $1.trackNumber }))
+                            }, label: {
                                 HStack(spacing: 10) {
                                     RectIconWrapper(icon: Image("Play"), color: Color(.white), iconWidth: 12, wrapperWidth: 12, wrapperHeight: 14.18)
                                     Text("Play")
@@ -163,6 +163,16 @@ struct Collection: View {
 
                 }, label: {
                     Text("Play MODM")
+                })
+                Button(action: {
+                    if let originURL = Bundle.main.url(forResource: "01 - Key", withExtension: "mp3") {
+                        do {
+                            try FileManager.default.copyItem(at: originURL, to: URL.documentsDirectory.appending(component: "test"))
+                        } catch {}
+                    }
+
+                }, label: {
+                    Text("Text Bundle")
                 })
                 AlbumGridList(albums: albums, onTabGestureHander: handleAlbumOnTabGesture)
             }

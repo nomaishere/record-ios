@@ -91,8 +91,10 @@ class PlayableQueue {
         queueOfTracks.append(contentsOf: tracks)
 
         for track in tracks {
-            avPlayerItems.append(AVPlayerItem(asset: AVURLAsset(url: track.audioLocalURL), automaticallyLoadedAssetKeys: ["availableMediaCharacteristicsWithMediaSelectionOptions"]))
-            let image = UIImage(named: "modm_highres")!
+            NSLog("\(track.audioLocalURL.absoluteString)")
+            let trackAudioFileURL = URL.documentsDirectory.appending(path: track.audioLocalURL.path(percentEncoded: true))
+            avPlayerItems.append(AVPlayerItem(asset: AVURLAsset(url: trackAudioFileURL), automaticallyLoadedAssetKeys: ["availableMediaCharacteristicsWithMediaSelectionOptions"]))
+            let image = UIImage(named: "modm_highres")! // TODO: support image loading
             let temp = NowPlayableStaticMetadata(assetURL: track.audioLocalURL, mediaType: MPNowPlayingInfoMediaType.audio, isLiveStream: false, title: track.title, artist: "Khundi Panda", artwork: MPMediaItemArtwork(boundsSize: image.size) { _ in image }, albumArtist: "todo", albumTitle: "todo") // TODO: Support Multiple Artist
             nowPlayableStaticMetadatas.append(temp)
 

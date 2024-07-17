@@ -82,13 +82,6 @@ struct RecordApp: App {
                 let demoTrack = DemoDataInjector.sharedInstance.makeDemoTracksOfDemoAlbum(artist: demoArtist, album: demoAlbum)
 
                 container.mainContext.insert(demoAlbum)
-
-                /*
-                 let descriptor = FetchDescriptor<Album>(
-                     predicate: #Predicate { $0.title == "Minecraft - Volume Alpha" }
-                 )
-                 let result = try container.mainContext.fetch(descriptor)
-                  */
                 demoAlbum.tracks = demoTrack
             }
 

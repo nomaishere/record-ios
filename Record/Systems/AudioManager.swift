@@ -222,6 +222,7 @@ final class AudioManager: ObservableObject {
             playableQueue.addTracksAtEndofQueue(tracks: tracks)
 
             for (index, _) in tracks.enumerated() {
+                NSLog("add!")
                 avQueuePlayer.insert(playableQueue.avPlayerItems[index], after: nil)
             }
 
@@ -268,7 +269,7 @@ final class AudioManager: ObservableObject {
         } else if currentIndex == playableQueue.nowPlayingIndex + 1 {
         } else if currentIndex == playableQueue.nowPlayingIndex - 1 {
         } else {
-            NSLog("[AudioManager] : AVQueuePlayer currentItem doesn't point previous, now, or next.")
+            NSLog("[AudioManager] : AVQueuePlayer currentItem doesn't point previous, now, or next. Current Index is \(currentIndex).")
         }
 
         // Update nowPlayingTrack (Published Variable)
