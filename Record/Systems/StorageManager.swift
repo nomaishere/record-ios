@@ -84,4 +84,16 @@ final class StorageManager {
         }
         return dstURLWithoutDocument
     }
+
+    func getActualTrackURL(_ track: Track) -> URL {
+        let actualURL = URL.documentsDirectory.appending(path: track.audioLocalURL.path())
+        // NSLog("Actual URL: \(actualURL)")
+
+        return actualURL
+    }
+
+    func getActualTrackArtworkURL(_ track: Track) -> URL {
+        let actualURL = URL.documentsDirectory.appending(path: track.artwork.path())
+        return actualURL
+    }
 }

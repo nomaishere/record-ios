@@ -159,20 +159,23 @@ struct PlayerView: View {
 
     var body: some View {
         ZStack {
-            Color.clear
-                .background(
-                    AsyncImage(url: audioManager.nowPlayingTrack?.artwork) { phase in
-                        if let image = phase.image {
-                            image
-                                .resizable()
-                                .scaledToFill()
-                        } else if phase.error != nil {
-                            Color.red
-                        } else {
-                            Color.blue
+            if let nowPlayingTrack = audioManager.nowPlayingTrack {
+                Color.clear
+                    .background(
+                        AsyncImage(url: StorageManager.shared.getActualTrackArtworkURL(nowPlayingTrack)) { phase in
+                            if let image = phase.image {
+                                image
+                                    .resizable()
+                                    .scaledToFill()
+                            } else if phase.error != nil {
+                                Color.red
+                            } else {
+                                Color.blue
+                            }
                         }
-                    }
-                )
+                    )
+            }
+
             switch playerMode {
             case .minibar:
                 if isMinibarItemRender {
