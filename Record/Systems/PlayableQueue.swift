@@ -91,16 +91,17 @@ class PlayableQueue {
         queueOfTracks.append(contentsOf: tracks)
 
         for track in tracks {
-            NSLog("\(track.audioLocalURL.absoluteString)")
-            let trackAudioFileURL = URL.documentsDirectory.appending(path: track.audioLocalURL.path(percentEncoded: true))
-            avPlayerItems.append(AVPlayerItem(asset: AVURLAsset(url: trackAudioFileURL), automaticallyLoadedAssetKeys: ["availableMediaCharacteristicsWithMediaSelectionOptions"]))
+            let trackURL = StorageManager.shared.getActualTrackURL(track)
+            avPlayerItems.append(AVPlayerItem(asset: AVURLAsset(url: trackURL), automaticallyLoadedAssetKeys: ["availableMediaCharacteristicsWithMediaSelectionOptions"]))
             let image = UIImage(named: "modm_highres")! // TODO: support image loading
-            let temp = NowPlayableStaticMetadata(assetURL: track.audioLocalURL, mediaType: MPNowPlayingInfoMediaType.audio, isLiveStream: false, title: track.title, artist: "Khundi Panda", artwork: MPMediaItemArtwork(boundsSize: image.size) { _ in image }, albumArtist: "todo", albumTitle: "todo") // TODO: Support Multiple Artist
-            nowPlayableStaticMetadatas.append(temp)
+            let metadata = NowPlayableStaticMetadata(assetURL: track.audioLocalURL, mediaType: MPNowPlayingInfoMediaType.audio, isLiveStream: false, title: track.title, artist: "Khundi Panda", artwork: MPMediaItemArtwork(boundsSize: image.size) { _ in image }, albumArtist: "todo", albumTitle: "todo") // TODO: Support Multiple Artist
+            nowPlayableStaticMetadatas.append(metadata)
 
             lenghtOfQueue += 1
         }
     }
+
+    // func addTrackAtEndofQueue(track: Track) throws {}
 
     func doesNextTrackExist() -> Bool {
         if nowPlayingIndex < lenghtOfQueue - 1 {

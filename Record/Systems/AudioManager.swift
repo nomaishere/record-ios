@@ -117,6 +117,7 @@ final class AudioManager: ObservableObject {
     // MARK: - Method For Updating MPNowPlayingInfoCenter
 
     func updateNowPlayingStaticMetadata(_ metadata: NowPlayableStaticMetadata) {
+        NSLog("AudioManager: Update NowPlayingStaticMetadata to \(metadata.title)")
         var nowPlayingInfo = [String: Any]()
 
         nowPlayingInfo[MPNowPlayingInfoPropertyAssetURL] = metadata.assetURL
@@ -222,7 +223,6 @@ final class AudioManager: ObservableObject {
             playableQueue.addTracksAtEndofQueue(tracks: tracks)
 
             for (index, _) in tracks.enumerated() {
-                NSLog("add!")
                 avQueuePlayer.insert(playableQueue.avPlayerItems[index], after: nil)
             }
 
@@ -265,18 +265,22 @@ final class AudioManager: ObservableObject {
             return
         }
 
+        NSLog("Current Index: \(currentIndex)")
         if currentIndex == playableQueue.nowPlayingIndex {
         } else if currentIndex == playableQueue.nowPlayingIndex + 1 {
         } else if currentIndex == playableQueue.nowPlayingIndex - 1 {
         } else {
-            NSLog("[AudioManager] : AVQueuePlayer currentItem doesn't point previous, now, or next. Current Index is \(currentIndex).")
+            // NSLog("[AudioManager] : AVQueuePlayer currentItem doesn't point previous, now, or next. Current Index is \(currentIndex).")
         }
 
         // Update nowPlayingTrack (Published Variable)
         nowPlayingTrack = playableQueue.getNowPlayingTrack()
 
         // Update NowPlayable Metadata
-        guard let currentNowPlayableStaticMetadata = playableQueue.getCurrentNowPlayableStaticMetadata() else { return }
+        guard let currentNowPlayableStaticMetadata = playableQueue.getCurrentNowPlayableStaticMetadata() else {
+            NSLog("AudioManager: Failed to fetch nowPlayableStaticMetadata from PlayableQueue")
+            return
+        }
         updateNowPlayingStaticMetadata(currentNowPlayableStaticMetadata)
     }
 
