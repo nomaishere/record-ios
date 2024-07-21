@@ -94,7 +94,10 @@ class PlayableQueue {
             let trackURL = StorageManager.shared.getActualTrackURL(track)
             NSLog("PlayableQueue: Track URL is \(trackURL)")
             avPlayerItems.append(AVPlayerItem(asset: AVURLAsset(url: trackURL), automaticallyLoadedAssetKeys: ["availableMediaCharacteristicsWithMediaSelectionOptions"]))
-            let image = UIImage(named: "modm_highres")! // TODO: support image loading
+
+            guard let imageData = try? Data(contentsOf: StorageManager.shared.getActualTrackArtworkURL(track)) else { return }
+            guard let image = UIImage(data: imageData) else { return }
+
             let metadata = NowPlayableStaticMetadata(assetURL: track.audioLocalURL, mediaType: MPNowPlayingInfoMediaType.audio, isLiveStream: false, title: track.title, artist: "Khundi Panda", artwork: MPMediaItemArtwork(boundsSize: image.size) { _ in image }, albumArtist: "todo", albumTitle: "todo") // TODO: Support Multiple Artist
             nowPlayableStaticMetadatas.append(metadata)
 
