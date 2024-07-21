@@ -17,6 +17,7 @@ final class StorageManager {
         case encodeFailed
         case alreadyFileExisted
         case copyFailed
+        case unsupportedExtension
     }
 
     /// Create album directory at Document. This method must be called at Application's initialization.
@@ -66,7 +67,16 @@ final class StorageManager {
             NSLog("StorageManager: Failed to encode album title")
             throw saveAudioFileError.encodeFailed
         }
-        let dstURLWithoutDocument = URL(string: "albums/\(encodedAlbumTitle)/\(encodedTrackTitle).mp3")!
+
+
+        // TODO: Extract this(hard-coded)
+        let supportedAudioFileExtension = ["mp3", "wav", "aiff"]
+        guard supportedAudioFileExtension.contains(origin.pathExtension) else {
+            NSLog("StorageManager: Target file is using unsupported extension")
+            throw saveAudioFileError.unsupportedExtension
+        }
+
+        let dstURLWithoutDocument = URL(string: "albums/\(encodedAlbumTitle)/\(encodedTrackTitle).\(origin.pathExtension)")!
         let dstURL = URL.documentsDirectory.appending(path: dstURLWithoutDocument.path(percentEncoded: true))
 
         if FileManager.default.fileExists(atPath: dstURL.path(percentEncoded: true)) {
@@ -74,26 +84,24 @@ final class StorageManager {
         }
 
         do {
-            // try FileManager.default.copyItem(at: origin, to: dstURL)
-
             try FileManager.default.copyItem(at: origin, to: dstURL)
-
         } catch {
             NSLog("\(error)")
             throw saveAudioFileError.copyFailed
         }
+
         return dstURLWithoutDocument
     }
 
     func getActualTrackURL(_ track: Track) -> URL {
         let actualURL = URL.documentsDirectory.appending(path: track.audioLocalURL.path())
-        // NSLog("Actual URL: \(actualURL)")
 
         return actualURL
     }
 
     func getActualTrackArtworkURL(_ track: Track) -> URL {
         let actualURL = URL.documentsDirectory.appending(path: track.artwork.path())
+
         return actualURL
     }
 }
