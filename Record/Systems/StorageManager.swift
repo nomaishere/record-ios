@@ -66,7 +66,7 @@ final class StorageManager {
             NSLog("StorageManager: Failed to encode album title")
             throw saveAudioFileError.encodeFailed
         }
-        let dstURLWithoutDocument = URL(string: "albums/\(encodedAlbumTitle)/\(encodedTrackTitle)")!
+        let dstURLWithoutDocument = URL(string: "albums/\(encodedAlbumTitle)/\(encodedTrackTitle).mp3")!
         let dstURL = URL.documentsDirectory.appending(path: dstURLWithoutDocument.path(percentEncoded: true))
 
         if FileManager.default.fileExists(atPath: dstURL.path(percentEncoded: true)) {
@@ -76,7 +76,7 @@ final class StorageManager {
         do {
             // try FileManager.default.copyItem(at: origin, to: dstURL)
 
-            try FileManager.default.copyItem(at: origin, to: URL.documentsDirectory.appending(component: "albums/\(encodedAlbumTitle)/\(title).mp3"))
+            try FileManager.default.copyItem(at: origin, to: dstURL)
 
         } catch {
             NSLog("\(error)")
