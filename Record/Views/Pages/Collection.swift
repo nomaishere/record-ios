@@ -62,8 +62,7 @@ struct Collection: View {
                         }
                         .padding(.horizontal, 16)
                     }
-                    Spacer()
-                        .frame(height: 24)
+                    Spacer.vertical(24)
                     AsyncImage(url: URL.documentsDirectory.appending(path: album.artwork.absoluteString)) { phase in
                         if let image = phase.image {
                             image
@@ -76,18 +75,15 @@ struct Collection: View {
                         } else {}
                     }
                     .frame(width: 249, height: 249)
-                    Spacer()
-                        .frame(height: 12)
+                    Spacer.vertical(12)
                     Text("\(album.title)")
                         .font(Font.custom("Pretendard-SemiBold", size: 20))
                         .foregroundStyle(Color(hexString: album.themeColor))
-                    Spacer()
-                        .frame(height: 4)
+                    Spacer.vertical(4)
                     Text("\(album.artist.first!.name)")
                         .font(Font.custom("Pretendard-Medium", size: 18))
                         .foregroundStyle(Color("G5"))
-                    Spacer()
-                        .frame(height: 24)
+                    Spacer.vertical(24)
                     VStack(spacing: 18) {
                         ForEach(album.tracks.sorted(by: { $0.trackNumber < $1.trackNumber }), id: \.self) { track in
                             HStack(spacing: 0) {

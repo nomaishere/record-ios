@@ -80,9 +80,6 @@ struct PlayerView: View {
 
     let minibarBottomPadding: CGFloat
 
-    // Temporary
-    @State var isPlaying: Bool = false
-
     init(isPlayerMinimized: Binding<Bool>, safeAreaInsetBottom: CGFloat, playerMode: PlayerMode) {
         _isPlayerMinimized = isPlayerMinimized
         minibarBottomPadding = safeAreaInsetBottom + 59 + 8
@@ -184,7 +181,8 @@ struct PlayerView: View {
                             if let nowPlayintTrack = audioManager.nowPlayingTrack {
                                 Text("\(nowPlayintTrack.title)")
 
-                            } else { Text("error")
+                            } else {
+                                Text("Not Playing")
                             }
                         }
                         .font(Font.custom("Pretendard-SemiBold", size: 20))
