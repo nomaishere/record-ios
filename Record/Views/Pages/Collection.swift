@@ -114,11 +114,9 @@ struct Collection: View {
         } else {
             ScrollView {
                 VStack {
-                    Spacer()
-                        .frame(height: 24)
+                    Spacer.vertical(24)
                     DomainHeader(domainName: "COLLECTION", handler: { router.navigate(to: .addalbum) }, actionButtonText: "Add")
-                    Spacer()
-                        .frame(height: 24)
+                    Spacer.vertical(24)
                     AlbumGridList(albums: albums, onTabGestureHander: handleAlbumOnTabGesture)
                 }
             }
