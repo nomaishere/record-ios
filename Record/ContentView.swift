@@ -19,9 +19,7 @@ struct ContentView: View {
         ZStack(alignment: .bottom) {
             DomainView(selectedTab: $selectedTab)
                 .padding(.top, safeAreaInsets.top)
-            PlayerView(isPlayerMinimized: $isPlayerMinimized, safeAreaInsetBottom: safeAreaInsets.bottom, playerMode: .vanished)
-                .zIndex(isPlayerMinimized ? 0 : 1) // increase this
-
+            PlayerView(safeAreaInsetBottom: safeAreaInsets.bottom, playerMode: .vanished)
             NavigationBar(selectedTab: $selectedTab)
         }
         .ignoresSafeArea()
@@ -64,7 +62,6 @@ struct PlayerView: View {
 
     @EnvironmentObject var audioManager: AudioManager
 
-    @Binding var isPlayerMinimized: Bool
     @Environment(\.safeAreaInsets) private var safeAreaInsets
 
     @State var playerMode: PlayerMode
@@ -80,8 +77,7 @@ struct PlayerView: View {
 
     let minibarBottomPadding: CGFloat
 
-    init(isPlayerMinimized: Binding<Bool>, safeAreaInsetBottom: CGFloat, playerMode: PlayerMode) {
-        _isPlayerMinimized = isPlayerMinimized
+    init(safeAreaInsetBottom: CGFloat, playerMode: PlayerMode) {
         minibarBottomPadding = safeAreaInsetBottom + 59 + 8
         _playerMode = State(initialValue: playerMode)
 
@@ -109,6 +105,7 @@ struct PlayerView: View {
     var dragGesture: some Gesture {
         DragGesture(minimumDistance: 10)
             .onChanged { value in
+
                 self.isDragging = true
 
                 // MARK: - Expand Player (Swipe Up)
@@ -117,7 +114,6 @@ struct PlayerView: View {
                     if !self.doOnceLock {
                         self.doOnceLock.toggle()
                         self.playerMode = .animated
-                        isPlayerMinimized = false
                         withAnimation(.easeOut(duration: 0.15)) {
                             self.viewWidth = UIScreen.main.bounds.size.width
                             self.viewHeight = UIScreen.main.bounds.size.height
@@ -141,17 +137,18 @@ struct PlayerView: View {
                             self.viewWidth = UIScreen.main.bounds.size.width - 16
                             self.viewHeight = 64
                             self.bottomPadding = minibarBottomPadding
-
                         } completion: {
                             self.playerMode = .minibar
                             self.doOnceLock.toggle()
                             self.isMinibarItemRender = true
-                            isPlayerMinimized = true
                         }
                     }
                 }
             }
-            .onEnded { _ in self.isDragging = false }
+            .onEnded { _ in
+                NSLog("Drag End")
+                self.isDragging = false
+            }
     }
 
     var body: some View {
@@ -308,5 +305,7 @@ struct PlayerView: View {
         .clipShape(RoundedRectangle(cornerRadius: 4))
         .padding(.bottom, bottomPadding)
         .gesture(dragGesture)
+        .contentShape(Rectangle())
+        .zIndex(playerMode == .expanded || playerMode == .animated ? 1 : 0)
     }
 }
