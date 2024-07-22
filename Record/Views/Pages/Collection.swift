@@ -116,25 +116,9 @@ struct Collection: View {
                 VStack {
                     Spacer()
                         .frame(height: 24)
-                    HStack(alignment: .center) {
-                        Text("COLLECTION")
-                            .font(Font.custom("ProFont For Powerline", size: 32))
-                            .foregroundStyle(Color("DefaultBlack"))
-                        Spacer()
-                        Button("Add", action: { router.navigate(to: .addalbum) })
-                            .padding(.vertical, 4.0)
-                            .padding(.horizontal, 24)
-                            .background(Color("DefaultBlack"))
-                            .font(Font.custom("Poppins-Medium", size: 20)).foregroundStyle(.white)
-                            .clipShape(Capsule())
-                    }
-                    .padding(.horizontal, 24.0)
+                    DomainHeader(domainName: "COLLECTION", handler: { router.navigate(to: .addalbum) }, actionButtonText: "Add")
                     Spacer()
                         .frame(height: 24)
-                    // SearchAndOrderView()
-                    Spacer()
-                        .frame(height: 16)
-
                     AlbumGridList(albums: albums, onTabGestureHander: handleAlbumOnTabGesture)
                 }
             }
