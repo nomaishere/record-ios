@@ -11,6 +11,7 @@ import SwiftUI
 struct More: View {
     @EnvironmentObject var audioManager: AudioManager
     @Environment(\.modelContext) private var modelContext
+    @Query var artists: [Artist]
 
     var body: some View {
         Spacer()
@@ -54,9 +55,63 @@ struct More: View {
         }, label: {
             Text("Add Demo Album")
                 .padding(.vertical, 8)
-
         })
+        MoreFeatureGroup(sectionName: "Artist") {
+            MoreFeatureItem(icon: Image("plus"), text: "View Artists", onTabAction: {})
+        }
+        VStack {
+            if artists.isEmpty {
+                Text("No Artist")
+            } else {
+                ForEach(artists) { artist in
+                    Text(artist.name)
+                }
+            }
+        }
         Spacer()
+    }
+}
+
+struct MoreFeatureGroup<Content: View>: View {
+    let sectionName: String
+
+    @ViewBuilder var content: () -> Content
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text(sectionName)
+                    .font(Font.custom("Poppins-SemiBold", size: 20))
+                    .foregroundStyle(Color("DefaultBlack"))
+                Spacer()
+            }
+            VStack(spacing: 4) {
+                content()
+            }
+        }
+        .padding(.horizontal, 20)
+    }
+}
+
+struct MoreFeatureItem: View {
+    let icon: Image
+    let text: String
+    let onTabAction: () -> Void
+
+    var body: some View {
+        Button(action: { onTabAction() }, label: {
+            HStack(spacing: 16) {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 8)
+                        .foregroundStyle(Color("G1"))
+                    RectIconWrapper(icon: icon, color: Color("G6"), iconWidth: 20, wrapperWidth: 40, wrapperHeight: 40)
+                }
+                .frame(width: 40, height: 40)
+                Text(text)
+                    .font(Font.custom("Pretendard-Medium", size: 20))
+                    .foregroundStyle(Color("G7"))
+            }
+            .padding(.vertical, 4)
+        })
     }
 }
 
