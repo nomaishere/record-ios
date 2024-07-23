@@ -14,61 +14,103 @@ struct More: View {
     @Query var artists: [Artist]
 
     var body: some View {
-        Spacer()
-            .frame(height: 24)
-        DomainHeader(domainName: "MORE", handler: { NSLog("hi") }, actionButtonText: "Setting")
-        Button(action: {
-            audioManager.playTracksAfterCleanQueue(tracks: DemoDataInjector.sharedInstance.makePlayableDemoTrack())
+        VStack(spacing: 0) {
+            Spacer.vertical(24)
+            DomainHeader(domainName: "MORE", handler: { NSLog("hi") }, actionButtonText: "Setting")
+            /*
+             Button(action: {
+             audioManager.playTracksAfterCleanQueue(tracks: DemoDataInjector.sharedInstance.makePlayableDemoTrack())
 
-        }, label: {
-            Text("Play MODM")
-                .padding(.vertical, 8)
-        })
-        Button(action: {
-            if let originURL = Bundle.main.url(forResource: "01 - Key", withExtension: "mp3") {
-                do {
-                    try FileManager.default.copyItem(at: originURL, to: URL.documentsDirectory.appending(component: "test.mp3"))
-                } catch {}
+             }, label: {
+             Text("Play MODM")
+             .padding(.vertical, 8)
+             })
+             Button(action: {
+             if let originURL = Bundle.main.url(forResource: "01 - Key", withExtension: "mp3") {
+             do {
+             try FileManager.default.copyItem(at: originURL, to: URL.documentsDirectory.appending(component: "test.mp3"))
+             } catch {}
+             }
+
+             }, label: {
+             Text("Test Bundle")
+             .padding(.vertical, 8)
+
+             })
+             Button(action: {
+             do {
+             let existingAlbums = try modelContext.fetchCount(FetchDescriptor<Album>())
+             if existingAlbums == 0 {
+             let demoArtist = Artist(name: "C418", isGroup: false)
+
+             // Default Strategy: Making Model -> Saving Files -> Updating Model's Data
+             let demoAlbum = Album(title: "Minecraft - Volume Alpha", artist: [demoArtist], tracks: [], artwork: URL(string: "msva_cover.png")!, releaseDate: Date(), themeColor: "66A53D")
+             StorageManager.shared.createAlbumDirectory(title: "Minecraft - Volume Alpha")
+             let demoTrack = DemoDataInjector.sharedInstance.makeDemoTracksOfDemoAlbum(artist: demoArtist, album: demoAlbum)
+             modelContext.insert(demoAlbum)
+
+             demoAlbum.tracks = demoTrack
+             }
+             } catch {}
+
+             }, label: {
+             Text("Add Demo Album")
+             .padding(.vertical, 8)
+             })
+             */
+            Spacer.vertical(24)
+            SimpleDashboard()
+            Spacer.vertical(24)
+            MoreFeatureGroup(sectionName: "Artists") {
+                MoreFeatureItem(icon: Image("plus"), text: "Manage Artists", onTabAction: {})
+                MoreFeatureItem(icon: Image("plus"), text: "Add Artist", onTabAction: {})
             }
-
-        }, label: {
-            Text("Test Bundle")
-                .padding(.vertical, 8)
-
-        })
-        Button(action: {
-            do {
-                let existingAlbums = try modelContext.fetchCount(FetchDescriptor<Album>())
-                if existingAlbums == 0 {
-                    let demoArtist = Artist(name: "C418", isGroup: false)
-
-                    // Default Strategy: Making Model -> Saving Files -> Updating Model's Data
-                    let demoAlbum = Album(title: "Minecraft - Volume Alpha", artist: [demoArtist], tracks: [], artwork: URL(string: "msva_cover.png")!, releaseDate: Date(), themeColor: "66A53D")
-                    StorageManager.shared.createAlbumDirectory(title: "Minecraft - Volume Alpha")
-                    let demoTrack = DemoDataInjector.sharedInstance.makeDemoTracksOfDemoAlbum(artist: demoArtist, album: demoAlbum)
-                    modelContext.insert(demoAlbum)
-
-                    demoAlbum.tracks = demoTrack
-                }
-            } catch {}
-
-        }, label: {
-            Text("Add Demo Album")
-                .padding(.vertical, 8)
-        })
-        MoreFeatureGroup(sectionName: "Artist") {
-            MoreFeatureItem(icon: Image("plus"), text: "View Artists", onTabAction: {})
+            Spacer()
         }
-        VStack {
-            if artists.isEmpty {
-                Text("No Artist")
-            } else {
-                ForEach(artists) { artist in
-                    Text(artist.name)
+    }
+}
+
+struct SimpleDashboard: View {
+    @Query var albums: [Album]
+    @Query var tracks: [Track]
+    @Query var artists: [Artist]
+    var body: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 4)
+                .foregroundStyle(Color("G1"))
+                .frame(height: 120)
+            HStack {
+                Spacer()
+                VStack(spacing: 0) {
+                    Text("\(albums.count)")
+                        .font(Font.custom("Poppins-SemiBold", size: 24))
+                        .foregroundStyle(Color("DefaultBlack"))
+                    Text("albums")
+                        .font(Font.custom("Pretendard-SemiBold", size: 16))
+                        .foregroundStyle(Color("G5"))
                 }
+                Spacer()
+                VStack(spacing: 0) {
+                    Text("\(albums.count)")
+                        .font(Font.custom("Poppins-SemiBold", size: 24))
+                        .foregroundStyle(Color("DefaultBlack"))
+                    Text("tracks")
+                        .font(Font.custom("Pretendard-SemiBold", size: 16))
+                        .foregroundStyle(Color("G5"))
+                }
+                Spacer()
+                VStack(spacing: 0) {
+                    Text("\(albums.count)")
+                        .font(Font.custom("Poppins-SemiBold", size: 24))
+                        .foregroundStyle(Color("DefaultBlack"))
+                    Text("artists")
+                        .font(Font.custom("Pretendard-SemiBold", size: 16))
+                        .foregroundStyle(Color("G5"))
+                }
+                Spacer()
             }
         }
-        Spacer()
+        .padding(.horizontal, 16)
     }
 }
 
@@ -109,6 +151,7 @@ struct MoreFeatureItem: View {
                 Text(text)
                     .font(Font.custom("Pretendard-Medium", size: 20))
                     .foregroundStyle(Color("G7"))
+                Spacer()
             }
             .padding(.vertical, 4)
         })
