@@ -12,6 +12,7 @@ struct Playlist: View {
         Spacer()
             .frame(height: 24)
         DomainHeader(domainName: "PLAYLIST", handler: { NSLog("hi") }, actionButtonText: "Create")
+        Spacer()
     }
 }
 

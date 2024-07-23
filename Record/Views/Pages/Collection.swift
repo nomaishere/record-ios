@@ -108,12 +108,17 @@ struct Collection: View {
                 }
             }
         } else {
-            ScrollView {
-                VStack {
+            VStack(spacing: 0) {
+                Spacer.vertical(24)
+                DomainHeader(domainName: "COLLECTION", handler: { router.navigate(to: .addalbum) }, actionButtonText: "Add")
+                Spacer.vertical(24)
+                if albums.isEmpty {
+                    EmtpyCollectionPlaceholder()
                     Spacer.vertical(24)
-                    DomainHeader(domainName: "COLLECTION", handler: { router.navigate(to: .addalbum) }, actionButtonText: "Add")
-                    Spacer.vertical(24)
-                    AlbumGridList(albums: albums, onTabGestureHander: handleAlbumOnTabGesture)
+                } else {
+                    ScrollView {
+                        AlbumGridList(albums: albums, onTabGestureHander: handleAlbumOnTabGesture)
+                    }
                 }
             }
         }
@@ -152,5 +157,28 @@ struct SearchAndOrderView: View {
             }
         }
         .padding(.horizontal, 16.0)
+    }
+}
+
+struct EmtpyCollectionPlaceholder: View {
+    @EnvironmentObject var router: Router
+
+    var body: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 8)
+                .padding(.horizontal, 18)
+                .padding(.vertical, 0)
+                .foregroundStyle(Color("G1"))
+            VStack(spacing: 18) {
+                RectIconWrapper(icon: Image("plus"), color: Color("G5"), iconWidth: 18, wrapperWidth: 18, wrapperHeight: 18)
+                Text("Tab to add album")
+                    .font(Font.custom("Pretendard-Medium", size: 18))
+                    .multilineTextAlignment(.center)
+                    .foregroundStyle(Color("G5"))
+            }
+        }
+        .onTapGesture {
+            router.navigate(to: .addalbum)
+        }
     }
 }

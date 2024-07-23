@@ -20,6 +20,7 @@ struct ContentView: View {
             DomainView(selectedTab: $selectedTab)
                 .padding(.top, safeAreaInsets.top) // Top Safe Area
                 .padding(.bottom, safeAreaInsets.bottom + 59) // Bottom Navigation Bar
+
             PlayerView(safeAreaInsetBottom: safeAreaInsets.bottom, playerMode: .vanished)
             NavigationBar(selectedTab: $selectedTab)
         }
@@ -40,7 +41,6 @@ struct DomainView: View {
             case .More:
                 More()
             }
-            Spacer()
         }
     }
 }

@@ -56,6 +56,7 @@ struct More: View {
                 .padding(.vertical, 8)
 
         })
+        Spacer()
     }
 }
 
