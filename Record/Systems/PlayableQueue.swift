@@ -92,13 +92,22 @@ class PlayableQueue {
 
         for track in tracks {
             let trackURL = StorageManager.shared.getActualTrackURL(track)
-            NSLog("PlayableQueue: Track URL is \(trackURL)")
             avPlayerItems.append(AVPlayerItem(asset: AVURLAsset(url: trackURL), automaticallyLoadedAssetKeys: ["availableMediaCharacteristicsWithMediaSelectionOptions"]))
 
             guard let imageData = try? Data(contentsOf: StorageManager.shared.getActualTrackArtworkURL(track)) else { return }
             guard let image = UIImage(data: imageData) else { return }
 
-            let metadata = NowPlayableStaticMetadata(assetURL: track.audioLocalURL, mediaType: MPNowPlayingInfoMediaType.audio, isLiveStream: false, title: track.title, artist: "Khundi Panda", artwork: MPMediaItemArtwork(boundsSize: image.size) { _ in image }, albumArtist: "todo", albumTitle: "todo") // TODO: Support Multiple Artist
+            NSLog("Track artist: \(track.artists.count)")
+            let artistNames = makeArtistAsString(track.artists)
+
+            var albumArtist = "Unknown Artist"
+            var albumTitle = "Unknown Album"
+            /*
+             if let album = track.album {
+                 albumArtist = makeArtistAsString(album.artist)
+                 albumTitle = album.title
+             }*/
+            let metadata = NowPlayableStaticMetadata(assetURL: track.audioLocalURL, mediaType: MPNowPlayingInfoMediaType.audio, isLiveStream: false, title: track.title, artist: artistNames, artwork: MPMediaItemArtwork(boundsSize: image.size) { _ in image }, albumArtist: albumArtist, albumTitle: albumTitle) // TODO: Support Multiple Artist
             nowPlayableStaticMetadatas.append(metadata)
 
             lenghtOfQueue += 1
@@ -134,5 +143,23 @@ class PlayableQueue {
             nowPlayingIndex = 0
             NSLog("PlayableQueue: Can't go previous track. Now-playing track is the first track of queue.")
         }
+    }
+
+    // MARK: - Helper Method
+
+    /// Return formatted string that display name of artists like "Dog, Cat, Cow"
+    func makeArtistAsString(_ artists: [Artist]) -> String {
+        if artists.isEmpty {
+            return "Unknown Artist"
+        }
+
+        var artistNames = ""
+        for (index, artist) in artists.enumerated() {
+            artistNames.append(artist.name)
+            if index < artists.count - 1 {
+                artistNames.append(", ")
+            }
+        }
+        return artistNames
     }
 }
