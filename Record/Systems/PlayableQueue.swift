@@ -89,6 +89,7 @@ class PlayableQueue {
 
     func addTracksAtEndofQueue(tracks: [Track]) {
         queueOfTracks.append(contentsOf: tracks)
+        
 
         for track in tracks {
             let trackURL = StorageManager.shared.getActualTrackURL(track)

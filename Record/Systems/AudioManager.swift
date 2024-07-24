@@ -268,7 +268,10 @@ final class AudioManager: ObservableObject {
         NSLog("Current Index: \(currentIndex)")
         if currentIndex == playableQueue.nowPlayingIndex {
         } else if currentIndex == playableQueue.nowPlayingIndex + 1 {
+            playableQueue.handleNowPlayingItemMoveNext()
         } else if currentIndex == playableQueue.nowPlayingIndex - 1 {
+            playableQueue.handleNowPlayingItemMoveNext()
+ 
         } else {
             // NSLog("[AudioManager] : AVQueuePlayer currentItem doesn't point previous, now, or next. Current Index is \(currentIndex).")
         }

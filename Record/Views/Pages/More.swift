@@ -125,11 +125,11 @@ struct More: View {
                                     } catch {}
                                 }
                                 
-                                // MARK: 4) Insert First
+                                // MARK: 4) Insert Model First
                                 
                                 modelContext.insert(demoAlbum)
                                 
-                                // MARK: 5) Link Everything
+                                // MARK: 5) Link Relationship Between Models
                                 
                                 demoArtist.albums = [demoAlbum]
                                 demoArtist.tracks = demoTracks
@@ -142,6 +142,8 @@ struct More: View {
                                     demoTrack.album = demoAlbum
                                 }
                                 
+                                // MARK: 6) Save ModelContext Changes Manually
+
                                 if modelContext.hasChanges {
                                     NSLog("Save Album")
                                     do {
