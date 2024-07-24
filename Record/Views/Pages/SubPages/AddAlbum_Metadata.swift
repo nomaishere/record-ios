@@ -34,10 +34,10 @@ struct AddAlbum_Metadata: View {
         return tempGenres
     }
 
-    func checkMetadataEditComplete() -> Bool {
+    func checkMetadataEditComplete(hasCover: Bool = false) -> Bool {
         if isTitleEditComplete() {
             if isArtistEditComplete() {
-                if isCoverEditComplete() {
+                if isCoverEditComplete() || hasCover {
                     return true
                 }
             }
@@ -209,9 +209,6 @@ struct AddAlbum_Metadata: View {
                                 }
                             }
                         }
-
-                        // TODO: Implement Cover Seletion via File app
-                        SqaureBoxButton(text: "Files", textColor: Color(hex: 0x1AADF8), icon: Image("FolderIcon"), action: { print("hi") })
                     }
                     .padding(.horizontal, 16)
                 case .failure:
@@ -228,8 +225,17 @@ struct AddAlbum_Metadata: View {
         .onChange(of: artists) {
             isNextEnabled = checkMetadataEditComplete()
         }
-        .onReceive(viewModel.$imageState) { _ in
-            isNextEnabled = checkMetadataEditComplete()
+        .onReceive(viewModel.$imageState) { value in
+            switch value {
+            case .success:
+                isNextEnabled = checkMetadataEditComplete(hasCover: true) // Pass hasCover parameter because viewModel.imageState doesn't update fast as this onReceive modifier.
+            case .empty:
+                isNextEnabled = checkMetadataEditComplete()
+            case .loading:
+                isNextEnabled = checkMetadataEditComplete()
+            case .failure:
+                break
+            }
         }
     }
 }
