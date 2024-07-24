@@ -13,11 +13,15 @@ final class Artist: Identifiable {
     var id: UUID = UUID()
     var name: String
     var isGroup: Bool
-    var member: [Artist]?
-    var albums: [Album]?
+    @Relationship var member: [Artist]?
 
-    init(name: String, isGroup: Bool) {
+    @Relationship var albums: [Album]?
+    @Relationship var tracks: [Track]?
+
+    init(name: String, isGroup: Bool, albums: [Album]? = nil, tracks: [Track]? = nil) {
         self.name = name
         self.isGroup = isGroup
+        self.albums = albums
+        self.tracks = tracks
     }
 }

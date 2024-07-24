@@ -19,14 +19,14 @@ final class Track: Identifiable {
 
     var artwork: URL
 
-    var album: Album?
-    var artists: [Artist]
+    @Relationship var album: Album?
+    @Relationship(inverse: \Artist.tracks) var artists: [Artist]
     var trackNumber: Int
 
     /// hex
     var themeColor: String
 
-    init(title: String, audioLocalURL: URL, duration: Double, artwork: URL, album: Album?, artists: [Artist], trackNumber: Int, themeColor: String) {
+    init(title: String, audioLocalURL: URL, duration: Double, artwork: URL, album: Album? = nil, artists: [Artist] = [], trackNumber: Int, themeColor: String) {
         self.title = title
         self.audioLocalURL = audioLocalURL
         self.duration = duration

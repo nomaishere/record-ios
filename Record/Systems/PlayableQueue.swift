@@ -97,16 +97,15 @@ class PlayableQueue {
             guard let imageData = try? Data(contentsOf: StorageManager.shared.getActualTrackArtworkURL(track)) else { return }
             guard let image = UIImage(data: imageData) else { return }
 
-            NSLog("Track artist: \(track.artists.count)")
             let artistNames = makeArtistAsString(track.artists)
 
             var albumArtist = "Unknown Artist"
             var albumTitle = "Unknown Album"
-            /*
-             if let album = track.album {
-                 albumArtist = makeArtistAsString(album.artist)
-                 albumTitle = album.title
-             }*/
+
+            if let album = track.album {
+                albumArtist = makeArtistAsString(album.artist)
+                albumTitle = album.title
+            }
             let metadata = NowPlayableStaticMetadata(assetURL: track.audioLocalURL, mediaType: MPNowPlayingInfoMediaType.audio, isLiveStream: false, title: track.title, artist: artistNames, artwork: MPMediaItemArtwork(boundsSize: image.size) { _ in image }, albumArtist: albumArtist, albumTitle: albumTitle) // TODO: Support Multiple Artist
             nowPlayableStaticMetadatas.append(metadata)
 

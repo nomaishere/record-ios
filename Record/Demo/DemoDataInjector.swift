@@ -30,9 +30,6 @@ class DemoDataInjector {
             }
             fileName = "\(fileName) - \(trackName)"
             do {
-                // let originPath = Bundle.main.path(forResource: "\(fileName)", ofType: "mp3")!
-                // let originURL = URL(filePath: originPath)
-
                 if let originURL = Bundle.main.url(forResource: fileName, withExtension: "mp3") {
                     let savedAudioFileURL = try StorageManager.shared.saveTrackAudioFileAtDocumentByOriginURL(origin: originURL, title: trackName, album: album)
                     tracks.append(Track(title: trackName, audioLocalURL: savedAudioFileURL, duration: 30.0, artwork: coverURL, album: album, artists: [artist], trackNumber: index + 1, themeColor: "66A53D"))
@@ -40,9 +37,7 @@ class DemoDataInjector {
                     NSLog("System: Failed to find files at ")
                 }
 
-            } catch {
-                // NSLog("System: Failed to save file ")
-            }
+            } catch {}
         }
 
         return tracks

@@ -99,6 +99,7 @@ struct Collection: View {
                                         .foregroundStyle(Color("DefaultBlack"))
                                         .lineLimit(1)
                                         .truncationMode(.tail)
+                                    Text("\(track.artists.count)")
                                 }
                                 .frame(maxWidth: .infinity, alignment: .leading)
                             }

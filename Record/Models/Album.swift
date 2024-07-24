@@ -12,7 +12,7 @@ import SwiftData
 final class Album: Identifiable {
     var id: UUID = UUID()
     var title: String
-    @Relationship var artist: [Artist]
+    @Relationship(inverse: \Artist.albums) var artist: [Artist]
     @Relationship(inverse: \Track.album) var tracks: [Track]
 
     var artwork: URL

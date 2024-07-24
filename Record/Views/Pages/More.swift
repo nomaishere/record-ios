@@ -61,11 +61,105 @@ struct More: View {
             Spacer.vertical(24)
             SimpleDashboard()
             Spacer.vertical(24)
-            MoreFeatureGroup(sectionName: "Artists") {
-                MoreFeatureItem(icon: Image("plus"), text: "Manage Artists", onTabAction: {})
-                MoreFeatureItem(icon: Image("plus"), text: "Add Artist", onTabAction: {})
+            ScrollView {
+                MoreFeatureGroup(sectionName: "Tracks") {
+                    MoreFeatureItem(icon: Image("music-solid"), text: "View All Tracks", onTabAction: {})
+                }
+                MoreFeatureGroup(sectionName: "Artists") {
+                    MoreFeatureItem(icon: Image("plus"), text: "Manage Artists", onTabAction: {})
+                    MoreFeatureItem(icon: Image("plus"), text: "Add Artist", onTabAction: {})
+                }
+                Spacer.vertical(24)
+                MoreFeatureGroup(sectionName: "Developer Only") {
+                    MoreFeatureItem(icon: Image("plus"), text: "Add Demo Album(v1)", onTabAction: {
+                        do {
+                            let existingAlbums = try modelContext.fetchCount(FetchDescriptor<Album>())
+                            if existingAlbums == 0 {
+                                let demoArtist = Artist(name: "C418", isGroup: false)
+                                
+                                let demoAlbum = Album(title: "Minecraft - Volume Alpha", artist: [demoArtist], tracks: [], artwork: URL(string: "msva_cover.png")!, releaseDate: Date(), themeColor: "66A53D")
+                                StorageManager.shared.createAlbumDirectory(title: "Minecraft - Volume Alpha")
+                                let demoTrack = DemoDataInjector.sharedInstance.makeDemoTracksOfDemoAlbum(artist: demoArtist, album: demoAlbum)
+                                
+                                modelContext.insert(demoAlbum)
+                                
+                                demoAlbum.tracks = demoTrack
+                            }
+                        } catch {}
+                        
+                    })
+                    MoreFeatureItem(icon: Image("plus"), text: "Add Demo Album(v2)", onTabAction: {
+                        do {
+                            let existingAlbums = try modelContext.fetchCount(FetchDescriptor<Album>())
+                            if existingAlbums == 0 {
+                                // MARK: 1) Create Artist Model
+                                
+                                let demoArtist = Artist(name: "C418", isGroup: false)
+                                
+                                // MARK: 2) Add Albums without Tracks At ModelContainer
+                                
+                                let demoAlbum = Album(title: "Minecraft - Volume Alpha", artist: [], tracks: [], artwork: URL(string: "msva_cover.png")!, releaseDate: Date(), themeColor: "66A53D")
+                                StorageManager.shared.createAlbumDirectory(title: "Minecraft - Volume Alpha")
+                                
+                                // MARK: 3) Add Tracks
+                                
+                                let demoTracks = DemoDataInjector.sharedInstance.makeDemoTracksOfDemoAlbum(artist: demoArtist, album: demoAlbum)
+                                
+                                var tracks: [Track] = []
+                                let trackNames = ["Key", "Door", "Subwoofer Lullaby", "Death", "Living Mice", "Moog City", "Haggstrom", "Minecraft", "Oxygène", "Équinoxe", "Mice on Venus", "Dry Hands", "Wet Hands", "Clark", "Chris", "Thirteen", "Excuse", "Sweden", "Cat", "Dog", "Danny", "Beginning", "Droopy Likes Ricochet", "Droopy Likes Your Face"]
+                                
+                                for (index, trackName) in trackNames.enumerated() {
+                                    var fileName = String(index + 1)
+                                    if index + 1 <= 9 {
+                                        fileName = "0" + fileName
+                                    }
+                                    fileName = "\(fileName) - \(trackName)"
+                                    do {
+                                        if let originURL = Bundle.main.url(forResource: fileName, withExtension: "mp3") {
+                                            let savedAudioFileURL = try StorageManager.shared.saveTrackAudioFileAtDocumentByOriginURL(origin: originURL, title: trackName, album: demoAlbum)
+                                            tracks.append(Track(title: trackName, audioLocalURL: savedAudioFileURL, duration: 30.0, artwork: URL(string: "msva_cover.png")!, album: nil, artists: [], trackNumber: index + 1, themeColor: "66A53D"))
+                                        } else {
+                                            NSLog("System: Failed to find files at ")
+                                        }
+                                        
+                                    } catch {}
+                                }
+                                
+                                // MARK: 4) Insert First
+                                
+                                modelContext.insert(demoAlbum)
+                                
+                                // MARK: 5) Link Everything
+                                
+                                demoArtist.albums = [demoAlbum]
+                                demoArtist.tracks = demoTracks
+                                
+                                demoAlbum.artist = [demoArtist]
+                                demoAlbum.tracks = demoTracks
+                                
+                                for demoTrack in demoTracks {
+                                    demoTrack.artists = [demoArtist]
+                                    demoTrack.album = demoAlbum
+                                }
+                                
+                                if modelContext.hasChanges {
+                                    NSLog("Save Album")
+                                    do {
+                                        try modelContext.save()
+                                    } catch {
+                                        NSLog("Failed to save")
+                                    }
+                                }
+                            }
+                        } catch {}
+                    })
+                    MoreFeatureItem(icon: Image("plus"), text: "Add Artist", onTabAction: {
+                        let demoArtist = Artist(name: "C418", isGroup: false)
+                        modelContext.insert(demoArtist)
+                        
+                    })
+                }
             }
-            Spacer()
         }
     }
 }
@@ -74,6 +168,7 @@ struct SimpleDashboard: View {
     @Query var albums: [Album]
     @Query var tracks: [Track]
     @Query var artists: [Artist]
+
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 4)
@@ -91,7 +186,7 @@ struct SimpleDashboard: View {
                 }
                 Spacer()
                 VStack(spacing: 0) {
-                    Text("\(albums.count)")
+                    Text("\(tracks.count)")
                         .font(Font.custom("Poppins-SemiBold", size: 24))
                         .foregroundStyle(Color("DefaultBlack"))
                     Text("tracks")
@@ -100,7 +195,7 @@ struct SimpleDashboard: View {
                 }
                 Spacer()
                 VStack(spacing: 0) {
-                    Text("\(albums.count)")
+                    Text("\(artists.count)")
                         .font(Font.custom("Poppins-SemiBold", size: 24))
                         .foregroundStyle(Color("DefaultBlack"))
                     Text("artists")
@@ -122,7 +217,7 @@ struct MoreFeatureGroup<Content: View>: View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
                 Text(sectionName)
-                    .font(Font.custom("Poppins-SemiBold", size: 20))
+                    .font(Font.custom("Poppins-SemiBold", size: 18))
                     .foregroundStyle(Color("DefaultBlack"))
                 Spacer()
             }
@@ -145,11 +240,11 @@ struct MoreFeatureItem: View {
                 ZStack {
                     RoundedRectangle(cornerRadius: 8)
                         .foregroundStyle(Color("G1"))
-                    RectIconWrapper(icon: icon, color: Color("G6"), iconWidth: 20, wrapperWidth: 40, wrapperHeight: 40)
+                    RectIconWrapper(icon: icon, color: Color("G6"), iconWidth: 16, wrapperWidth: 40, wrapperHeight: 40)
                 }
                 .frame(width: 40, height: 40)
                 Text(text)
-                    .font(Font.custom("Pretendard-Medium", size: 20))
+                    .font(Font.custom("Pretendard-Medium", size: 18))
                     .foregroundStyle(Color("G7"))
                 Spacer()
             }
