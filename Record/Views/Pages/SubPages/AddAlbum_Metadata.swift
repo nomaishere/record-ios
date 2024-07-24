@@ -21,8 +21,6 @@ struct AddAlbum_Metadata: View {
 
     @State var title: String = ""
     @State var artists: [Artist] = []
-    @State var selectedPrimaryGenre: [Genre] = []
-    @State var selectedSubgenres: [Genre] = []
 
     func querySubgenresByIDs(ids: [Genre.ID]) -> [Genre] {
         var tempGenres: [Genre] = []
@@ -40,9 +38,7 @@ struct AddAlbum_Metadata: View {
         if isTitleEditComplete() {
             if isArtistEditComplete() {
                 if isCoverEditComplete() {
-                    if isGenreEditComplete() {
-                        return true
-                    }
+                    return true
                 }
             }
         }
@@ -73,21 +69,18 @@ struct AddAlbum_Metadata: View {
     func isCoverEditComplete() -> Bool {
         switch viewModel.imageState {
         case .success:
+            NSLog("success")
             return true
         case .empty:
+            NSLog("empyt")
             return false
         case .loading:
+            NSLog("loading")
             return false
         case .failure:
-            return false
-        }
-    }
+            NSLog("failure")
 
-    func isGenreEditComplete() -> Bool {
-        if selectedPrimaryGenre.isEmpty {
             return false
-        } else {
-            return true
         }
     }
 
@@ -227,108 +220,7 @@ struct AddAlbum_Metadata: View {
                         .foregroundColor(.white)
                 }
             }
-            Spacer()
-                .frame(height: 40)
-
-            // MARK: - Genre Area
-
-            VStack(spacing: 0) {
-                SectionHeader(text: "Genre")
-                Spacer()
-                    .frame(height: 8)
-                FlowLayout(mode: .scrollable, items: genres, itemSpacing: 4) { genre in
-                    if !genre.isSubgenre {
-                        Button(action: {
-                            if selectedPrimaryGenre.contains(genre) {
-                                if let index = selectedPrimaryGenre.firstIndex(of: genre) {
-                                    selectedPrimaryGenre.remove(at: index)
-
-                                    // TODO: Delete Subgenre of deleted primary genre
-                                }
-                            } else {
-                                selectedPrimaryGenre.append(genre)
-                            }
-                        }, label: {
-                            Text("\(genre.name)")
-                                .font(Font.custom("Poppins-SemiBold", size: 20))
-                                .foregroundStyle(selectedPrimaryGenre.contains(genre) ? Color(.white) : Color("G3"))
-                                .padding(.horizontal, 16)
-                                .padding(.vertical, 4)
-                                .background(selectedPrimaryGenre.contains(genre) ? Color("DefaultBlack") : Color("G1"))
-                                .clipShape(RoundedRectangle(cornerRadius: 100))
-
-                        })
-                    }
-                }
-                .padding(.horizontal, 12)
-                Spacer()
-                    .frame(height: 4)
-                HStack(spacing: 0) {
-                    // TODO: Implement Cover Seletion via File app
-                    Button(action: {}, label: {
-                        HStack(spacing: 8) {
-                            RectIconWrapper(icon: Image("plus-bold"),
-                                            color: Color("G3"), iconWidth: 17, wrapperWidth: 20, wrapperHeight: 20)
-
-                            Text("Add Genre")
-                                .font(Font.custom("Poppins-SemiBold", size: 20))
-                                .foregroundStyle(Color("G3"))
-                        }
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 4)
-                        .background(
-                            RoundedRectangle(cornerRadius: 100)
-                                .fill(.clear)
-                                .strokeBorder(Color("G2"), style: StrokeStyle(lineWidth: 4, dash: [8])))
-
-                    })
-                    .padding(.all, 0)
-                    Spacer()
-                }
-                .padding(.horizontal, 16)
-            }
-            Spacer()
-                .frame(height: 40)
-
-            // MARK: - SubGenre Area
-
-            VStack {
-                ForEach(selectedPrimaryGenre) { primaryGenre in
-                    if !primaryGenre.subgenre.isEmpty {
-                        VStack(spacing: 0) {
-                            SectionHeader(text: "SubGenre of \(primaryGenre.name)")
-
-                            FlowLayout(mode: .scrollable, items: querySubgenresByIDs(ids: primaryGenre.subgenre), itemSpacing: 4) { subgenre in
-                                Button(action: {
-                                    if selectedSubgenres.contains(subgenre) {
-                                        if let index = selectedSubgenres.firstIndex(of: subgenre) {
-                                            selectedSubgenres.remove(at: index)
-                                        }
-                                    } else {
-                                        selectedSubgenres.append(subgenre)
-                                    }
-                                }, label: {
-                                    Text("\(subgenre.name)")
-                                        .font(Font.custom("Poppins-SemiBold", size: 20))
-                                        .foregroundStyle(selectedSubgenres.contains(subgenre) ? Color(.white) : Color("G3"))
-                                        .padding(.horizontal, 16)
-                                        .padding(.vertical, 4)
-                                        .background(selectedSubgenres.contains(subgenre) ? Color("DefaultBlack") : Color("G1"))
-                                        .clipShape(RoundedRectangle(cornerRadius: 4))
-                                })
-                            }
-                            .padding(.horizontal, 12)
-                            Spacer()
-                                .frame(height: 40)
-                        }
-                    }
-                }
-            }
-
-            // MARK: - Area for Scroll
-
-            Spacer()
-                .frame(height: 128)
+            Spacer.vertical(80)
         }
         .onChange(of: title) {
             isNextEnabled = checkMetadataEditComplete()
@@ -337,9 +229,6 @@ struct AddAlbum_Metadata: View {
             isNextEnabled = checkMetadataEditComplete()
         }
         .onReceive(viewModel.$imageState) { _ in
-            isNextEnabled = checkMetadataEditComplete()
-        }
-        .onChange(of: selectedPrimaryGenre) {
             isNextEnabled = checkMetadataEditComplete()
         }
     }
