@@ -180,7 +180,6 @@ final class AudioManager: ObservableObject {
 
     func previousTrack() {
         if playableQueue.doesPreviousTrackExist() {
-            let currentItems = avQueuePlayer.items() // 5, 3번째 트랙 재생중
             let currentItem = avQueuePlayer.currentItem!
             let previousItem = playableQueue.getPreviousAVPlayerItem()!
             playableQueue.handleNowPlayingItemMovePrevious()
@@ -189,12 +188,6 @@ final class AudioManager: ObservableObject {
             avQueuePlayer.advanceToNextItem()
             avQueuePlayer.insert(currentItem, after: avQueuePlayer.currentItem)
 
-            /*
-             avQueuePlayer.insert(previousItem, after: nil)
-             for item in currentItems {
-                 avQueuePlayer.insert(item, after: nil)
-             }
-              */
             NSLog("\(avQueuePlayer.items().count) items in avQueuePlayer in previousTrack()")
 
             play()
@@ -271,7 +264,7 @@ final class AudioManager: ObservableObject {
             playableQueue.handleNowPlayingItemMoveNext()
         } else if currentIndex == playableQueue.nowPlayingIndex - 1 {
             playableQueue.handleNowPlayingItemMoveNext()
- 
+
         } else {
             // NSLog("[AudioManager] : AVQueuePlayer currentItem doesn't point previous, now, or next. Current Index is \(currentIndex).")
         }

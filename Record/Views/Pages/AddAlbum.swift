@@ -98,6 +98,7 @@ struct AddAlbum: View {
                                     case .CHECK:
                                         importManager.nowStep = .METADATA
                                     }
+                                    isNextEnabled = true
                                 }
                             }, label: {
                                 HStack {
