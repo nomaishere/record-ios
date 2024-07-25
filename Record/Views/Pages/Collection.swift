@@ -26,43 +26,44 @@ struct Collection: View {
     var body: some View {
         if isAlbumViewPopup {
             if let album = selectedAlbum {
-                ScrollView {
-                    VStack(spacing: 0) {
-                        HStack {
-                            Button(action: {
-                                isAlbumViewPopup = false
-                                selectedAlbum = nil
-                            }, label: {
-                                HStack(spacing: 10) {
-                                    RectIconWrapper(icon: Image("LeftChevron"), color: Color("G5"), iconWidth: 8, wrapperWidth: 8, wrapperHeight: 14)
-                                    Text("Collection")
-                                        .font(Font.custom("Pretendard-Medium", size: 18))
-                                        .foregroundStyle(Color("G5"))
-                                }
-                                .padding(.horizontal, 16)
-                                .frame(height: 36)
-                                .background(RoundedRectangle(cornerRadius: 100)
-                                    .fill(Color("G1")))
-                            })
-                            Spacer()
-                            Button(action: {
-                                audioManager.playTracksAfterCleanQueue(tracks: album.tracks.sorted(by: { $0.trackNumber < $1.trackNumber }))
-                            }, label: {
-                                HStack(spacing: 10) {
-                                    RectIconWrapper(icon: Image("Play"), color: Color(.white), iconWidth: 12, wrapperWidth: 12, wrapperHeight: 14.18)
-                                    Text("Play")
-                                        .font(Font.custom("Pretendard-Medium", size: 18))
-                                        .foregroundStyle(Color(.white))
-                                }
-                                .padding(.horizontal, 16)
-                                .frame(height: 36)
-                                .background(RoundedRectangle(cornerRadius: 100)
-                                    .fill(Color(hexString: album.themeColor)))
-                            })
-                        }
-                        .padding(.horizontal, 16)
+                VStack(spacing: 0) {
+                    HStack {
+                        Button(action: {
+                            isAlbumViewPopup = false
+                            selectedAlbum = nil
+                        }, label: {
+                            HStack(spacing: 10) {
+                                RectIconWrapper(icon: Image("LeftChevron"), color: Color("G5"), iconWidth: 8, wrapperWidth: 8, wrapperHeight: 14)
+                                Text("Collection")
+                                    .font(Font.custom("Pretendard-Medium", size: 18))
+                                    .foregroundStyle(Color("G5"))
+                            }
+                            .padding(.horizontal, 16)
+                            .frame(height: 36)
+                            .background(RoundedRectangle(cornerRadius: 100)
+                                .fill(Color("G1")))
+                        })
+                        Spacer()
+                        Button(action: {
+                            audioManager.playTracksAfterCleanQueue(tracks: album.tracks.sorted(by: { $0.trackNumber < $1.trackNumber }))
+                        }, label: {
+                            HStack(spacing: 10) {
+                                RectIconWrapper(icon: Image("Play"), color: Color(.white), iconWidth: 12, wrapperWidth: 12, wrapperHeight: 14.18)
+                                Text("Play")
+                                    .font(Font.custom("Pretendard-Medium", size: 18))
+                                    .foregroundStyle(Color(.white))
+                            }
+                            .padding(.horizontal, 16)
+                            .frame(height: 36)
+                            .background(RoundedRectangle(cornerRadius: 100)
+                                .fill(Color(hexString: album.themeColor)))
+                        })
                     }
-                    Spacer.vertical(24)
+                    .padding(.horizontal, 16)
+                    Spacer.vertical(8)
+                }
+                ScrollView {
+                    Spacer.vertical(16)
                     AsyncImage(url: URL.documentsDirectory.appending(path: album.artwork.absoluteString)) { phase in
                         if let image = phase.image {
                             image
@@ -99,7 +100,6 @@ struct Collection: View {
                                         .foregroundStyle(Color("DefaultBlack"))
                                         .lineLimit(1)
                                         .truncationMode(.tail)
-                                    Text("\(track.artists.count)")
                                 }
                                 .frame(maxWidth: .infinity, alignment: .leading)
                             }
