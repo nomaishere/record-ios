@@ -16,11 +16,17 @@ struct Collection: View {
     @State var isAlbumViewPopup: Bool = false
     @State var selectedAlbum: Album? = nil
 
+    var numberFormatter = NumberFormatter()
+
     func handleAlbumOnTabGesture(album: Album) {
         guard isAlbumViewPopup == false else { return }
 
         isAlbumViewPopup = true
         selectedAlbum = album
+    }
+
+    init() {
+        numberFormatter.minimumIntegerDigits = 2
     }
 
     var body: some View {
@@ -78,32 +84,37 @@ struct Collection: View {
                     .frame(width: 249, height: 249)
                     Spacer.vertical(12)
                     Text("\(album.title)")
-                        .font(Font.custom("Pretendard-SemiBold", size: 20))
+                        .font(Font.custom("Poppins-SemiBold", size: 20))
                         .foregroundStyle(Color(hexString: album.themeColor))
                     Spacer.vertical(4)
                     Text("\(album.artist.first!.name)")
                         .font(Font.custom("Pretendard-Medium", size: 18))
                         .foregroundStyle(Color("G5"))
                     Spacer.vertical(24)
-                    VStack(spacing: 18) {
+                    VStack(spacing: 12) {
                         ForEach(album.tracks.sorted(by: { $0.trackNumber < $1.trackNumber }), id: \.self) { track in
-                            HStack(spacing: 0) {
-                                Text("\(track.trackNumber)")
-                                    .font(Font.custom("Pretendard-Medium", size: 18))
-                                    .foregroundStyle(Color("G3"))
-                                    .frame(width: 24)
-                                Spacer()
-                                    .frame(width: 12)
-                                VStack(alignment: .leading, spacing: 4) {
+                            ZStack {
+                                RoundedRectangle(cornerRadius: 4)
+                                    .foregroundStyle(Color(hex: 0xF8F8F8, opacity: 0.6))
+                                HStack {
+                                    Text(numberFormatter.string(from: track.trackNumber as NSNumber)!)
+                                        .font(Font.custom("Pretendard-SemiBold", size: 18))
+                                        .foregroundStyle(Color("G3"))
+                                        .monospacedDigit()
+                                        .padding(.trailing, 8)
+
                                     Text("\(track.title)")
-                                        .font(Font.custom("Pretendard-Medium", size: 18))
+                                        .font(Font.custom("Pretendard-SemiBold", size: 18))
                                         .foregroundStyle(Color("DefaultBlack"))
                                         .lineLimit(1)
                                         .truncationMode(.tail)
+                                    Spacer()
                                 }
-                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding(.vertical, 12)
+                                .padding(.leading, 18)
+                                .padding(.trailing, 12)
                             }
-                            .padding(.horizontal, 24)
+                            .padding(.horizontal, 16)
                         }
                     }
                 }
