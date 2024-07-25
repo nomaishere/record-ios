@@ -16,23 +16,13 @@ struct AddAlbum_Metadata: View {
     @StateObject var viewModel = CoverImageViewModel()
 
     @EnvironmentObject var importManager: ImportManager
-    @Query var genres: [Genre]
     @Binding var isNextEnabled: Bool
 
     @State var title: String = ""
     @State var artists: [Artist] = []
 
-    func querySubgenresByIDs(ids: [Genre.ID]) -> [Genre] {
-        var tempGenres: [Genre] = []
-        for genre in genres {
-            for id in ids {
-                if id == genre.id {
-                    tempGenres.append(genre)
-                }
-            }
-        }
-        return tempGenres
-    }
+    @Query var savedArtists: [Artist]
+    @State var testArtist = [Artist(name: "C418", isGroup: false), Artist(name: "david kim", isGroup: false), Artist(name: "Kendrick Lamar", isGroup: false), Artist(name: "Kanye West", isGroup: false)]
 
     func checkMetadataEditComplete(hasCover: Bool = false) -> Bool {
         if isTitleEditComplete() {
@@ -107,58 +97,76 @@ struct AddAlbum_Metadata: View {
                         UITextField.appearance().clearButtonMode = .whileEditing
                     }
             }
-            Spacer()
-                .frame(height: 40)
+            Spacer.vertical(40)
 
             // MARK: - Artist Section
 
             VStack(spacing: 12) {
                 SectionHeader(text: "Artist")
-                ForEach(Array($artists.enumerated()), id: \.offset) { index, artist in
-                    HStack {
-                        Circle()
-                            .fill(Color(hex: 0xF2F2F2))
-                            .frame(width: 48, height: 48)
-                            .overlay {
-                                Text("?")
-                                    .font(Font.custom("Pretendard-SemiBold", size: 20))
-                                    .foregroundStyle(Color(hex: 0xD7D7D7))
-                            }
-                            .padding(.all, 6)
-                        TextField("name", text: artist.name)
-                            .submitLabel(.done)
-                            .font(Font.custom("Pretendard-SemiBold", size: 18))
-                            .foregroundStyle(Color("DefaultBlack"))
-                        Button(action: {
-                            artists.remove(at: index)
-                        }, label: {
-                            RectIconWrapper(icon: Image("xmark"), color: Color(hex: 0xD5D5D5), iconWidth: 12, wrapperWidth: 32, wrapperHeight: 32)
-                                .padding(.trailing, 14)
-                        })
-                    }
-                    .background(Color("G1"))
-                    .clipShape(RoundedRectangle(cornerRadius: 100.0))
-                    .padding(.horizontal, 16)
+                FlowLayout(mode: .scrollable, items: testArtist, itemSpacing: 4) { savedArtist in
+                    Text(savedArtist.name)
+                        .font(Font.custom("Pretendard-Medium", size: 16))
+                        .foregroundStyle(Color("G7"))
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 8)
+                        .background(
+                            RoundedRectangle(cornerRadius: 100)
+                                .fill(Color("G1"))
+                        )
                 }
-                Button(action: {
-                    artists.append(Artist(name: "", isGroup: false))
-                }, label: {
-                    ZStack {
-                        RoundedRectangle(cornerRadius: 100.0, style: .circular)
-                            .inset(by: 1)
-                            .stroke(Color("G2"), lineWidth: 2)
-                            .fill(.clear)
-                            .frame(maxWidth: .infinity, minHeight: 60)
-                            .padding(.all, 0)
-
-                        Image("plus")
-                            .foregroundStyle(Color("G3"))
-                    }
-                    .padding(.horizontal, 16)
-                })
+                .padding(.horizontal, 18)
             }
-            Spacer()
-                .frame(height: 40)
+            Spacer.vertical(40)
+
+            /*
+             VStack(spacing: 12) {
+                 SectionHeader(text: "Artist")
+                 ForEach(Array($artists.enumerated()), id: \.offset) { index, artist in
+                     HStack {
+                         Circle()
+                             .fill(Color(hex: 0xF2F2F2))
+                             .frame(width: 48, height: 48)
+                             .overlay {
+                                 Text("?")
+                                     .font(Font.custom("Pretendard-SemiBold", size: 20))
+                                     .foregroundStyle(Color(hex: 0xD7D7D7))
+                             }
+                             .padding(.all, 6)
+                         TextField("name", text: artist.name)
+                             .submitLabel(.done)
+                             .font(Font.custom("Pretendard-SemiBold", size: 18))
+                             .foregroundStyle(Color("DefaultBlack"))
+                         Button(action: {
+                             artists.remove(at: index)
+                         }, label: {
+                             RectIconWrapper(icon: Image("xmark"), color: Color(hex: 0xD5D5D5), iconWidth: 12, wrapperWidth: 32, wrapperHeight: 32)
+                                 .padding(.trailing, 14)
+                         })
+                     }
+                     .background(Color("G1"))
+                     .clipShape(RoundedRectangle(cornerRadius: 100.0))
+                     .padding(.horizontal, 16)
+                 }
+                 Button(action: {
+                     artists.append(Artist(name: "", isGroup: false))
+                 }, label: {
+                     ZStack {
+                         RoundedRectangle(cornerRadius: 100.0, style: .circular)
+                             .inset(by: 1)
+                             .stroke(Color("G2"), lineWidth: 2)
+                             .fill(.clear)
+                             .frame(maxWidth: .infinity, minHeight: 60)
+                             .padding(.all, 0)
+
+                         Image("plus")
+                             .foregroundStyle(Color("G3"))
+                     }
+                     .padding(.horizontal, 16)
+                 })
+             }
+             Spacer()
+                 .frame(height: 40)
+             */
 
             // MARK: - Cover Section
 

@@ -46,12 +46,6 @@ struct AddAlbum_Tracklist: View {
                                     .padding(.trailing, 8)
                                     .monospacedDigit()
                             }
-
-                            /*
-                             Text("\(track.title)")
-                                 .font(Font.custom("Pretendard-SemiBold", size: 18))
-                                 .foregroundStyle(Color("DefaultBlack"))
-                             */
                             TextField("", text: $trackTempDatas[index].title)
                                 .autocorrectionDisabled()
                                 .submitLabel(.done)

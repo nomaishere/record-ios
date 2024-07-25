@@ -86,7 +86,7 @@ struct PlayerView: View {
         case .minibar:
             _viewWidth = State(initialValue: UIScreen.main.bounds.size.width - 16)
             _viewHeight = State(initialValue: 64)
-            _bottomPadding = State(initialValue: safeAreaInsetBottom + 59 + 8)
+            _bottomPadding = State(initialValue: minibarBottomPadding)
         case .expanded:
             _viewWidth = State(initialValue: UIScreen.main.bounds.size.width)
             _viewHeight = State(initialValue: UIScreen.main.bounds.size.height)
@@ -296,7 +296,7 @@ struct PlayerView: View {
                             viewWidth = UIScreen.main.bounds.size.width - 16
                             viewHeight = 64
                             withAnimation {
-                                bottomPadding = safeAreaInsets.bottom + 59 + 8
+                                bottomPadding = minibarBottomPadding
                             }
                         } else {}
                     }
