@@ -18,9 +18,11 @@ struct TrackTempData: Identifiable, Equatable, Hashable {
 struct AddAlbum_Tracklist: View {
     @EnvironmentObject var importManager: ImportManager
 
-    @State private var active: TrackTempData?
+    @State private var selectedIndex: Int? = nil
     @State private var trackTempDatas: [TrackTempData]
     @State private var isScrollDisabled: Bool = false
+
+    @FocusState private var isTextFieldFocused: Bool
 
     var numberFormatter = NumberFormatter()
 
@@ -31,26 +33,64 @@ struct AddAlbum_Tracklist: View {
 
     var body: some View {
         List {
-            ForEach(trackTempDatas, id: \.self) { track in
+            ForEach(Array(trackTempDatas.enumerated()), id: \.offset) { index, track in
                 ZStack(alignment: .leading) {
                     RoundedRectangle(cornerRadius: 4)
-                        .foregroundStyle(Color(hex: 0xF8F8F8, opacity: 0.6))
-                    HStack {
-                        Text(numberFormatter.string(from: track.trackNumber as NSNumber)!)
-                            .font(Font.custom("Pretendard-SemiBold", size: 18))
-                            .foregroundStyle(Color("G5"))
-                            .padding(.trailing, 8)
-                            .monospacedDigit()
-                        Text("\(track.title)")
-                            .font(Font.custom("Pretendard-SemiBold", size: 18))
-                            .foregroundStyle(Color("DefaultBlack"))
+                        .foregroundStyle(index == selectedIndex ? Color("G2") : Color(hex: 0xF8F8F8, opacity: 0.6))
+                    VStack {
+                        HStack {
+                            if selectedIndex != index {
+                                Text(numberFormatter.string(from: track.trackNumber as NSNumber)!)
+                                    .font(Font.custom("Pretendard-SemiBold", size: 18))
+                                    .foregroundStyle(Color("G5"))
+                                    .padding(.trailing, 8)
+                                    .monospacedDigit()
+                            }
 
-                        Spacer()
-                        RectIconWrapper(icon: Image("More"), color: Color("G3"), iconWidth: 16, wrapperWidth: 16, wrapperHeight: 16)
+                            /*
+                             Text("\(track.title)")
+                                 .font(Font.custom("Pretendard-SemiBold", size: 18))
+                                 .foregroundStyle(Color("DefaultBlack"))
+                             */
+                            TextField("", text: $trackTempDatas[index].title)
+                                .autocorrectionDisabled()
+                                .submitLabel(.done)
+                                .focused($isTextFieldFocused)
+                                .font(Font.custom("Pretendard-SemiBold", size: 18))
+                                .foregroundStyle(Color("DefaultBlack"))
+                                .onSubmit {
+                                    withAnimation(.easeIn(duration: 0.2)) {
+                                        selectedIndex = nil
+                                    }
+                                }
+                            Spacer()
+                            if selectedIndex == index {
+                                RectIconWrapper(icon: Image("circle-check-solid"), color: Color("G7"), iconWidth: 20, wrapperWidth: 20, wrapperHeight: 20)
+                                    .onTapGesture {
+                                        isTextFieldFocused = false
+                                        withAnimation(.easeIn(duration: 0.2)) {
+                                            selectedIndex = nil
+                                        }
+                                    }
+
+                            } else {
+                                RectIconWrapper(icon: Image("More"), color: Color("G3"), iconWidth: 16, wrapperWidth: 20, wrapperHeight: 20)
+                            }
+                        }
+                        .onTapGesture {
+                            if selectedIndex == index {
+                            } else {
+                                withAnimation(.easeIn(duration: 0.2)) {
+                                    selectedIndex = index
+                                }
+                            }
+                        }
                     }
                     .padding(.vertical, 12)
-                    .padding(.horizontal, 18)
+                    .padding(.leading, 18)
+                    .padding(.trailing, 12)
                 }
+                .opacity(index == selectedIndex || selectedIndex == nil ? 1.0 : 0.4)
                 .listRowInsets(EdgeInsets(top: 8, leading: 8, bottom: 8, trailing: 8))
                 .listRowSeparator(.hidden)
             }
