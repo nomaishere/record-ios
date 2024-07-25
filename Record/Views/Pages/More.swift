@@ -103,9 +103,7 @@ struct More: View {
                                 
                                 // MARK: 3) Add Tracks
                                 
-                                let demoTracks = DemoDataInjector.sharedInstance.makeDemoTracksOfDemoAlbum(artist: demoArtist, album: demoAlbum)
-                                
-                                var tracks: [Track] = []
+                                var demoTracks: [Track] = []
                                 let trackNames = ["Key", "Door", "Subwoofer Lullaby", "Death", "Living Mice", "Moog City", "Haggstrom", "Minecraft", "Oxygène", "Équinoxe", "Mice on Venus", "Dry Hands", "Wet Hands", "Clark", "Chris", "Thirteen", "Excuse", "Sweden", "Cat", "Dog", "Danny", "Beginning", "Droopy Likes Ricochet", "Droopy Likes Your Face"]
                                 
                                 for (index, trackName) in trackNames.enumerated() {
@@ -117,7 +115,7 @@ struct More: View {
                                     do {
                                         if let originURL = Bundle.main.url(forResource: fileName, withExtension: "mp3") {
                                             let savedAudioFileURL = try StorageManager.shared.saveTrackAudioFileAtDocumentByOriginURL(origin: originURL, title: trackName, album: demoAlbum)
-                                            tracks.append(Track(title: trackName, audioLocalURL: savedAudioFileURL, duration: 30.0, artwork: URL(string: "msva_cover.png")!, album: nil, artists: [], trackNumber: index + 1, themeColor: "66A53D"))
+                                            demoTracks.append(Track(title: trackName, audioLocalURL: savedAudioFileURL, duration: 30.0, artwork: URL(string: "msva_cover.png")!, album: nil, artists: [], trackNumber: index + 1, themeColor: "66A53D"))
                                         } else {
                                             NSLog("System: Failed to find files at ")
                                         }
@@ -159,6 +157,82 @@ struct More: View {
                         let demoArtist = Artist(name: "C418", isGroup: false)
                         modelContext.insert(demoArtist)
                         
+                        if modelContext.hasChanges {
+                            NSLog("Save Artist")
+                            do {
+                                try modelContext.save()
+                            } catch {
+                                NSLog("Failed to save")
+                            }
+                        }
+                    })
+                    MoreFeatureItem(icon: Image("plus"), text: "Add Demo Album(v3)", onTabAction: {
+                        do {
+                            let existingAlbums = try modelContext.fetchCount(FetchDescriptor<Album>())
+                            if existingAlbums == 0 {
+                                // MARK: 1) Create Artist Model
+                                
+                                guard let demoArtist = try modelContext.fetch(FetchDescriptor<Artist>(predicate: #Predicate { $0.name == "C418" })).first else {
+                                    NSLog("No C418")
+                                    return
+                                }
+                                
+                                // MARK: 2) Add Albums without Tracks At ModelContainer
+                                
+                                let demoAlbum = Album(title: "Minecraft - Volume Alpha", artist: [], tracks: [], artwork: URL(string: "msva_cover.png")!, releaseDate: Date(), themeColor: "66A53D")
+                                StorageManager.shared.createAlbumDirectory(title: "Minecraft - Volume Alpha")
+                                
+                                // MARK: 3) Add Tracks
+                                
+                                var demoTracks: [Track] = []
+                                let trackNames = ["Key", "Door", "Subwoofer Lullaby", "Death", "Living Mice", "Moog City", "Haggstrom", "Minecraft", "Oxygène", "Équinoxe", "Mice on Venus", "Dry Hands", "Wet Hands", "Clark", "Chris", "Thirteen", "Excuse", "Sweden", "Cat", "Dog", "Danny", "Beginning", "Droopy Likes Ricochet", "Droopy Likes Your Face"]
+                                
+                                for (index, trackName) in trackNames.enumerated() {
+                                    var fileName = String(index + 1)
+                                    if index + 1 <= 9 {
+                                        fileName = "0" + fileName
+                                    }
+                                    fileName = "\(fileName) - \(trackName)"
+                                    do {
+                                        if let originURL = Bundle.main.url(forResource: fileName, withExtension: "mp3") {
+                                            let savedAudioFileURL = try StorageManager.shared.saveTrackAudioFileAtDocumentByOriginURL(origin: originURL, title: trackName, album: demoAlbum)
+                                            demoTracks.append(Track(title: trackName, audioLocalURL: savedAudioFileURL, duration: 30.0, artwork: URL(string: "msva_cover.png")!, album: nil, artists: [], trackNumber: index + 1, themeColor: "66A53D"))
+                                        } else {
+                                            NSLog("System: Failed to find files at ")
+                                        }
+                                        
+                                    } catch {}
+                                }
+                                
+                                // MARK: 4) Insert Model First
+                                
+                                modelContext.insert(demoAlbum)
+                                
+                                // MARK: 5) Link Relationship Between Models
+                                
+                                demoArtist.albums = [demoAlbum]
+                                demoArtist.tracks = demoTracks
+                                
+                                demoAlbum.artist = [demoArtist]
+                                demoAlbum.tracks = demoTracks
+                                
+                                for demoTrack in demoTracks {
+                                    demoTrack.artists = [demoArtist]
+                                    demoTrack.album = demoAlbum
+                                }
+                                
+                                // MARK: 6) Save ModelContext Changes Manually
+
+                                if modelContext.hasChanges {
+                                    NSLog("Save Album")
+                                    do {
+                                        try modelContext.save()
+                                    } catch {
+                                        NSLog("Failed to save")
+                                    }
+                                }
+                            }
+                        } catch {}
                     })
                 }
             }
