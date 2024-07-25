@@ -25,13 +25,13 @@ final class ImportManager: ObservableObject {
         var trackTempDatas: [TrackTempData] = []
 
         for (index, url) in self.selectedFilesURL.enumerated() {
-            trackTempDatas.append(TrackTempData(title: url.lastPathComponent, trackNumber: index + 1, fileURL: url))
+            trackTempDatas.append(TrackTempData(title: url.deletingPathExtension().lastPathComponent, trackNumber: index + 1, fileURL: url))
         }
 
         return trackTempDatas
     }
-    
-    func addAlbumToCollection() -> Void {
+
+    func addAlbumToCollection() {
         print("hi")
     }
 }
