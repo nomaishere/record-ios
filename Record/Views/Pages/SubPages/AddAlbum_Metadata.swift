@@ -21,6 +21,8 @@ struct AddAlbum_Metadata: View {
     @State var title: String = ""
     @State var artists: [Artist] = []
 
+    @State var selectedArtist: [Artist] = []
+
     @Query var savedArtists: [Artist]
     @State var testArtist = [Artist(name: "C418", isGroup: false), Artist(name: "david kim", isGroup: false), Artist(name: "Kendrick Lamar", isGroup: false), Artist(name: "Kanye West", isGroup: false)]
 
@@ -101,72 +103,57 @@ struct AddAlbum_Metadata: View {
 
             // MARK: - Artist Section
 
-            VStack(spacing: 12) {
+            VStack(spacing: 0) {
                 SectionHeader(text: "Artist")
-                FlowLayout(mode: .scrollable, items: testArtist, itemSpacing: 4) { savedArtist in
-                    Text(savedArtist.name)
+                Spacer.vertical(12)
+                FlowLayout(mode: .scrollable, items: testArtist, itemSpacing: 4) { artist in
+                    Text(artist.name)
                         .font(Font.custom("Pretendard-Medium", size: 16))
-                        .foregroundStyle(Color("G7"))
+                        .foregroundStyle(selectedArtist.contains(artist) ? Color(.white) : Color("G7"))
                         .padding(.horizontal, 16)
                         .padding(.vertical, 8)
                         .background(
                             RoundedRectangle(cornerRadius: 100)
-                                .fill(Color("G1"))
+                                .fill(selectedArtist.contains(artist) ? Color("DefaultBlack") : Color("G1"))
                         )
+                        .onTapGesture {
+                            if selectedArtist.contains(artist) {
+                                if let index = selectedArtist.firstIndex(of: artist) {
+                                    withAnimation(.easeIn(duration: 0.2)) {
+                                        selectedArtist.remove(at: index)
+                                    }
+                                }
+                            } else {
+                                withAnimation(.easeOut(duration: 0.2)) {
+                                    selectedArtist.append(artist)
+                                }
+                            }
+                        }
+                        .contentShape(Rectangle())
                 }
                 .padding(.horizontal, 18)
+                Spacer.vertical(4)
+                HStack {
+                    HStack {
+                        RectIconWrapper(icon: Image("plus"), color: Color(hex: 0xFF7511), iconWidth: 14, wrapperWidth: 14, wrapperHeight: 14)
+                            .padding(.leading, 16)
+                        Text("add artist")
+                            .font(Font.custom("Pretendard-Medium", size: 16))
+                            .foregroundStyle(Color(hex: 0xFF7511))
+                            .padding(.trailing, 16)
+                            .padding(.vertical, 8)
+                    }
+                    .background(RoundedRectangle(cornerRadius: 100)
+                        .fill(Color("G1")))
+                    .onTapGesture {
+                        NSLog("hi")
+                    }
+                    .contentShape(Rectangle())
+                    Spacer()
+                }
+                .padding(.leading, 20)
             }
             Spacer.vertical(40)
-
-            /*
-             VStack(spacing: 12) {
-                 SectionHeader(text: "Artist")
-                 ForEach(Array($artists.enumerated()), id: \.offset) { index, artist in
-                     HStack {
-                         Circle()
-                             .fill(Color(hex: 0xF2F2F2))
-                             .frame(width: 48, height: 48)
-                             .overlay {
-                                 Text("?")
-                                     .font(Font.custom("Pretendard-SemiBold", size: 20))
-                                     .foregroundStyle(Color(hex: 0xD7D7D7))
-                             }
-                             .padding(.all, 6)
-                         TextField("name", text: artist.name)
-                             .submitLabel(.done)
-                             .font(Font.custom("Pretendard-SemiBold", size: 18))
-                             .foregroundStyle(Color("DefaultBlack"))
-                         Button(action: {
-                             artists.remove(at: index)
-                         }, label: {
-                             RectIconWrapper(icon: Image("xmark"), color: Color(hex: 0xD5D5D5), iconWidth: 12, wrapperWidth: 32, wrapperHeight: 32)
-                                 .padding(.trailing, 14)
-                         })
-                     }
-                     .background(Color("G1"))
-                     .clipShape(RoundedRectangle(cornerRadius: 100.0))
-                     .padding(.horizontal, 16)
-                 }
-                 Button(action: {
-                     artists.append(Artist(name: "", isGroup: false))
-                 }, label: {
-                     ZStack {
-                         RoundedRectangle(cornerRadius: 100.0, style: .circular)
-                             .inset(by: 1)
-                             .stroke(Color("G2"), lineWidth: 2)
-                             .fill(.clear)
-                             .frame(maxWidth: .infinity, minHeight: 60)
-                             .padding(.all, 0)
-
-                         Image("plus")
-                             .foregroundStyle(Color("G3"))
-                     }
-                     .padding(.horizontal, 16)
-                 })
-             }
-             Spacer()
-                 .frame(height: 40)
-             */
 
             // MARK: - Cover Section
 
