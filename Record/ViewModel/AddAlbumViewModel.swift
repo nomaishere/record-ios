@@ -36,19 +36,26 @@ final class AddAlbumViewModel: ObservableObject {
     // Album Metadata
     @Published var title: String = ""
     @Published var artists: [Artist] = []
-    @Published var artwork: URL = .init(string: "s")!
-    @Published var themeColor: String = ""
+    @Published var artwork: URL = .init(string: "s")! // TODO: Add Album Cover Placeholder URL
+    @Published var themeColor: String = "000000"
 
     var coverImage: Image? = nil
 
     func makeTrackMetadataFromFiles() -> [TrackMetadata] {
         var trackTempDatas: [TrackMetadata] = []
 
-        for (index, url) in self.selectedFilesURL.enumerated() {
+        for (index, url) in selectedFilesURL.enumerated() {
             trackTempDatas.append(TrackMetadata(title: url.deletingPathExtension().lastPathComponent, trackNumber: index + 1, fileURL: url, artists: []))
         }
 
         return trackTempDatas
+    }
+
+    func makeTrackFromMetadatas() {
+        tracks.removeAll()
+        for trackMetadata in trackMetadatas {
+            // tracks.append()
+        }
     }
 
     func movePreviousStep() {
@@ -67,6 +74,7 @@ final class AddAlbumViewModel: ObservableObject {
         }
     }
 
+    /// This method doesn't contain "complete" action that add album to collection because of SwiftData
     func moveNextStep() {
         withAnimation {
             if self.isNextEnabled {
@@ -77,15 +85,18 @@ final class AddAlbumViewModel: ObservableObject {
                 case .TRACKLIST:
                     self.nowStep = .METADATA
                 case .METADATA:
+                    self.makeTrackFromMetadatas()
                     self.nowStep = .CHECK
                 case .CHECK:
-                    self.addAlbumToCollection()
+                    break
                 }
             }
         }
     }
 
     func addAlbumToCollection() {
-        NSLog("ImportManager: Start adding album to collection")
+        // MARK: 1) Fetch Artist Model
+
+        // let targetArtists
     }
 }
