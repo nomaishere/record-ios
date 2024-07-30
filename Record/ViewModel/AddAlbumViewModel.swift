@@ -20,17 +20,26 @@ final class ImportManager: ObservableObject {
 
     var selectedFilesURL: [URL] = []
 
+    // Track Data
+    @Published var tracks: [Track] = []
+
+    // Album Metadata
+    @Published var title: String = ""
+    @Published var artists: [Artist] = []
+    @Published var artwork: URL = .init(string: "s")!
+    @Published var themeColor: String = ""
+
     func makeTracktempDatas() -> [TrackTempData] {
         var trackTempDatas: [TrackTempData] = []
 
         for (index, url) in self.selectedFilesURL.enumerated() {
-            trackTempDatas.append(TrackTempData(title: url.deletingPathExtension().lastPathComponent, trackNumber: index + 1, fileURL: url))
+            trackTempDatas.append(TrackTempData(title: url.deletingPathExtension().lastPathComponent, trackNumber: index + 1, fileURL: url, artists: []))
         }
 
         return trackTempDatas
     }
 
     func addAlbumToCollection() {
-        print("hi")
+        NSLog("ImportManager: Start adding album to collection")
     }
 }
