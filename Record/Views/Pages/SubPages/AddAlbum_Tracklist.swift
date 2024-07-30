@@ -23,6 +23,7 @@ struct AddAlbum_Tracklist: View {
 
     var body: some View {
         List {
+            Spacer.vertical(8)
             ForEach(Array(viewModel.trackMetadatas.enumerated()), id: \.offset) { index, track in
                 ZStack(alignment: .leading) {
                     RoundedRectangle(cornerRadius: 4)

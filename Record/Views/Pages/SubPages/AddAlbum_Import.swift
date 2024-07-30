@@ -9,17 +9,16 @@ import SwiftUI
 
 struct AddAlbum_Import: View {
     @State private var showFileImporter = false
-    @State private var isAnyFileSelected = false
 
-    @EnvironmentObject var importManager: AddAlbumViewModel
+    @EnvironmentObject var viewModel: AddAlbumViewModel
 
     var body: some View {
         ScrollView {
             Spacer.vertical(32)
             VStack(spacing: 12) {
-                if isAnyFileSelected {
+                if !viewModel.selectedFilesURL.isEmpty {
                     HStack(spacing: 0) {
-                        Text("\(importManager.selectedFilesURL.count) Tracks from ")
+                        Text("\(viewModel.selectedFilesURL.count) Tracks from")
                             .font(Font.custom("Poppins-SemiBold", size: 20))
                             .foregroundStyle(Color("DefaultBlack"))
                         Text(" Files")
@@ -28,7 +27,7 @@ struct AddAlbum_Import: View {
                         Spacer()
                     }
                     .padding(.horizontal, 24)
-                    FileListView(fileURLs: importManager.selectedFilesURL)
+                    FileListView(fileURLs: viewModel.selectedFilesURL)
 
                     Spacer()
                 } else {
@@ -66,11 +65,10 @@ struct AddAlbum_Import: View {
                             switch result {
                             case .success(let files):
                                 for file in files {
-                                    importManager.selectedFilesURL.append(file)
+                                    viewModel.selectedFilesURL.append(file)
                                 }
-                                if !importManager.selectedFilesURL.isEmpty {
-                                    isAnyFileSelected = true
-                                    importManager.isNextEnabled = true
+                                if !viewModel.selectedFilesURL.isEmpty {
+                                    viewModel.isNextEnabled = true
                                 }
                             case .failure(let error):
                                 print(error)

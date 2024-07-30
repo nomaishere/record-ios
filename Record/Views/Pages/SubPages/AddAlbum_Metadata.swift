@@ -14,16 +14,11 @@ import SwiftUIFlowLayout
 // View
 struct AddAlbum_Metadata: View {
     @StateObject var coverImageViewModel = CoverImageViewModel()
-
     @EnvironmentObject var viewModel: AddAlbumViewModel
 
-    @State var title: String = ""
     @State var artists: [Artist] = []
 
-    @State var selectedArtist: [Artist] = []
-
     @Query var savedArtists: [Artist]
-    @State var testArtist = [Artist(name: "C418", isGroup: false), Artist(name: "david kim", isGroup: false), Artist(name: "Kendrick Lamar", isGroup: false), Artist(name: "Kanye West", isGroup: false)]
 
     func checkMetadataEditComplete(hasCover: Bool = false) -> Bool {
         if isTitleEditComplete() {
@@ -37,7 +32,7 @@ struct AddAlbum_Metadata: View {
     }
 
     func isTitleEditComplete() -> Bool {
-        if title.isEmpty {
+        if viewModel.title.isEmpty {
             return false
         } else {
             return true
@@ -45,10 +40,10 @@ struct AddAlbum_Metadata: View {
     }
 
     func isArtistEditComplete() -> Bool {
-        if selectedArtist.isEmpty {
+        if viewModel.artists.isEmpty {
             return false
         } else {
-            for artist in selectedArtist {
+            for artist in viewModel.artists {
                 if artist.name.isEmpty {
                     return false
                 }
@@ -60,31 +55,25 @@ struct AddAlbum_Metadata: View {
     func isCoverEditComplete() -> Bool {
         switch coverImageViewModel.imageState {
         case .success:
-            NSLog("success")
             return true
         case .empty:
-            NSLog("emtpy")
             return false
         case .loading:
-            NSLog("loading")
             return false
         case .failure:
-            NSLog("failure")
-
             return false
         }
     }
 
     var body: some View {
         ScrollView {
-            Spacer()
-                .frame(height: 32)
+            Spacer.vertical(32)
 
             // MARK: - Title Section
 
             VStack(spacing: 12) {
                 SectionHeader(text: "Title")
-                TextField("Enter name of album", text: $title)
+                TextField("Enter name of album", text: $viewModel.title)
                     .autocorrectionDisabled()
                     .submitLabel(.done)
                     .font(Font.custom("Pretendard-SemiBold", size: 18))
@@ -108,23 +97,23 @@ struct AddAlbum_Metadata: View {
                 FlowLayout(mode: .scrollable, items: savedArtists, itemSpacing: 4) { artist in
                     Text(artist.name)
                         .font(Font.custom("Pretendard-Medium", size: 16))
-                        .foregroundStyle(selectedArtist.contains(artist) ? Color(.white) : Color("G7"))
+                        .foregroundStyle(viewModel.artists.contains(artist) ? Color(.white) : Color("G7"))
                         .padding(.horizontal, 16)
                         .padding(.vertical, 8)
                         .background(
                             RoundedRectangle(cornerRadius: 100)
-                                .fill(selectedArtist.contains(artist) ? Color("DefaultBlack") : Color("G1"))
+                                .fill(viewModel.artists.contains(artist) ? Color("DefaultBlack") : Color("G1"))
                         )
                         .onTapGesture {
-                            if selectedArtist.contains(artist) {
-                                if let index = selectedArtist.firstIndex(of: artist) {
+                            if viewModel.artists.contains(artist) {
+                                if let index = viewModel.artists.firstIndex(of: artist) {
                                     withAnimation(.easeIn(duration: 0.2)) {
-                                        selectedArtist.remove(at: index)
+                                        _ = viewModel.artists.remove(at: index)
                                     }
                                 }
                             } else {
                                 withAnimation(.easeOut(duration: 0.2)) {
-                                    selectedArtist.append(artist)
+                                    viewModel.artists.append(artist)
                                 }
                             }
                         }
@@ -213,15 +202,16 @@ struct AddAlbum_Metadata: View {
             }
             Spacer.vertical(80)
         }
-        .onChange(of: title) {
+        .onReceive(viewModel.$title) { _ in
             viewModel.isNextEnabled = checkMetadataEditComplete()
         }
-        .onChange(of: artists) {
+        .onReceive(viewModel.$artists) { _ in
             viewModel.isNextEnabled = checkMetadataEditComplete()
         }
         .onReceive(coverImageViewModel.$imageState) { value in
             switch value {
-            case .success:
+            case .success(let image):
+                viewModel.coverImage = image
                 viewModel.isNextEnabled = checkMetadataEditComplete(hasCover: true) // Pass hasCover parameter because viewModel.imageState doesn't update fast as this onReceive modifier.
             case .empty:
                 viewModel.isNextEnabled = checkMetadataEditComplete()

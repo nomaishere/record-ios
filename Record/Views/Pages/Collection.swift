@@ -74,9 +74,8 @@ struct Collection: View {
                         if let image = phase.image {
                             image
                                 .resizable()
-                                .scaledToFit()
+                                .scaledToFill()
                                 .clipShape(RoundedRectangle(cornerRadius: 4))
-                                .scaledToFit()
                         } else if phase.error != nil {
                             Color.red
                         } else {}
