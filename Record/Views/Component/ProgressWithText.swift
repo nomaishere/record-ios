@@ -27,11 +27,11 @@ struct ProgressWithText: View {
     @State var itemRects: [CGRect]
     
     
-    @EnvironmentObject var importManager: ImportManager
+    @EnvironmentObject var viewModel: AddAlbumViewModel
     
     /// NOTE: Need to update(remove hard-corded code)
     func makeProgressBarPosition() -> CGFloat {
-        switch importManager.nowStep {
+        switch viewModel.nowStep {
         case .IMPORT:
             return itemRects[0].minX + itemRects[0].width/2 - horizontalPadding
         case .TRACKLIST:
@@ -46,7 +46,7 @@ struct ProgressWithText: View {
     /// NOTE: Need to update(remove hard-corded code)
     func isTextShouldHighlighted(_ selectedStep: Step) -> Bool {
         var tempNowStep: Step
-        switch importManager.nowStep {
+        switch viewModel.nowStep {
         case .IMPORT:
             tempNowStep = Step(id: 1, name: "Import")
         case .TRACKLIST:
@@ -116,7 +116,7 @@ struct ProgressWithText: View {
 
 #Preview {
     ProgressWithText(steps: [Step(id: 1, name: "Import"), Step(id: 2, name: "Tracklist"), Step(id: 3, name: "Metadata"), Step(id: 4, name: "Check")])
-        .environmentObject(ImportManager())
+        .environmentObject(AddAlbumViewModel())
 }
 
 

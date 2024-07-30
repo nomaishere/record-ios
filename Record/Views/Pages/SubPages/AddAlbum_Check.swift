@@ -8,10 +8,11 @@
 import SwiftUI
 
 struct AddAlbum_Check: View {
-    @EnvironmentObject var importManager: ImportManager
+    @EnvironmentObject var viewModel: AddAlbumViewModel
 
     var body: some View {
-        Text("Check")
+        Text(viewModel.title)
+        Text(viewModel.artwork.absoluteString)
     }
 }
 

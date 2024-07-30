@@ -10,9 +10,7 @@ import SwiftUI
 struct AddAlbum: View {
     @EnvironmentObject var router: Router
 
-    @ObservedObject var importManager = ImportManager()
-
-    @State var isNextEnabled: Bool = false
+    @ObservedObject var viewModel = AddAlbumViewModel()
 
     var body: some View {
         ZStack(alignment: .top) {
@@ -53,27 +51,26 @@ struct AddAlbum: View {
                                 .padding(.bottom, 24)
                                 ProgressWithText(steps: [Step(id: 1, name: "Import"), Step(id: 2, name: "Tracklist"), Step(id: 3, name: "Metadata"), Step(id: 4, name: "Check")])
                                     .padding(.bottom, 24)
-                                    .environmentObject(importManager)
+                                    .environmentObject(viewModel)
 
                             },
                             alignment: .top
                         )
                         .navigationBarBackButtonHidden()
                 }
-
                 Group {
-                    switch importManager.nowStep {
+                    switch viewModel.nowStep {
                     case .IMPORT:
-                        AddAlbum_Import(isNextEnabled: $isNextEnabled)
+                        AddAlbum_Import()
                     case .TRACKLIST:
-                        AddAlbum_Tracklist(trackTempDatas: importManager.makeTracktempDatas())
+                        AddAlbum_Tracklist(trackTempDatas: viewModel.makeTracktempDatas())
                     case .METADATA:
-                        AddAlbum_Metadata(isNextEnabled: $isNextEnabled)
+                        AddAlbum_Metadata()
                     case .CHECK:
                         AddAlbum_Check()
                     }
                 }
-                .environmentObject(importManager)
+                .environmentObject(viewModel)
             }
             // Wrap VStack to apply ignoreSafeArea(.keyboard)
 
@@ -85,20 +82,20 @@ struct AddAlbum: View {
                         .frame(height: 2)
                         .padding(.all, 0)
                     HStack(spacing: 15.5) {
-                        if importManager.nowStep != .IMPORT {
+                        if viewModel.nowStep != .IMPORT {
                             Button(action: {
                                 withAnimation {
-                                    switch importManager.nowStep {
+                                    switch viewModel.nowStep {
                                     case .IMPORT:
                                         break
                                     case .TRACKLIST:
-                                        importManager.nowStep = .IMPORT
+                                        viewModel.nowStep = .IMPORT
                                     case .METADATA:
-                                        importManager.nowStep = .TRACKLIST
+                                        viewModel.nowStep = .TRACKLIST
                                     case .CHECK:
-                                        importManager.nowStep = .METADATA
+                                        viewModel.nowStep = .METADATA
                                     }
-                                    isNextEnabled = true
+                                    viewModel.isNextEnabled = true
                                 }
                             }, label: {
                                 HStack {
@@ -115,25 +112,25 @@ struct AddAlbum: View {
                             .padding(.leading, 8)
                         }
                         Spacer()
-                        Button(importManager.nowStep == .CHECK ? "Complete" : "Next Step", action: {
+                        Button(viewModel.nowStep == .CHECK ? "Complete" : "Next Step", action: {
                             withAnimation {
-                                if isNextEnabled {
-                                    switch importManager.nowStep {
+                                if viewModel.isNextEnabled {
+                                    switch viewModel.nowStep {
                                     case .IMPORT:
-                                        importManager.nowStep = .TRACKLIST
+                                        viewModel.nowStep = .TRACKLIST
                                     case .TRACKLIST:
-                                        importManager.nowStep = .METADATA
+                                        viewModel.nowStep = .METADATA
                                     case .METADATA:
-                                        importManager.nowStep = .CHECK
+                                        viewModel.nowStep = .CHECK
                                     case .CHECK:
-                                        importManager.addAlbumToCollection()
+                                        viewModel.addAlbumToCollection()
                                     }
                                 }
                             }
                         })
                         .padding(.vertical, 8.0)
                         .padding(.horizontal, 32.0)
-                        .background(isNextEnabled ? Color("DefaultBlack") : Color("G3"))
+                        .background(viewModel.isNextEnabled ? Color("DefaultBlack") : Color("G3"))
                         .font(Font.custom("Poppins-Medium", size: 20))
                         .foregroundStyle(.white)
                         .clipShape(Capsule())

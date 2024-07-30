@@ -8,7 +8,7 @@
 import Foundation
 import SwiftUI
 
-final class ImportManager: ObservableObject {
+final class AddAlbumViewModel: ObservableObject {
     public enum importSteps: Codable, Hashable {
         case IMPORT
         case TRACKLIST
@@ -17,6 +17,8 @@ final class ImportManager: ObservableObject {
     }
 
     @Published var nowStep: importSteps = .IMPORT
+    @Published var isNextEnabled: Bool = false
+
 
     var selectedFilesURL: [URL] = []
 
@@ -38,8 +40,11 @@ final class ImportManager: ObservableObject {
 
         return trackTempDatas
     }
+    
+    
 
     func addAlbumToCollection() {
         NSLog("ImportManager: Start adding album to collection")
     }
+    
 }

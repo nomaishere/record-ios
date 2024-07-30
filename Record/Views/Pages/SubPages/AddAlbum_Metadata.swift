@@ -15,8 +15,7 @@ import SwiftUIFlowLayout
 struct AddAlbum_Metadata: View {
     @StateObject var viewModel = CoverImageViewModel()
 
-    @EnvironmentObject var importManager: ImportManager
-    @Binding var isNextEnabled: Bool
+    @EnvironmentObject var viewModel: AddAlbumViewModel
 
     @State var title: String = ""
     @State var artists: [Artist] = []
@@ -46,10 +45,10 @@ struct AddAlbum_Metadata: View {
     }
 
     func isArtistEditComplete() -> Bool {
-        if artists.isEmpty {
+        if selectedArtist.isEmpty {
             return false
         } else {
-            for artist in artists {
+            for artist in selectedArtist {
                 if artist.name.isEmpty {
                     return false
                 }
@@ -64,7 +63,7 @@ struct AddAlbum_Metadata: View {
             NSLog("success")
             return true
         case .empty:
-            NSLog("empyt")
+            NSLog("emtpy")
             return false
         case .loading:
             NSLog("loading")
@@ -106,7 +105,7 @@ struct AddAlbum_Metadata: View {
             VStack(spacing: 0) {
                 SectionHeader(text: "Artist")
                 Spacer.vertical(12)
-                FlowLayout(mode: .scrollable, items: testArtist, itemSpacing: 4) { artist in
+                FlowLayout(mode: .scrollable, items: savedArtists, itemSpacing: 4) { artist in
                     Text(artist.name)
                         .font(Font.custom("Pretendard-Medium", size: 16))
                         .foregroundStyle(selectedArtist.contains(artist) ? Color(.white) : Color("G7"))
@@ -215,19 +214,19 @@ struct AddAlbum_Metadata: View {
             Spacer.vertical(80)
         }
         .onChange(of: title) {
-            isNextEnabled = checkMetadataEditComplete()
+            viewModel.isNextEnabled = checkMetadataEditComplete()
         }
         .onChange(of: artists) {
-            isNextEnabled = checkMetadataEditComplete()
+            viewModel.isNextEnabled = checkMetadataEditComplete()
         }
         .onReceive(viewModel.$imageState) { value in
             switch value {
             case .success:
-                isNextEnabled = checkMetadataEditComplete(hasCover: true) // Pass hasCover parameter because viewModel.imageState doesn't update fast as this onReceive modifier.
+                viewModel.isNextEnabled = checkMetadataEditComplete(hasCover: true) // Pass hasCover parameter because viewModel.imageState doesn't update fast as this onReceive modifier.
             case .empty:
-                isNextEnabled = checkMetadataEditComplete()
+                viewModel.isNextEnabled = checkMetadataEditComplete()
             case .loading:
-                isNextEnabled = checkMetadataEditComplete()
+                viewModel.isNextEnabled = checkMetadataEditComplete()
             case .failure:
                 break
             }
@@ -268,7 +267,7 @@ struct AddAlbum_Metadata: View {
         }
     }()
 
-    return AddAlbum_Metadata(isNextEnabled: .constant(false))
+    return AddAlbum_Metadata()
         .modelContainer(previewModelContainer)
 }
 

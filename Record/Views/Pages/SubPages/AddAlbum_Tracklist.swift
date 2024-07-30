@@ -12,11 +12,11 @@ struct TrackTempData: Identifiable, Equatable, Hashable {
     var title: String
     var trackNumber: Int
     var fileURL: URL
-    var artists: [String] = ["Unknown Artist"] // for test
+    var artists: [Artist]
 }
 
 struct AddAlbum_Tracklist: View {
-    @EnvironmentObject var importManager: ImportManager
+    @EnvironmentObject var viewModel: AddAlbumViewModel
 
     @State private var selectedIndex: Int? = nil
     @State private var trackTempDatas: [TrackTempData]
@@ -99,8 +99,4 @@ struct AddAlbum_Tracklist: View {
         .listStyle(.plain)
         .environment(\.defaultMinListRowHeight, 0)
     }
-}
-
-#Preview {
-    AddAlbum_Tracklist(trackTempDatas: [TrackTempData(title: "Wesley’s Theory", trackNumber: 1, fileURL: URL(string: "hi")!, artists: ["Kendrick Lamar", "George Clinton", "Thundercat"]), TrackTempData(title: "This is super long text that over the screen", trackNumber: 2, fileURL: URL(string: "hi")!, artists: ["Kendrick Lamar", "George Clinton", "Thundercat"]), TrackTempData(title: "Song 2", trackNumber: 3, fileURL: URL(string: "hi")!, artists: ["Kendrick Lamar", "George Clinton", "Thundercat"])])
 }

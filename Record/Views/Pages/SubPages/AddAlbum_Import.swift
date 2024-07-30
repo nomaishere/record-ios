@@ -11,14 +11,11 @@ struct AddAlbum_Import: View {
     @State private var showFileImporter = false
     @State private var isAnyFileSelected = false
 
-    @EnvironmentObject var importManager: ImportManager
-
-    @Binding var isNextEnabled: Bool
+    @EnvironmentObject var importManager: AddAlbumViewModel
 
     var body: some View {
         ScrollView {
-            Spacer()
-                .frame(height: 32)
+            Spacer.vertical(32)
             VStack(spacing: 12) {
                 if isAnyFileSelected {
                     HStack(spacing: 0) {
@@ -73,7 +70,7 @@ struct AddAlbum_Import: View {
                                 }
                                 if !importManager.selectedFilesURL.isEmpty {
                                     isAnyFileSelected = true
-                                    isNextEnabled = true
+                                    importManager.isNextEnabled = true
                                 }
                             case .failure(let error):
                                 print(error)
@@ -118,7 +115,7 @@ struct FileListView: View {
 }
 
 #Preview {
-    AddAlbum_Import(isNextEnabled: .constant(false))
+    AddAlbum_Import()
 }
 
 #Preview("FileList") {
