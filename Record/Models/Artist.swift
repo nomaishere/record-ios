@@ -25,3 +25,20 @@ final class Artist: Identifiable {
         self.tracks = tracks
     }
 }
+
+extension Artist {
+    static func makeArtistAsString(_ artists: [Artist]) -> String {
+        if artists.isEmpty {
+            return "Unknown Artist"
+        }
+
+        var artistNames = ""
+        for (index, artist) in artists.enumerated() {
+            artistNames.append(artist.name)
+            if index < artists.count - 1 {
+                artistNames.append(", ")
+            }
+        }
+        return artistNames
+    }
+}
