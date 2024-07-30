@@ -68,9 +68,8 @@ final class StorageManager {
             throw saveAudioFileError.encodeFailed
         }
 
-
         // TODO: Extract this(hard-coded)
-        let supportedAudioFileExtension = ["mp3", "wav", "aiff"]
+        let supportedAudioFileExtension = ["mp3", "wav", "aiff", "aif"]
         guard supportedAudioFileExtension.contains(origin.pathExtension) else {
             NSLog("StorageManager: Target file is using unsupported extension")
             throw saveAudioFileError.unsupportedExtension
