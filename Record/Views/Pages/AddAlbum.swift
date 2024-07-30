@@ -63,7 +63,7 @@ struct AddAlbum: View {
                     case .IMPORT:
                         AddAlbum_Import()
                     case .TRACKLIST:
-                        AddAlbum_Tracklist(trackTempDatas: viewModel.makeTracktempDatas())
+                        AddAlbum_Tracklist()
                     case .METADATA:
                         AddAlbum_Metadata()
                     case .CHECK:
@@ -83,21 +83,7 @@ struct AddAlbum: View {
                         .padding(.all, 0)
                     HStack(spacing: 15.5) {
                         if viewModel.nowStep != .IMPORT {
-                            Button(action: {
-                                withAnimation {
-                                    switch viewModel.nowStep {
-                                    case .IMPORT:
-                                        break
-                                    case .TRACKLIST:
-                                        viewModel.nowStep = .IMPORT
-                                    case .METADATA:
-                                        viewModel.nowStep = .TRACKLIST
-                                    case .CHECK:
-                                        viewModel.nowStep = .METADATA
-                                    }
-                                    viewModel.isNextEnabled = true
-                                }
-                            }, label: {
+                            Button(action: { viewModel.movePreviousStep() }, label: {
                                 HStack {
                                     Image("LeftChevron")
                                         .renderingMode(.template)
@@ -113,20 +99,7 @@ struct AddAlbum: View {
                         }
                         Spacer()
                         Button(viewModel.nowStep == .CHECK ? "Complete" : "Next Step", action: {
-                            withAnimation {
-                                if viewModel.isNextEnabled {
-                                    switch viewModel.nowStep {
-                                    case .IMPORT:
-                                        viewModel.nowStep = .TRACKLIST
-                                    case .TRACKLIST:
-                                        viewModel.nowStep = .METADATA
-                                    case .METADATA:
-                                        viewModel.nowStep = .CHECK
-                                    case .CHECK:
-                                        viewModel.addAlbumToCollection()
-                                    }
-                                }
-                            }
+                            viewModel.moveNextStep()
                         })
                         .padding(.vertical, 8.0)
                         .padding(.horizontal, 32.0)

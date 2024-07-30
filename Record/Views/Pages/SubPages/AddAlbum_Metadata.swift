@@ -13,7 +13,7 @@ import SwiftUIFlowLayout
 
 // View
 struct AddAlbum_Metadata: View {
-    @StateObject var viewModel = CoverImageViewModel()
+    @StateObject var coverImageViewModel = CoverImageViewModel()
 
     @EnvironmentObject var viewModel: AddAlbumViewModel
 
@@ -58,7 +58,7 @@ struct AddAlbum_Metadata: View {
     }
 
     func isCoverEditComplete() -> Bool {
-        switch viewModel.imageState {
+        switch coverImageViewModel.imageState {
         case .success:
             NSLog("success")
             return true
@@ -158,14 +158,14 @@ struct AddAlbum_Metadata: View {
 
             VStack(spacing: 12) {
                 SectionHeader(text: "Cover")
-                switch viewModel.imageState {
+                switch coverImageViewModel.imageState {
                 case .success(let image):
                     image
                         .resizable()
                         .scaledToFill()
                         .frame(width: UIScreen.main.bounds.size.width - 48, height: UIScreen.main.bounds.size.width - 48)
                         .clipShape(RoundedRectangle(cornerRadius: 4))
-                    Button(action: { viewModel.selectAgain() }, label: {
+                    Button(action: { coverImageViewModel.selectAgain() }, label: {
                         HStack(spacing: 12) {
                             RectIconWrapper(icon: Image("Reload"), color: Color("DefaultBlack"), iconWidth: 14, wrapperWidth: 14, wrapperHeight: 14)
                             Text("Select Again")
@@ -183,7 +183,7 @@ struct AddAlbum_Metadata: View {
                     ProgressView()
                 case .empty:
                     HStack {
-                        PhotosPicker(selection: $viewModel.imageSelection,
+                        PhotosPicker(selection: $coverImageViewModel.imageSelection,
                                      matching: .images)
                         {
                             ZStack {
@@ -219,7 +219,7 @@ struct AddAlbum_Metadata: View {
         .onChange(of: artists) {
             viewModel.isNextEnabled = checkMetadataEditComplete()
         }
-        .onReceive(viewModel.$imageState) { value in
+        .onReceive(coverImageViewModel.$imageState) { value in
             switch value {
             case .success:
                 viewModel.isNextEnabled = checkMetadataEditComplete(hasCover: true) // Pass hasCover parameter because viewModel.imageState doesn't update fast as this onReceive modifier.

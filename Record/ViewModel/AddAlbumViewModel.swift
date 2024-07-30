@@ -8,6 +8,14 @@
 import Foundation
 import SwiftUI
 
+struct TrackMetadata: Identifiable, Equatable, Hashable {
+    let id = UUID()
+    var title: String
+    var trackNumber: Int
+    var fileURL: URL
+    var artists: [Artist]
+}
+
 final class AddAlbumViewModel: ObservableObject {
     public enum importSteps: Codable, Hashable {
         case IMPORT
@@ -19,10 +27,10 @@ final class AddAlbumViewModel: ObservableObject {
     @Published var nowStep: importSteps = .IMPORT
     @Published var isNextEnabled: Bool = false
 
-
     var selectedFilesURL: [URL] = []
 
     // Track Data
+    @Published var trackMetadatas: [TrackMetadata] = []
     @Published var tracks: [Track] = []
 
     // Album Metadata
@@ -31,20 +39,51 @@ final class AddAlbumViewModel: ObservableObject {
     @Published var artwork: URL = .init(string: "s")!
     @Published var themeColor: String = ""
 
-    func makeTracktempDatas() -> [TrackTempData] {
-        var trackTempDatas: [TrackTempData] = []
+    func makeTrackMetadataFromFiles() -> [TrackMetadata] {
+        var trackTempDatas: [TrackMetadata] = []
 
         for (index, url) in self.selectedFilesURL.enumerated() {
-            trackTempDatas.append(TrackTempData(title: url.deletingPathExtension().lastPathComponent, trackNumber: index + 1, fileURL: url, artists: []))
+            trackTempDatas.append(TrackMetadata(title: url.deletingPathExtension().lastPathComponent, trackNumber: index + 1, fileURL: url, artists: []))
         }
 
         return trackTempDatas
     }
-    
-    
+
+    func movePreviousStep() {
+        withAnimation {
+            switch self.nowStep {
+            case .IMPORT:
+                break
+            case .TRACKLIST:
+                self.nowStep = .IMPORT
+            case .METADATA:
+                self.nowStep = .TRACKLIST
+            case .CHECK:
+                self.nowStep = .METADATA
+            }
+            self.isNextEnabled = true
+        }
+    }
+
+    func moveNextStep() {
+        withAnimation {
+            if self.isNextEnabled {
+                switch self.nowStep {
+                case .IMPORT:
+                    self.trackMetadatas = self.makeTrackMetadataFromFiles()
+                    self.nowStep = .TRACKLIST
+                case .TRACKLIST:
+                    self.nowStep = .METADATA
+                case .METADATA:
+                    self.nowStep = .CHECK
+                case .CHECK:
+                    self.addAlbumToCollection()
+                }
+            }
+        }
+    }
 
     func addAlbumToCollection() {
         NSLog("ImportManager: Start adding album to collection")
     }
-    
 }

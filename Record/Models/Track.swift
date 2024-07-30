@@ -26,7 +26,7 @@ final class Track: Identifiable {
     /// hex
     var themeColor: String
 
-    init(title: String, audioLocalURL: URL, duration: Double, artwork: URL, album: Album? = nil, artists: [Artist] = [], trackNumber: Int, themeColor: String) {
+    init(title: String, audioLocalURL: URL, duration: Double = 0.0, artwork: URL, album: Album? = nil, artists: [Artist] = [], trackNumber: Int, themeColor: String = "") {
         self.title = title
         self.audioLocalURL = audioLocalURL
         self.duration = duration

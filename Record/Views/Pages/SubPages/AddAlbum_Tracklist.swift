@@ -7,33 +7,23 @@
 
 import SwiftUI
 
-struct TrackTempData: Identifiable, Equatable, Hashable {
-    let id = UUID()
-    var title: String
-    var trackNumber: Int
-    var fileURL: URL
-    var artists: [Artist]
-}
-
 struct AddAlbum_Tracklist: View {
     @EnvironmentObject var viewModel: AddAlbumViewModel
 
     @State private var selectedIndex: Int? = nil
-    @State private var trackTempDatas: [TrackTempData]
     @State private var isScrollDisabled: Bool = false
 
     @FocusState private var isTextFieldFocused: Bool
 
     var numberFormatter = NumberFormatter()
 
-    init(trackTempDatas: [TrackTempData]) {
-        _trackTempDatas = State(initialValue: trackTempDatas)
+    init() {
         numberFormatter.minimumIntegerDigits = 2
     }
 
     var body: some View {
         List {
-            ForEach(Array(trackTempDatas.enumerated()), id: \.offset) { index, track in
+            ForEach(Array(viewModel.trackMetadatas.enumerated()), id: \.offset) { index, track in
                 ZStack(alignment: .leading) {
                     RoundedRectangle(cornerRadius: 4)
                         .foregroundStyle(index == selectedIndex ? Color("G2") : Color(hex: 0xF8F8F8, opacity: 0.6))
@@ -46,7 +36,7 @@ struct AddAlbum_Tracklist: View {
                                     .padding(.trailing, 8)
                                     .monospacedDigit()
                             }
-                            TextField("", text: $trackTempDatas[index].title)
+                            TextField("", text: $viewModel.trackMetadatas[index].title)
                                 .autocorrectionDisabled()
                                 .submitLabel(.done)
                                 .focused($isTextFieldFocused)
@@ -90,9 +80,9 @@ struct AddAlbum_Tracklist: View {
             }
             .onMove(perform: { from, to in
                 NSLog("from: \(from), to: \(to)")
-                trackTempDatas.move(fromOffsets: from, toOffset: to)
-                for (index, _) in trackTempDatas.enumerated() {
-                    trackTempDatas[index].trackNumber = index + 1
+                viewModel.trackMetadatas.move(fromOffsets: from, toOffset: to)
+                for (index, _) in viewModel.trackMetadatas.enumerated() {
+                    viewModel.trackMetadatas[index].trackNumber = index + 1
                 }
             })
         }
