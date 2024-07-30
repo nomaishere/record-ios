@@ -18,6 +18,7 @@ final class StorageManager {
         case alreadyFileExisted
         case copyFailed
         case unsupportedExtension
+        case originFileAccessFailed
     }
 
     /// Create album directory at Document. This method must be called at Application's initialization.
@@ -81,6 +82,13 @@ final class StorageManager {
         if FileManager.default.fileExists(atPath: dstURL.path(percentEncoded: true)) {
             throw saveAudioFileError.alreadyFileExisted
         }
+
+        guard origin.startAccessingSecurityScopedResource() else {
+            NSLog("Storagemanager: Failed to startAccessingSecurityScopedResource()")
+            throw saveAudioFileError.originFileAccessFailed
+        }
+
+        defer { origin.stopAccessingSecurityScopedResource() }
 
         do {
             try FileManager.default.copyItem(at: origin, to: dstURL)

@@ -5,10 +5,12 @@
 //  Created by nomamac2 on 5/26/24.
 //
 
+import SwiftData
 import SwiftUI
 
 struct AddAlbum: View {
     @EnvironmentObject var router: Router
+    @Environment(\.modelContext) private var modelContext
 
     @ObservedObject var viewModel = AddAlbumViewModel()
 
@@ -99,7 +101,76 @@ struct AddAlbum: View {
                         }
                         Spacer()
                         Button(viewModel.nowStep == .CHECK ? "Complete" : "Next Step", action: {
-                            viewModel.moveNextStep()
+                            if viewModel.nowStep == .CHECK {
+                                // MARK: 1) Fetch Artist Model
+
+                                var targetArtists: [Artist] = []
+                                for artist in viewModel.artists {
+                                    do {
+                                        // TODO: This line doesn't support for multiple artists that has same name.
+                                        let artistID = artist.id
+                                        guard let fetchedArtist = try modelContext.fetch(FetchDescriptor<Artist>(predicate: #Predicate { $0.id == artistID })).first else {
+                                            NSLog("AddAlbum: Can't find artist at system")
+                                            return
+                                        }
+                                        targetArtists.append(fetchedArtist)
+                                    } catch {
+                                        NSLog("AddAlbum: Failed to find artist")
+                                    }
+                                }
+
+                                // MARK: 2) All Albums without Tracks at ModelContainer & Create Album Directory
+
+                                let targetAlbum = Album(title: viewModel.title, artist: [], tracks: [], artwork: viewModel.artworkURL, releaseDate: Date(), themeColor: viewModel.themeColor)
+                                _ = StorageManager.shared.createAlbumDirectory(title: viewModel.title)
+
+                                // MARK: 3) Add Tracks
+
+                                var targetTracks: [Track] = []
+                                NSLog("AddAlbum: Start saving \(viewModel.trackMetadatas.count) tracks")
+                                for trackMetadata in viewModel.trackMetadatas {
+                                    do {
+                                        let savedAudioFileURL = try StorageManager.shared.saveTrackAudioFileAtDocumentByOriginURL(origin: trackMetadata.fileURL, title: trackMetadata.title, album: targetAlbum)
+                                        targetTracks.append(Track(title: trackMetadata.title, audioLocalURL: savedAudioFileURL, duration: 0.0, artwork: viewModel.artworkURL, album: targetAlbum, artists: [], trackNumber: trackMetadata.trackNumber, themeColor: viewModel.themeColor))
+                                    } catch {
+                                        NSLog("AddAlbum: Failed to save track '\(trackMetadata.title)'.")
+                                        return
+                                    }
+                                }
+
+                                // MARK: 4) Insert Model First
+
+                                modelContext.insert(targetAlbum)
+
+                                // MARK: 5) Link Relationship Between Models
+
+                                for targetArtist in targetArtists {
+                                    targetArtist.albums?.append(targetAlbum)
+                                    targetArtist.tracks?.append(contentsOf: targetTracks)
+                                }
+
+                                targetAlbum.artist = targetArtists
+                                targetAlbum.tracks = targetTracks
+
+                                for targetTrack in targetTracks {
+                                    targetTrack.artists = targetArtists
+                                    targetTrack.album = targetAlbum
+                                }
+
+                                // MARK: 6) Save ModelContext Changes Manually
+
+                                if modelContext.hasChanges {
+                                    NSLog("Success to add album. ")
+                                    do {
+                                        try modelContext.save()
+                                    } catch {
+                                        NSLog("Failed to save")
+                                    }
+                                }
+
+                            } else {
+                                viewModel.moveNextStep()
+                            }
                         })
                         .padding(.vertical, 8.0)
                         .padding(.horizontal, 32.0)

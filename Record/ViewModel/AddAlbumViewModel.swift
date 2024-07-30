@@ -36,8 +36,8 @@ final class AddAlbumViewModel: ObservableObject {
     // Album Metadata
     @Published var title: String = ""
     @Published var artists: [Artist] = []
-    @Published var artwork: URL = .init(string: "s")! // TODO: Add Album Cover Placeholder URL
-    @Published var themeColor: String = "000000"
+    @Published var artworkURL: URL = .init(string: "s")!
+    @Published var themeColor: String = ""
 
     var coverImage: Image? = nil
 
@@ -74,7 +74,7 @@ final class AddAlbumViewModel: ObservableObject {
         }
     }
 
-    /// This method doesn't contain "complete" action that add album to collection because of SwiftData
+    /// This method doesn't contain "complete" action that add album to collection because of swiftData
     func moveNextStep() {
         withAnimation {
             if self.isNextEnabled {
@@ -85,7 +85,6 @@ final class AddAlbumViewModel: ObservableObject {
                 case .TRACKLIST:
                     self.nowStep = .METADATA
                 case .METADATA:
-                    self.makeTrackFromMetadatas()
                     self.nowStep = .CHECK
                 case .CHECK:
                     break
