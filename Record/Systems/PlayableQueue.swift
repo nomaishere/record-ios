@@ -89,17 +89,23 @@ class PlayableQueue {
 
     func addTracksAtEndofQueue(tracks: [Track]) {
         queueOfTracks.append(contentsOf: tracks)
-        
 
         for track in tracks {
             let trackURL = StorageManager.shared.getActualTrackURL(track)
             avPlayerItems.append(AVPlayerItem(asset: AVURLAsset(url: trackURL), automaticallyLoadedAssetKeys: ["availableMediaCharacteristicsWithMediaSelectionOptions"]))
 
-            guard let imageData = try? Data(contentsOf: StorageManager.shared.getActualTrackArtworkURL(track)) else { return }
-            guard let image = UIImage(data: imageData) else { return }
+            var image: UIImage
+            if let imageData = try? Data(contentsOf: StorageManager.shared.getActualTrackArtworkURL(track)) {
+                guard let temp = UIImage(data: imageData) else { return }
+                image = temp
+            } else {
+                guard let temp = UIImage(named: "cover_placeholder") else { return }
+                image = temp
+            }
 
             let artistNames = makeArtistAsString(track.artists)
 
+            // TODO: Get Album Metadata by Track Relation
             var albumArtist = "Unknown Artist"
             var albumTitle = "Unknown Album"
 

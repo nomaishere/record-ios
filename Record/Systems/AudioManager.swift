@@ -11,6 +11,12 @@ import Combine
 import Foundation
 import MediaPlayer
 
+extension Array {
+    subscript(safe index: Index) -> Element? {
+        index >= 0 && index < count ? self[index] : nil
+    }
+}
+
 /// AudioManager is highest-level controller that manager all feature about audio.
 ///
 final class AudioManager: ObservableObject {
@@ -216,7 +222,12 @@ final class AudioManager: ObservableObject {
             playableQueue.addTracksAtEndofQueue(tracks: tracks)
 
             for (index, _) in tracks.enumerated() {
-                avQueuePlayer.insert(playableQueue.avPlayerItems[index], after: nil)
+                if let item = playableQueue.avPlayerItems[safe: index] {
+                    avQueuePlayer.insert(item, after: nil)
+                } else {
+                    NSLog("AudioManager: PlayableQueue doesn't have proper avPlayerItems properties. The count of it is \(playableQueue.avPlayerItems.count).")
+                    return
+                }
             }
 
             do {
