@@ -18,11 +18,13 @@ struct ClickableAlbumCover: View {
                     .resizable()
                     .scaledToFit()
                     .clipShape(RoundedRectangle(cornerRadius: 4))
-                    .scaledToFit()
             } else if phase.error != nil {
-                Color.red
+                Image("cover_placeholder")
+                    .resizable()
+                    .scaledToFit()
+                    .clipShape(RoundedRectangle(cornerRadius: 4))
             } else {
-                Color.blue
+                Color.gray
             }
         }
         .onTapGesture {

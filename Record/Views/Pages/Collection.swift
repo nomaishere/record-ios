@@ -77,7 +77,10 @@ struct Collection: View {
                                 .scaledToFill()
                                 .clipShape(RoundedRectangle(cornerRadius: 4))
                         } else if phase.error != nil {
-                            Color.red
+                            Image("cover_placeholder")
+                                .resizable()
+                                .scaledToFit()
+                                .clipShape(RoundedRectangle(cornerRadius: 4))
                         } else {}
                     }
                     .frame(width: 249, height: 249)
