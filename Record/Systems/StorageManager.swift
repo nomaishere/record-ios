@@ -53,7 +53,7 @@ final class StorageManager {
         }
     }
 
-    func saveTrackAudioFileAtDocumentByOriginURL(origin: URL, title: String, album: Album?) throws -> URL {
+    func saveTrackAudioFileAtDocumentByOriginURL(origin: URL, isSecurityScopedURL: Bool = false, title: String, album: Album?) throws -> URL {
         guard let album = album else {
             NSLog("StorageManager: Application doesn't support saving tracks that don't belong to any album. ")
             throw saveAudioFileError.notSuppportedFeature
@@ -83,20 +83,28 @@ final class StorageManager {
             throw saveAudioFileError.alreadyFileExisted
         }
 
-        guard origin.startAccessingSecurityScopedResource() else {
-            NSLog("Storagemanager: Failed to startAccessingSecurityScopedResource()")
-            throw saveAudioFileError.originFileAccessFailed
+        if isSecurityScopedURL {
+            guard origin.startAccessingSecurityScopedResource() else {
+                NSLog("Storagemanager: Failed to startAccessingSecurityScopedResource()")
+                throw saveAudioFileError.originFileAccessFailed
+            }
+
+            defer { origin.stopAccessingSecurityScopedResource() }
+
+            do {
+                try FileManager.default.copyItem(at: origin, to: dstURL)
+            } catch {
+                NSLog("\(error)")
+                throw saveAudioFileError.copyFailed
+            }
+        } else {
+            do {
+                try FileManager.default.copyItem(at: origin, to: dstURL)
+            } catch {
+                NSLog("\(error)")
+                throw saveAudioFileError.copyFailed
+            }
         }
-
-        defer { origin.stopAccessingSecurityScopedResource() }
-
-        do {
-            try FileManager.default.copyItem(at: origin, to: dstURL)
-        } catch {
-            NSLog("\(error)")
-            throw saveAudioFileError.copyFailed
-        }
-
         return dstURLWithoutDocument
     }
 
