@@ -148,7 +148,7 @@ struct AddAlbum_Metadata: View {
             VStack(spacing: 12) {
                 SectionHeader(text: "Cover")
                 switch coverImageViewModel.imageState {
-                case .success(let image):
+                case .success(let image, let uiImage):
                     image
                         .resizable()
                         .scaledToFill()
@@ -210,8 +210,8 @@ struct AddAlbum_Metadata: View {
         }
         .onReceive(coverImageViewModel.$imageState) { value in
             switch value {
-            case .success(let image):
-                viewModel.coverImage = image
+            case .success(_, let uiImage):
+                viewModel.coverImage = uiImage
                 viewModel.isNextEnabled = checkMetadataEditComplete(hasCover: true) // Pass hasCover parameter because viewModel.imageState doesn't update fast as this onReceive modifier.
             case .empty:
                 viewModel.isNextEnabled = checkMetadataEditComplete()

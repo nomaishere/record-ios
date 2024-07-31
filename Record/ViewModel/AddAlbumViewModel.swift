@@ -39,7 +39,7 @@ final class AddAlbumViewModel: ObservableObject {
     @Published var artworkURL: URL = .init(string: "s")!
     @Published var themeColor: String = ""
 
-    var coverImage: Image? = nil
+    var coverImage: UIImage? = nil
 
     func makeTrackMetadataFromFiles() -> [TrackMetadata] {
         var trackTempDatas: [TrackMetadata] = []
@@ -49,13 +49,6 @@ final class AddAlbumViewModel: ObservableObject {
         }
 
         return trackTempDatas
-    }
-
-    func makeTrackFromMetadatas() {
-        tracks.removeAll()
-        for trackMetadata in trackMetadatas {
-            // tracks.append()
-        }
     }
 
     func movePreviousStep() {

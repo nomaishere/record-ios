@@ -20,7 +20,7 @@ struct AddAlbum_Check: View {
         ScrollView {
             Spacer.vertical(32)
             if let image = viewModel.coverImage {
-                image
+                Image(uiImage: image)
                     .resizable()
                     .scaledToFill()
                     .frame(width: 249, height: 249)

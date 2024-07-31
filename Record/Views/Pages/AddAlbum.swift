@@ -121,8 +121,13 @@ struct AddAlbum: View {
 
                                 // MARK: 2) All Albums without Tracks at ModelContainer & Create Album Directory
 
-                                let targetAlbum = Album(title: viewModel.title, artist: [], tracks: [], artwork: viewModel.artworkURL, releaseDate: Date(), themeColor: viewModel.themeColor)
-                                _ = StorageManager.shared.createAlbumDirectory(title: viewModel.title)
+                                guard let albumDirectory = StorageManager.shared.createAlbumDirectory(title: viewModel.title) else {
+                                    NSLog("AddAlbum: Failed to create album directory")
+                                    return
+                                }
+                                guard let artwork = viewModel.coverImage else { return }
+                                guard let targetArtworkURL = StorageManager.shared.updateAlbumArtworkByAlbumDirectory(albumDirectory: albumDirectory, artwork: artwork) else { return }
+                                let targetAlbum = Album(title: viewModel.title, artist: [], tracks: [], artwork: targetArtworkURL, releaseDate: Date(), themeColor: viewModel.themeColor)
 
                                 // MARK: 3) Add Tracks
 

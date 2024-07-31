@@ -14,7 +14,7 @@ class CoverImageViewModel: ObservableObject {
     enum ImageState {
         case empty
         case loading(Progress)
-        case success(Image)
+        case success(Image, UIImage)
         case failure(Error)
     }
 
@@ -24,6 +24,7 @@ class CoverImageViewModel: ObservableObject {
 
     struct CoverImage: Transferable {
         let image: Image
+        let uiImage: UIImage
 
         static var transferRepresentation: some TransferRepresentation {
             DataRepresentation(importedContentType: .image) { data in
@@ -32,12 +33,14 @@ class CoverImageViewModel: ObservableObject {
                     throw TransferError.importFailed
                 }
                 let image = Image(uiImage: uiImage)
-                return CoverImage(image: image)
+                return CoverImage(image: image, uiImage: uiImage)
             }
         }
     }
 
     @Published private(set) var imageState: ImageState = .empty
+
+    // @Published private(set) var selectedUIImage: UIImage? = nil
 
     @Published var imageSelection: PhotosPickerItem? = nil {
         didSet {
@@ -59,7 +62,7 @@ class CoverImageViewModel: ObservableObject {
                 }
                 switch result {
                 case .success(let coverImage?):
-                    self.imageState = .success(coverImage.image)
+                    self.imageState = .success(coverImage.image, coverImage.uiImage)
                 case .success(nil):
                     self.imageState = .empty
                 case .failure(let error):
