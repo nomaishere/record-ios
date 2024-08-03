@@ -13,17 +13,13 @@ struct AlbumGridList: View {
     var onTabGestureHander: (Album) -> Void
 
     var body: some View {
-        LazyVGrid(columns: columns, spacing: 16) {
-            ForEach(albums, id: \.self) { album in
-                ClickableAlbumCover(album: album, onTabGestureHander: onTabGestureHander)
+        GeometryReader { geometry in
+            LazyVGrid(columns: columns, spacing: 16) {
+                ForEach(albums, id: \.self) { album in
+                    ClickableAlbumCover(album: album, onTabGestureHander: onTabGestureHander, size: (geometry.size.width - 16) / 2)
+                }
             }
         }
         .padding(.horizontal, 16.0)
     }
 }
-
-/*
- #Preview {
- AlbumGridList(albums: [Image("mmtbs"), Image("mb"), Image("tpab"), Image("bomm")])
- }
- */

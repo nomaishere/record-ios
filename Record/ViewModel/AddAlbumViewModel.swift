@@ -37,7 +37,7 @@ final class AddAlbumViewModel: ObservableObject {
     @Published var title: String = ""
     @Published var artists: [Artist] = []
     @Published var artworkURL: URL = .init(string: "s")!
-    @Published var themeColor: String = ""
+    @Published var themeColor: String = "000000"
 
     var coverImage: UIImage? = nil
 

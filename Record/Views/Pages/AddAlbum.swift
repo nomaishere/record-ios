@@ -136,7 +136,7 @@ struct AddAlbum: View {
                                 for trackMetadata in viewModel.trackMetadatas {
                                     do {
                                         let savedAudioFileURL = try StorageManager.shared.saveTrackAudioFileAtDocumentByOriginURL(origin: trackMetadata.fileURL, isSecurityScopedURL: true, title: trackMetadata.title, album: targetAlbum)
-                                        targetTracks.append(Track(title: trackMetadata.title, audioLocalURL: savedAudioFileURL, duration: 0.0, artwork: viewModel.artworkURL, album: targetAlbum, artists: [], trackNumber: trackMetadata.trackNumber, themeColor: viewModel.themeColor))
+                                        targetTracks.append(Track(title: trackMetadata.title, audioLocalURL: savedAudioFileURL, duration: 0.0, artwork: targetArtworkURL, album: targetAlbum, artists: [], trackNumber: trackMetadata.trackNumber, themeColor: viewModel.themeColor))
                                     } catch {
                                         NSLog("AddAlbum: Failed to save track '\(trackMetadata.title)'.")
                                         return

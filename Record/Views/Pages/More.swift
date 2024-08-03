@@ -78,7 +78,7 @@ struct More: View {
                                 let demoArtist = Artist(name: "C418", isGroup: false)
                                 
                                 let demoAlbum = Album(title: "Minecraft - Volume Alpha", artist: [demoArtist], tracks: [], artwork: URL(string: "msva_cover.png")!, releaseDate: Date(), themeColor: "66A53D")
-                                StorageManager.shared.createAlbumDirectory(title: "Minecraft - Volume Alpha")
+                                _ = StorageManager.shared.createAlbumDirectory(title: "Minecraft - Volume Alpha")
                                 let demoTrack = DemoDataInjector.sharedInstance.makeDemoTracksOfDemoAlbum(artist: demoArtist, album: demoAlbum)
                                 
                                 modelContext.insert(demoAlbum)
@@ -99,7 +99,7 @@ struct More: View {
                                 // MARK: 2) Add Albums without Tracks At ModelContainer
                                 
                                 let demoAlbum = Album(title: "Minecraft - Volume Alpha", artist: [], tracks: [], artwork: URL(string: "msva_cover.png")!, releaseDate: Date(), themeColor: "66A53D")
-                                StorageManager.shared.createAlbumDirectory(title: "Minecraft - Volume Alpha")
+                                _ = StorageManager.shared.createAlbumDirectory(title: "Minecraft - Volume Alpha")
                                 
                                 // MARK: 3) Add Tracks
                                 
@@ -170,7 +170,7 @@ struct More: View {
                         do {
                             let existingAlbums = try modelContext.fetchCount(FetchDescriptor<Album>())
                             if existingAlbums == 0 {
-                                // MARK: 1) Create Artist Model
+                                // MARK: 1) Fetch Artist Model
                                 
                                 guard let demoArtist = try modelContext.fetch(FetchDescriptor<Artist>(predicate: #Predicate { $0.name == "C418" })).first else {
                                     NSLog("No C418")
@@ -180,7 +180,7 @@ struct More: View {
                                 // MARK: 2) Add Albums without Tracks At ModelContainer
                                 
                                 let demoAlbum = Album(title: "Minecraft - Volume Alpha", artist: [], tracks: [], artwork: URL(string: "msva_cover.png")!, releaseDate: Date(), themeColor: "66A53D")
-                                StorageManager.shared.createAlbumDirectory(title: "Minecraft - Volume Alpha")
+                                _ = StorageManager.shared.createAlbumDirectory(title: "Minecraft - Volume Alpha")
                                 
                                 // MARK: 3) Add Tracks
                                 

@@ -75,15 +75,16 @@ struct Collection: View {
                             image
                                 .resizable()
                                 .scaledToFill()
+                                .frame(width: 249, height: 249)
                                 .clipShape(RoundedRectangle(cornerRadius: 4))
                         } else if phase.error != nil {
                             Image("cover_placeholder")
                                 .resizable()
                                 .scaledToFit()
+                                .frame(width: 249, height: 249)
                                 .clipShape(RoundedRectangle(cornerRadius: 4))
                         } else {}
                     }
-                    .frame(width: 249, height: 249)
                     Spacer.vertical(12)
                     Text("\(album.title)")
                         .font(Font.custom("Poppins-SemiBold", size: 20))

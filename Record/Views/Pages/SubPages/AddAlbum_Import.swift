@@ -63,9 +63,10 @@ struct AddAlbum_Import: View {
                         }
                         .fileImporter(isPresented: $showFileImporter, allowedContentTypes: [.mp3, .wav, .aiff], allowsMultipleSelection: true) { result in
                             switch result {
-                            case .success(let files):
-                                for file in files {
-                                    viewModel.selectedFilesURL.append(file)
+                            case .success(let urls):
+
+                                for url in urls {
+                                    viewModel.selectedFilesURL.append(url)
                                 }
                                 if !viewModel.selectedFilesURL.isEmpty {
                                     viewModel.isNextEnabled = true

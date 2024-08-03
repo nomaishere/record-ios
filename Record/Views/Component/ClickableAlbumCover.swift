@@ -10,23 +10,27 @@ import SwiftUI
 struct ClickableAlbumCover: View {
     var album: Album
     var onTabGestureHander: (Album) -> Void
+    var size: CGFloat
 
     var body: some View {
         AsyncImage(url: URL.documentsDirectory.appending(path: album.artwork.absoluteString)) { phase in
             if let image = phase.image {
                 image
                     .resizable()
-                    .scaledToFit()
+                    .scaledToFill()
+                    .frame(width: size, height: size)
                     .clipShape(RoundedRectangle(cornerRadius: 4))
             } else if phase.error != nil {
                 Image("cover_placeholder")
                     .resizable()
-                    .scaledToFit()
+                    .scaledToFill()
+                    .frame(width: size, height: size)
                     .clipShape(RoundedRectangle(cornerRadius: 4))
             } else {
                 Color.gray
             }
         }
+        .contentShape(Rectangle())
         .onTapGesture {
             onTabGestureHander(self.album)
         }
