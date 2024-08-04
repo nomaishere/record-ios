@@ -22,8 +22,13 @@ struct DomainHeader: View {
 
     var body: some View {
         HStack(alignment: .center) {
+            /*
+             Text(domainName)
+                 .font(Font.custom("ProFont For Powerline", size: 32))
+                 .foregroundStyle(Color("DefaultBlack"))
+              */
             Text(domainName)
-                .font(Font.custom("ProFont For Powerline", size: 32))
+                .font(Font.custom("Poppins-SemiBold", size: 32))
                 .foregroundStyle(Color("DefaultBlack"))
             Spacer()
             if actionButton {
@@ -44,7 +49,7 @@ struct DomainHeader: View {
                 })
             }
         }
-        .padding(.horizontal, 24.0)
+        .padding(.horizontal, 20)
     }
 }
 

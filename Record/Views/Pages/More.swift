@@ -16,11 +16,11 @@ struct More: View {
     var body: some View {
         VStack(spacing: 0) {
             Spacer.vertical(24)
-            DomainHeader(domainName: "COLLECTION", handler: { NSLog("hi") }, actionButton: false)
-            Spacer.vertical(24)
-            SimpleDashboard()
-            Spacer.vertical(24)
+            DomainHeader(domainName: "More", handler: { NSLog("hi") }, actionButton: false)
             ScrollView {
+                Spacer.vertical(24)
+                SimpleDashboard()
+                Spacer.vertical(24)
                 MoreFeatureGroup(sectionName: "Tracks") {
                     MoreFeatureItem(icon: Image("music-solid"), text: "View All Tracks", onTabAction: {})
                 }
