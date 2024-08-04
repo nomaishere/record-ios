@@ -16,17 +16,11 @@ struct Collection: View {
     @State var isAlbumViewPopup: Bool = false
     @State var selectedAlbum: Album? = nil
 
-    var numberFormatter = NumberFormatter()
-
     func handleAlbumOnTabGesture(album: Album) {
         guard isAlbumViewPopup == false else { return }
 
         isAlbumViewPopup = true
         selectedAlbum = album
-    }
-
-    init() {
-        numberFormatter.minimumIntegerDigits = 2
     }
 
     var body: some View {
@@ -96,28 +90,7 @@ struct Collection: View {
                     Spacer.vertical(24)
                     VStack(spacing: 12) {
                         ForEach(album.tracks.sorted(by: { $0.trackNumber < $1.trackNumber }), id: \.self) { track in
-                            ZStack {
-                                RoundedRectangle(cornerRadius: 4)
-                                    .foregroundStyle(Color(hex: 0xF8F8F8, opacity: 0.6))
-                                HStack {
-                                    Text(numberFormatter.string(from: track.trackNumber as NSNumber)!)
-                                        .font(Font.custom("Pretendard-SemiBold", size: 18))
-                                        .foregroundStyle(Color("G3"))
-                                        .monospacedDigit()
-                                        .padding(.trailing, 8)
-
-                                    Text("\(track.title)")
-                                        .font(Font.custom("Pretendard-SemiBold", size: 18))
-                                        .foregroundStyle(Color("DefaultBlack"))
-                                        .lineLimit(1)
-                                        .truncationMode(.tail)
-                                    Spacer()
-                                }
-                                .padding(.vertical, 12)
-                                .padding(.leading, 18)
-                                .padding(.trailing, 12)
-                            }
-                            .padding(.horizontal, 16)
+                            TrackItemView(trackNumber: track.trackNumber, title: track.title)
                         }
                     }
                 }
@@ -125,7 +98,7 @@ struct Collection: View {
         } else {
             VStack(spacing: 0) {
                 Spacer.vertical(24)
-                DomainHeader(domainName: "COLLECTION", handler: { router.navigate(to: .addalbum) }, actionButton: true, actionButtonText: "Add")
+                DomainHeader(domainName: "Albums", handler: { router.navigate(to: .addalbum) }, actionButton: true, actionButtonText: "NEW")
                 Spacer.vertical(24)
                 if albums.isEmpty {
                     EmtpyCollectionPlaceholder()
@@ -195,5 +168,43 @@ struct EmtpyCollectionPlaceholder: View {
         .onTapGesture {
             router.navigate(to: .addalbum)
         }
+    }
+}
+
+struct TrackItemView: View {
+    let trackNumber: Int
+    let title: String
+
+    var numberFormatter = NumberFormatter()
+
+    init(trackNumber: Int, title: String) {
+        self.trackNumber = trackNumber
+        self.title = title
+        numberFormatter.minimumIntegerDigits = 2
+    }
+
+    var body: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 4)
+                .foregroundStyle(Color(hex: 0xF8F8F8, opacity: 0.6))
+            HStack {
+                Text(numberFormatter.string(from: trackNumber as NSNumber)!)
+                    .font(Font.custom("Pretendard-SemiBold", size: 18))
+                    .foregroundStyle(Color("G3"))
+                    .monospacedDigit()
+                    .padding(.trailing, 8)
+
+                Text("\(title)")
+                    .font(Font.custom("Pretendard-SemiBold", size: 18))
+                    .foregroundStyle(Color("DefaultBlack"))
+                    .lineLimit(1)
+                    .truncationMode(.tail)
+                Spacer()
+            }
+            .padding(.vertical, 12)
+            .padding(.leading, 18)
+            .padding(.trailing, 12)
+        }
+        .padding(.horizontal, 16)
     }
 }
