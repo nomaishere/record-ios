@@ -21,6 +21,12 @@ struct More: View {
                 Spacer.vertical(24)
                 SimpleDashboard()
                 Spacer.vertical(24)
+                MoreFeatureGroup(sectionName: "About Apps") {
+                    MoreFeatureItem(icon: Image("paperclip-solid"), text: "How to use", onTabAction: {})
+                    MoreFeatureItem(icon: Image("comment-regular"), text: "Report Problems", onTabAction: {})
+                    MoreFeatureItem(icon: Image("github-icon"), text: "Contribute", onTabAction: {})
+                    MoreFeatureItem(icon: Image("heart-regular"), text: "Credit", onTabAction: {})
+                }
                 MoreFeatureGroup(sectionName: "Tracks") {
                     MoreFeatureItem(icon: Image("music-solid"), text: "View All Tracks", onTabAction: {})
                 }
