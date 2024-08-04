@@ -125,7 +125,7 @@ struct Collection: View {
         } else {
             VStack(spacing: 0) {
                 Spacer.vertical(24)
-                DomainHeader(domainName: "COLLECTION", handler: { router.navigate(to: .addalbum) }, actionButtonText: "Add")
+                DomainHeader(domainName: "COLLECTION", handler: { router.navigate(to: .addalbum) }, actionButton: true, actionButtonText: "Add")
                 Spacer.vertical(24)
                 if albums.isEmpty {
                     EmtpyCollectionPlaceholder()
