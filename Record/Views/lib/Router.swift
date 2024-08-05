@@ -13,20 +13,19 @@ final class Router: ObservableObject {
         case addalbum
         case home
         case how_to_use
-        case report_problems
-        case credit
+        case delete_artist
     }
-    
+
     @Published var navPath = NavigationPath()
-    
+
     func navigate(to destination: Destination) {
         navPath.append(destination)
     }
-    
+
     func navigateBack() {
         navPath.removeLast()
     }
-    
+
     func navigationToRoot() {
         navPath.removeLast(navPath.count)
     }

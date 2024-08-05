@@ -94,6 +94,10 @@ struct RecordApp: App {
                             ContentView()
                         case .addalbum:
                             AddAlbum()
+                        case .how_to_use:
+                            HowToUsePage()
+                        case .delete_artist:
+                            DeleteArtistPage()
                         }
                     }
             }
