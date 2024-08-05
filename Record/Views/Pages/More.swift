@@ -72,6 +72,8 @@ struct More: View {
     @Environment(\.modelContext) private var modelContext
     @Query var artists: [Artist]
     
+    @Environment(\.openURL) private var openURL
+
     @StateObject var modalState = ModalState()
 
     var body: some View {
@@ -85,7 +87,9 @@ struct More: View {
                 MoreFeatureGroup(sectionName: "About Apps") {
                     MoreFeatureItem(icon: Image("paperclip-solid"), text: "How to use", onTabAction: {})
                     MoreFeatureItem(icon: Image("comment-regular"), text: "Report Problems", onTabAction: {})
-                    MoreFeatureItem(icon: Image("github-icon"), text: "Contribute", onTabAction: {})
+                    MoreFeatureItem(icon: Image("github-icon"), text: "Contribute", onTabAction: {
+                        openURL(URL(string: "https://github.com/nomaishere/record-ios")!)
+                    })
                     MoreFeatureItem(icon: Image("heart-regular"), text: "Credit", onTabAction: {})
                 }
                 MoreFeatureGroup(sectionName: "Tracks") {
