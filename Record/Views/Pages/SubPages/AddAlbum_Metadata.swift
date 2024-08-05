@@ -20,6 +20,8 @@ struct AddAlbum_Metadata: View {
 
     @Query var savedArtists: [Artist]
 
+    @State var isAddArtistModalPresented: Bool = false
+
     func checkMetadataEditComplete(hasCover: Bool = false) -> Bool {
         if isTitleEditComplete() {
             if isArtistEditComplete() {
@@ -133,10 +135,13 @@ struct AddAlbum_Metadata: View {
                     }
                     .background(RoundedRectangle(cornerRadius: 100)
                         .fill(Color("G1")))
-                    .onTapGesture {
-                        NSLog("hi")
-                    }
                     .contentShape(Rectangle())
+                    .onTapGesture {
+                        isAddArtistModalPresented = true
+                    }
+                    .sheet(isPresented: $isAddArtistModalPresented, content: {
+                        AddArtistModalView(isModalPresented: $isAddArtistModalPresented)
+                    })
                     Spacer()
                 }
                 .padding(.leading, 20)
