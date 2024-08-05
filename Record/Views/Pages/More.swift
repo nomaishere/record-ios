@@ -14,6 +14,7 @@ class ModalState: ObservableObject {
 
 struct More: View {
     @EnvironmentObject var audioManager: AudioManager
+    @EnvironmentObject var router: Router
     @Environment(\.modelContext) private var modelContext
     @Query var artists: [Artist]
     
@@ -30,7 +31,7 @@ struct More: View {
                 SimpleDashboard()
                 Spacer.vertical(24)
                 MoreFeatureGroup(sectionName: "About Apps") {
-                    MoreFeatureItem(icon: Image("paperclip-solid"), text: "How to use", onTabAction: {})
+                    MoreFeatureItem(icon: Image("paperclip-solid"), text: "How to use", onTabAction: { router.navigate(to: .how_to_use) })
                     MoreFeatureItem(icon: Image("comment-regular"), text: "Report Problems", onTabAction: {})
                     MoreFeatureItem(icon: Image("github-icon"), text: "Contribute", onTabAction: {
                         openURL(URL(string: "https://github.com/nomaishere/record-ios")!)
