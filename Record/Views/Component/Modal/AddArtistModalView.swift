@@ -40,7 +40,6 @@ struct AddArtistModalView: View {
                     Text("Done")
                         .font(Font.custom("Pretendard-Medium", size: 18))
                         .foregroundStyle(self.isAddConditionSatisfied ? Color("PointOrange") : Color("G2"))
-
                 })
                 .onChange(of: artistName) {
                     if artistName.isEmpty {

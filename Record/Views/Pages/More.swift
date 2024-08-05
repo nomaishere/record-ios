@@ -32,20 +32,16 @@ struct More: View {
                 Spacer.vertical(24)
                 MoreFeatureGroup(sectionName: "About Apps") {
                     MoreFeatureItem(icon: Image("paperclip-solid"), text: "How to use", onTabAction: { router.navigate(to: .how_to_use) })
-                    MoreFeatureItem(icon: Image("comment-regular"), text: "Report Problems", onTabAction: {})
                     MoreFeatureItem(icon: Image("github-icon"), text: "Contribute", onTabAction: {
                         openURL(URL(string: "https://github.com/nomaishere/record-ios")!)
                     })
                     MoreFeatureItem(icon: Image("heart-regular"), text: "Credit", onTabAction: {})
                 }
-                MoreFeatureGroup(sectionName: "Tracks") {
-                    MoreFeatureItem(icon: Image("music-solid"), text: "View All Tracks", onTabAction: {})
-                }
                 MoreFeatureGroup(sectionName: "Artists") {
-                    MoreFeatureItem(icon: Image("user-solid"), text: "Manage Artists", onTabAction: {})
-                    MoreFeatureItem(icon: Image("plus"), text: "Add Artist", onTabAction: {
+                    MoreFeatureItem(icon: Image("plus-thin"), text: "Add Artist", onTabAction: {
                         self.modalState.isAddArtistPresented = true
                     })
+                    MoreFeatureItem(icon: Image("minus-thin"), text: "Delete Artist", onTabAction: { router.navigate(to: .delete_artist) })
                 }
                 Spacer.vertical(24)
                 MoreFeatureGroup(sectionName: "Developer Only") {

@@ -93,6 +93,9 @@ struct Collection: View {
                             TrackItemView(trackNumber: track.trackNumber, title: track.title)
                         }
                     }
+                    Spacer.vertical(24)
+                    EditAlbumButton()
+                    Spacer.vertical(24)
                 }
             }
         } else {
@@ -125,7 +128,6 @@ struct SearchAndOrderView: View {
                 RoundedRectangle(cornerRadius: 4)
                     .fill(Color("G1"))
                     .frame(height: 48)
-
                 Text("Search")
                     .font(Font.custom("Poppins-Medium", size: 18))
                     .multilineTextAlignment(.leading)
@@ -206,5 +208,21 @@ struct TrackItemView: View {
             .padding(.trailing, 12)
         }
         .padding(.horizontal, 16)
+    }
+}
+
+struct EditAlbumButton: View {
+    var body: some View {
+        Button(action: { NSLog("hi") }, label: {
+            HStack(spacing: 10) {
+                Text("edit")
+                    .font(Font.custom("Pretendard-Medium", size: 18))
+                    .foregroundStyle(Color("G5"))
+            }
+            .padding(.horizontal, 16)
+            .frame(height: 36)
+            .background(RoundedRectangle(cornerRadius: 100)
+                .fill(Color("G1")))
+        })
     }
 }
