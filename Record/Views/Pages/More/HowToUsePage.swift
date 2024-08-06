@@ -7,20 +7,6 @@
 
 import SwiftUI
 
-extension Text {
-    func bodyStyle() -> some View {
-        self.font(Font.custom("Pretendard-Medium", size: 16))
-            .foregroundStyle(Color("DefaultBlack"))
-            .multilineTextAlignment(.leading)
-    }
-
-    func headerStyle() -> some View {
-        self.font(Font.custom("Pretendard-Semibold", size: 18))
-            .foregroundStyle(Color("DefaultBlack"))
-            .multilineTextAlignment(.leading)
-    }
-}
-
 struct HowToUsePage: View {
     var body: some View {
         Spacer.vertical(24)
@@ -30,7 +16,7 @@ struct HowToUsePage: View {
         VStack(alignment: .leading, spacing: 4) {
             Text("About Application")
                 .headerStyle()
-            Text("RECORD is music player for playing audio files, especially made for cd & vinyl lovers. This app is not a streaming app like Apple Music or Spotify, so you need an audio files that ripped from CD, downloaded on online store, etc. ")
+            Text("[RECORD] is a music player for playing audio files, especially for CD & vinyl lovers. This app is not a streaming app like Apple Music or Spotify, so you need audio files ripped from a CD, downloaded online, etc.")
                 .bodyStyle()
 
             Spacer.vertical(16)
