@@ -168,6 +168,7 @@ struct AddAlbum: View {
                                     NSLog("Success to add album. ")
                                     do {
                                         try modelContext.save()
+                                        router.navigateBack()
                                     } catch {
                                         NSLog("Failed to save")
                                     }

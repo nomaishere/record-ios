@@ -35,7 +35,7 @@ struct DeleteArtistPage: View {
                     }, label: {
                         if let artistAlbum = artist.albums {
                             if artistAlbum.isEmpty {
-                                RectIconWrapper(icon: Image("xmark"), color: Color(hex: 0xFF5353), iconWidth: 12, wrapperWidth: 24, wrapperHeight: 24)
+                                RectIconWrapper(icon: Image("xmark"), color: Color("WarningRed"), iconWidth: 12, wrapperWidth: 24, wrapperHeight: 24)
                             } else {
                                 RectIconWrapper(icon: Image("xmark"), color: Color("G3"), iconWidth: 12, wrapperWidth: 24, wrapperHeight: 24)
                             }
