@@ -94,7 +94,8 @@ struct Collection: View {
                         }
                     }
                     Spacer.vertical(24)
-                    EditAlbumButton()
+
+                    DeleteAlbumButton(albumID: album.id, isAlbumViewPopup: $isAlbumViewPopup)
                     Spacer.vertical(24)
                 }
             }
@@ -211,18 +212,61 @@ struct TrackItemView: View {
     }
 }
 
-struct EditAlbumButton: View {
+struct DeleteAlbumButton: View {
+    @State var isDeleteAlbumAlertPresented: Bool = false
+    @Environment(\.modelContext) var modelContext
+    let albumID: UUID
+
+    @Query var albums: [Album]
+
+    @Binding var isAlbumViewPopup: Bool
+
     var body: some View {
-        Button(action: { NSLog("hi") }, label: {
+        Button(action: { isDeleteAlbumAlertPresented = true }, label: {
             HStack(spacing: 10) {
-                Text("edit")
-                    .font(Font.custom("Pretendard-Medium", size: 18))
-                    .foregroundStyle(Color("G5"))
+                Text("Delete album")
+                    .font(Font.custom("Pretendard-Medium", size: 16))
+                    .foregroundStyle(Color("WarningRed"))
             }
+            .padding(.vertical, 8)
             .padding(.horizontal, 16)
-            .frame(height: 36)
             .background(RoundedRectangle(cornerRadius: 100)
                 .fill(Color("G1")))
         })
+        .alert(
+            Text("Warning"), isPresented: $isDeleteAlbumAlertPresented
+        ) {
+            Button("Delete", role: .destructive) {
+                guard let targetAlbumIndex = albums.firstIndex(where: { $0.id == albumID }) else { NSLog("ERROR: DeleteAlbumButton can't find album")
+                    return
+                }
+
+                let targetAlbum = albums[targetAlbumIndex]
+
+                // MARK: 1) Delete Artist's Album
+
+                for artist in targetAlbum.artist {
+                    guard var albums = artist.albums else {
+                        NSLog("ERROR: DeleteAlbumButton can't find album")
+                        return
+                    }
+                    albums.removeAll(where: { $0.id == albumID })
+                }
+
+                // MARK: Delete Tracks
+
+                for targetTrack in targetAlbum.tracks {
+                    modelContext.delete(targetTrack)
+                }
+                targetAlbum.tracks.removeAll()
+
+                // MARK: Delete All Tracks Relation
+
+                modelContext.delete(targetAlbum)
+                isAlbumViewPopup = false
+            }
+        } message: {
+            Text("If you delete album, its tracks are deleted too. This operation cannot be reversed.  Do you really want to delete this album?")
+        }
     }
 }
