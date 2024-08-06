@@ -85,6 +85,10 @@ class PlayableQueue {
     // This methods shouldn't be called directly in view. View can control audio by AudioManager.
     func deleteAllTracksInQueue() {
         queueOfTracks.removeAll()
+        avPlayerItems.removeAll()
+        nowPlayableStaticMetadatas.removeAll()
+        nowPlayingIndex = 0
+        lenghtOfQueue = 0
     }
 
     func addTracksAtEndofQueue(tracks: [Track]) {

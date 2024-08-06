@@ -112,6 +112,13 @@ final class AudioManager: ObservableObject {
         }
     }
 
+    func updateAvQueuePlayerCurrentItemObserver() {
+        avPlayerItemObserver = avQueuePlayer.observe(\.currentItem, options: .initial) {
+            [unowned self] _, _ in
+            self.handleAvPlayerItemChange()
+        }
+    }
+
     private func activateSession() throws {
         // TODO: Add NotificationCenter.default.addObserver(forName: AVAudioSession.interruptionNotification, object: audioSession, queue: .main)
 
@@ -194,7 +201,7 @@ final class AudioManager: ObservableObject {
             avQueuePlayer.advanceToNextItem()
             avQueuePlayer.insert(currentItem, after: avQueuePlayer.currentItem)
 
-            NSLog("\(avQueuePlayer.items().count) items in avQueuePlayer in previousTrack()")
+            // NSLog("AudioManager: \(avQueuePlayer.items().count) items in avQueuePlayer in previousTrack()")
 
             play()
         }
@@ -241,12 +248,42 @@ final class AudioManager: ObservableObject {
 
         case .playing:
             pause()
+            avQueuePlayer.removeAllItems()
+            updateAvQueuePlayerCurrentItemObserver()
+
             playableQueue.deleteAllTracksInQueue()
             playableQueue.addTracksAtEndofQueue(tracks: tracks)
 
+            for (index, _) in tracks.enumerated() {
+                if let item = playableQueue.avPlayerItems[safe: index] {
+                    avQueuePlayer.insert(item, after: nil)
+                } else {
+                    NSLog("AudioManager: PlayableQueue doesn't have proper avPlayerItems properties. The count of it is \(playableQueue.avPlayerItems.count).")
+                    return
+                }
+            }
+
+            play()
+            handleAvPlayerItemChange()
+
         case .paused:
+            avQueuePlayer.removeAllItems()
+            updateAvQueuePlayerCurrentItemObserver()
+
             playableQueue.deleteAllTracksInQueue()
             playableQueue.addTracksAtEndofQueue(tracks: tracks)
+
+            for (index, _) in tracks.enumerated() {
+                if let item = playableQueue.avPlayerItems[safe: index] {
+                    avQueuePlayer.insert(item, after: nil)
+                } else {
+                    NSLog("AudioManager: PlayableQueue doesn't have proper avPlayerItems properties. The count of it is \(playableQueue.avPlayerItems.count).")
+                    return
+                }
+            }
+
+            play()
+            handleAvPlayerItemChange()
         }
     }
 
