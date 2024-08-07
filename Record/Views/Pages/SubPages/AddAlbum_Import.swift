@@ -42,24 +42,7 @@ struct AddAlbum_Import: View {
                         Button {
                             showFileImporter = true
                         } label: {
-                            VStack {
-                                HStack {
-                                    Text("Files")
-                                        .font(Font.custom("Pretendard-SemiBold", size: 18))
-                                        .foregroundStyle(Color(hex: 0x1BA5F8))
-                                        .padding(.all, 16)
-                                    Spacer()
-                                }
-                                Spacer()
-                                HStack {
-                                    Spacer()
-                                    Image("FolderIcon")
-                                        .padding(.all, 16)
-                                }
-                            }
-                            .frame(width: 172, height: 172)
-                            .background(Color("G1"))
-                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                            FileSqaureButton()
                         }
                         .fileImporter(isPresented: $showFileImporter, allowedContentTypes: [.mp3, .wav, .aiff], allowsMultipleSelection: true) { result in
                             switch result {
@@ -83,6 +66,29 @@ struct AddAlbum_Import: View {
                 }
             }
         }
+    }
+}
+
+struct FileSqaureButton: View {
+    var body: some View {
+        VStack {
+            HStack {
+                Text("Files")
+                    .font(Font.custom("Pretendard-SemiBold", size: 18))
+                    .foregroundStyle(Color(hex: 0x1BA5F8))
+                    .padding(.all, 16)
+                Spacer()
+            }
+            Spacer()
+            HStack {
+                Spacer()
+                Image("FolderIcon")
+                    .padding(.all, 16)
+            }
+        }
+        .frame(width: 172, height: 172)
+        .background(Color("G1"))
+        .clipShape(RoundedRectangle(cornerRadius: 8))
     }
 }
 
