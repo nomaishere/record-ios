@@ -35,7 +35,9 @@ struct More: View {
                     MoreFeatureItem(icon: Image("github-icon"), text: "Contribute", onTabAction: {
                         openURL(URL(string: "https://github.com/nomaishere/record-ios")!)
                     })
-                    MoreFeatureItem(icon: Image("heart-regular"), text: "Credit", onTabAction: {})
+                    MoreFeatureItem(icon: Image("heart-regular"), text: "Credit", onTabAction: {
+                        openURL(URL(string: "https://nomaishere.notion.site/Credit-7e65d5d21bb34f01b977714fb7aa9be7?pvs=4")!)
+                    })
                 }
                 MoreFeatureGroup(sectionName: "Artists") {
                     MoreFeatureItem(icon: Image("plus-thin"), text: "Add Artist", onTabAction: {
